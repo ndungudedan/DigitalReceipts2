@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.widget.RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".homeActivity"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
+
+    <EditText
+        android:id="@+id/clName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
+        android:hint="NAME"
+        android:inputType="textCapWords"
+        android:textColor="@android:color/holo_blue_bright" />
+
+    <EditText
+        android:id="@+id/clNo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/clName"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="20dp"
+        android:hint="PHONE NO."
+        android:inputType="phone"
+        android:textColor="@android:color/holo_blue_bright" />
+
+    <EditText
+        android:id="@+id/clEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/clNo"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="20dp"
+        android:hint="EMAIL"
+        android:inputType="textEmailAddress"
+        android:textColor="@android:color/holo_blue_bright" />
+
+    <EditText
+        android:id="@+id/clCash"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/clEmail"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
+        android:hint="CASH TENDERED"
+        android:inputType="number"
+        android:textColor="@android:color/holo_blue_bright" />
+
+</android.widget.RelativeLayout>

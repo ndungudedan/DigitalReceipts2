@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.widget.RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity"
+    >
+
+
+    <ImageButton
+        android:id="@+id/button2"
+        android:layout_width="184dp"
+        android:layout_height="185dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="0dp"
+        android:onClick="temp"
+        android:scaleType="centerInside"
+        android:src="@drawable/icons8pdf96"
+        android:text="Templates" />
+
+    <ImageButton
+        android:id="@+id/button3"
+        android:layout_width="184dp"
+        android:layout_height="185dp"
+        android:layout_below="@+id/button2"
+        android:layout_alignParentStart="true"
+        android:onClick="drop"
+        android:scaleType="centerInside"
+        android:text="droplist"
+        android:src="@drawable/icons8add96" />
+
+    <ImageButton
+        android:id="@+id/button5"
+        android:layout_width="176dp"
+        android:layout_height="185dp"
+        android:layout_below="@+id/button2"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="0dp"
+        android:onClick="list"
+        android:src="@drawable/icons8list48" />
+
+    <ImageButton
+        android:id="@+id/imagebtn"
+        android:layout_width="176dp"
+        android:layout_height="185dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="0dp"
+        android:onClick="open"
+        android:scaleType="fitXY"
+        android:src="@drawable/icons8businessman80" />
+    <LinearLayout
+        android:id="@+id/linear1"
+        android:layout_width="85dp"
+        android:layout_height="141dp"
+        android:layout_below="@id/button5"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="Today:"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:padding="5dp"
+            android:paddingTop="-5dp"
+            android:text="Yesterday:" />
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="76dp"
+            android:layout_height="30dp"
+            android:padding="5dp"
+            android:text="ThisWeek:"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="83dp"
+            android:layout_height="30dp"
+            android:padding="5dp"
+            android:text="ThisMonth:"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="102dp"
+        android:layout_height="141dp"
+        android:layout_below="@id/button5"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="0dp"
+        android:layout_toRightOf="@id/linear1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="18dp"
+            android:layout_weight="1"
+            android:text="0" />
+
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="0" />
+
+        <TextView
+            android:id="@+id/textView8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="0" />
+
+        <TextView
+            android:id="@+id/textView9"
+            android:layout_width="wrap_content"
+            android:layout_height="15dp"
+            android:layout_weight="1"
+            android:text="0" />
+    </LinearLayout>
+
+
+</android.widget.RelativeLayout>
