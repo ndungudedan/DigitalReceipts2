@@ -1,15 +1,20 @@
 package com.example.dedan.digitalreceipts;
 
+import android.app.LoaderManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.Loader;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -24,6 +29,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,21 +48,20 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.draw.DottedLineSeparator;
 import com.itextpdf.text.pdf.draw.LineSeparator;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class homeActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class homeActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final int SPIN_LOAD = 1;
+    private static final int SPINQ_LOAD = 2;
     int itemlistCount=0;
     int count=0,initCount;
     int total=0,initTotal;
@@ -93,6 +98,14 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
     //String Title ="nameKey";
     //String email ="emailKey";
     String contact ="contactKey";
+    private SimpleCursorAdapter adapter;
+    private SimpleCursorAdapter adapterQ;
+    SqlOpenHelper sqlOpenHelper;
+    private int itemIdpos;
+    private Cursor mcursor;
+    private Cursor pcursor;
+    private SQLiteDatabase db;
+    ArrayList selectSpinid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +116,10 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         getSupportActionBar().setTitle("Receipt");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        selectSpinid=new ArrayList();
         Gpoint=new ArrayList<>();
+        sqlOpenHelper = new SqlOpenHelper(this);
+
 
         quant= findViewById(R.id.quantity);
         item= findViewById(R.id.items);
@@ -121,18 +137,26 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         spinQ= findViewById(R.id.quanSpin);
         spinListQ=new ArrayList<CharSequence>();
 
-        spinAdapt=new ArrayAdapter<CharSequence>(this,android.R.layout.simple_spinner_item,spinList);
-        spinAdapt.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spin.setAdapter(spinAdapt);
+
+        adapter = new SimpleCursorAdapter(this,android.R.layout.simple_spinner_item,null,new String[]
+                {SqlOpenHelper.KEY_ITEM},new int[]{android.R.id.text1},0);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //spinAdapt=new ArrayAdapter<CharSequence>(this,android.R.layout.simple_spinner_item,spinList);
+       // spinAdapt.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spin.setAdapter(adapter);
        // spinAdapt.add("");
-        spinPop();
+       // spinPop();
+        getLoaderManager().initLoader(SPIN_LOAD,null,this);
         spin.setOnItemSelectedListener(this);
 
-        spinAdaptQ=new ArrayAdapter<CharSequence>(this,android.R.layout.simple_spinner_item,spinListQ);
-        spinAdaptQ.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinQ.setAdapter(spinAdaptQ);
-        spinAdaptQ.add("");
-        spinPop2();
+        adapterQ = new SimpleCursorAdapter(this,android.R.layout.simple_spinner_item,null,new String[]
+                {SqlOpenHelper.KEY_PACK},new int[]{android.R.id.text1},0);
+        //spinAdaptQ=new ArrayAdapter<CharSequence>(this,android.R.layout.simple_spinner_item,spinListQ);
+        adapterQ.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinQ.setAdapter(adapterQ);
+//        spinAdaptQ.add("");
+        //spinPop2();
+        getLoaderManager().initLoader(SPINQ_LOAD,null,this);
         spinQ.setOnItemSelectedListener(this);
 
         itemList = new ArrayList<>();
@@ -379,24 +403,40 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         countTotal.setText("Ksh."+total);
         initTotal=total;
     }
-
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
         switch (adapterView.getId()){
             case R.id.quanSpin:
                 spinItem=adapterView.getItemAtPosition(i).toString();
+
                 break;
             case R.id.spinner2:
-                String q=adapterView.getItemAtPosition(i).toString();
-                item.setText(q);
-                break;
+                /*int selid=adapterView.getSelectedItemPosition();
+                mcursor=(Cursor)adapterView.getItemAtPosition(i);
+                int id=mcursor.getInt(mcursor.getColumnIndex(SqlOpenHelper.KEY_ITEM));*/
+                //loadfromDatabase(spin,kila);
+                String q= String.valueOf(adapterView.getItemAtPosition(i));
+                item.setText(q); 
+                /*int IDpos=mcursor.getColumnIndex(SqlOpenHelper._ID);
+                while (mcursor.moveToNext()) {
+                    int cd=mcursor.getInt(IDpos);
+                    if(cd==selid){
+                        String d = mcursor.getString(cd);
+                        item.setText(d);
+                        break;
+                    }*/
+                   // String n = mcursor.getString(itemPos);
+                   // String c = mcursor.getString(packPos);
+                  //  String h = mcursor.getString(costPos);
+               // }
+
+               // break;
         }
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
-
     }
 
     public void pdf(){
@@ -597,7 +637,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
     public void spinPop(){
-        File route = Environment.getExternalStorageDirectory();
+/*        File route = Environment.getExternalStorageDirectory();
         File dir = new File(route.getAbsolutePath() + "/DIGITALRECEIPTS", "Resources");
         File g=new File(dir,"/Items.txt");
         try (FileInputStream stream = new FileInputStream(g)) {
@@ -613,9 +653,24 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
             dataInputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }*/
+        db = sqlOpenHelper.getReadableDatabase();
+        String[] columns={SqlOpenHelper.KEY_ITEM_ID,SqlOpenHelper.KEY_ITEM,SqlOpenHelper._ID,SqlOpenHelper.KEY_COST,SqlOpenHelper.KEY_PACK};
+        mcursor = db.query(SqlOpenHelper.TABLE_ITEM_DETAILS,columns,
+                null,null,null,null,SqlOpenHelper.KEY_ITEM);
+        int IDpos=mcursor.getColumnIndex(SqlOpenHelper._ID);
+        int packPos=mcursor.getColumnIndex(SqlOpenHelper.KEY_PACK);
+        int costPos=mcursor.getColumnIndex(SqlOpenHelper.KEY_COST);
+        int itemPos=mcursor.getColumnIndex(SqlOpenHelper.KEY_ITEM);
+        while(mcursor.moveToNext()){
+            String t=mcursor.getString(itemPos);
+            String c=mcursor.getString(costPos);
+            String p=mcursor.getString(packPos);
+            int d=mcursor.getInt(IDpos);
         }
+        adapter.changeCursor(mcursor);
     }
-    public void spinPop2(){
+    public void spinPop2(){/*
         File route = Environment.getExternalStorageDirectory();
         File dir = new File(route.getAbsolutePath() + "/DIGITALRECEIPTS", "Resources");
         File g=new File(dir,"/Dominion.txt");
@@ -632,7 +687,66 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
             dataInputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }*/
+        db=sqlOpenHelper.getReadableDatabase();
+        String[] columns={SqlOpenHelper.KEY_ITEM_ID,SqlOpenHelper.KEY_ITEM,SqlOpenHelper._ID,SqlOpenHelper.KEY_COST,SqlOpenHelper.KEY_PACK};
+        pcursor = db.query(SqlOpenHelper.TABLE_ITEM_DETAILS,columns,
+                null,null,null,null,SqlOpenHelper.KEY_ITEM);
+        adapterQ.changeCursor(pcursor);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        android.content.CursorLoader loader=null;
+        if(i==SPIN_LOAD)
+            loader=createLoaderValues();
+        if(i==SPINQ_LOAD)
+            loader=createLoaderValuesQ();
+
+        return loader;
+    }
+
+    private android.content.CursorLoader createLoaderValuesQ() {
+        return new android.content.CursorLoader(this){
+            @Override
+            public Cursor loadInBackground() {
+                db=sqlOpenHelper.getReadableDatabase();
+                String[] columns={SqlOpenHelper.KEY_ITEM_ID,SqlOpenHelper.KEY_ITEM,SqlOpenHelper._ID,SqlOpenHelper.KEY_COST,SqlOpenHelper.KEY_PACK};
+                return db.query(SqlOpenHelper.TABLE_ITEM_DETAILS,columns,
+                        null,null,null,null,SqlOpenHelper._ID);
+            }
+        };
+    }
+
+    private android.content.CursorLoader createLoaderValues() {
+        return new android.content.CursorLoader(this) {
+            @Override
+            public Cursor loadInBackground() {
+                db = sqlOpenHelper.getReadableDatabase();
+                String[] columns={SqlOpenHelper.KEY_ITEM_ID,SqlOpenHelper.KEY_ITEM,SqlOpenHelper._ID,SqlOpenHelper.KEY_COST,SqlOpenHelper.KEY_PACK};
+                return db.query(SqlOpenHelper.TABLE_ITEM_DETAILS,columns,
+                        null,null,null,null,SqlOpenHelper._ID);
+            }
+
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if(loader.getId()==SPIN_LOAD) {
+            adapter.changeCursor(cursor);
+        }
+        if(loader.getId()==SPINQ_LOAD){
+            adapterQ.changeCursor(cursor);
         }
     }
 
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        if(loader.getId()==SPIN_LOAD)
+        adapter.changeCursor(null);
+
+        if(loader.getId()==SPINQ_LOAD)
+            adapterQ.changeCursor(null);
+    }
 }

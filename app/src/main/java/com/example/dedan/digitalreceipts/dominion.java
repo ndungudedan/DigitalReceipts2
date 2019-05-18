@@ -62,10 +62,13 @@ public  class dominion extends dropDown {
             @Override
             public void onClick(View view) {
                 CharSequence T = droptxt.getText().toString();
-                receiptList.add(new load((String) T));
-                // dropAdapt.add(T);
-               // dropAdapt.notifyDataSetChanged();
-                // saveDrop();
+                load load=new load((String) T);
+                // load.setFilename((String) T);
+                //    receiptList.add(new load((String) T));
+                receiptList.add(load);
+
+                //dropAdapt.add(T);
+                //  dropAdapt.notifyDataSetChanged();
                 String state = Environment.getExternalStorageState();
                 if (Environment.MEDIA_MOUNTED.equals(state)) {
                     File route = Environment.getExternalStorageDirectory();
@@ -76,8 +79,8 @@ public  class dominion extends dropDown {
                     File file = new File(dir, "Dominion" + ".txt");
                     try {
                         FileOutputStream fileOutputStream = new FileOutputStream(file);
-                        for (int i = 0; i < dropList.size(); i++) {
-                            CharSequence a = dropList.get(i)+"\n";
+                        for (int i = 0; i < receiptList.size(); i++) {
+                            CharSequence a = receiptList.get(i).getFilename()+"\n";
                             fileOutputStream.write(a.toString().getBytes());
                         }
                         fileOutputStream.close();
@@ -85,6 +88,7 @@ public  class dominion extends dropDown {
                         e1.printStackTrace();
                     }
                     droptxt.getText().clear();
+
 
                 }
             }
@@ -267,19 +271,36 @@ public  class dominion extends dropDown {
                             if  (selected.valueAt(i)) {
                                 load load;
                                 load= finalCustomListAdapter.getItem(selected.keyAt(i));
-                                // String  selecteditem =customListAdapter.getItem(selected.keyAt(i));
+                                 String  selecteditem =finalCustomListAdapter.getItem(selected.keyAt(i)).getFilename();
                                 // Remove  selected items following the ids
                                 finalCustomListAdapter.remove(load);
 
                                 String path = Environment.getExternalStorageDirectory().toString()+"/DIGITALRECEIPTS";
                                 File directory = new File(path,"Resources");
+
+                                if (!directory.exists()) {
+                                    directory.mkdir();
+                                }
                                 File file = new File(directory, "Dominion" + ".txt");
-                                String H= null;
+                                try {
+                                    FileOutputStream fileOutputStream = new FileOutputStream(file);
+                                    for (int j = 0; j < receiptList.size(); j++) {
+                                        CharSequence a = receiptList.get(j)+"\n";
+                                        fileOutputStream.write(a.toString().getBytes());
+                                    }
+                                    fileOutputStream.close();
+                                } catch (IOException e1) {
+                                    e1.printStackTrace();
+                                }
+
+                             //   File file = new File(directory, "Dominion" + ".txt");
+
+/*                                String H= null;
                                 if (load != null) {
                                     H = load.getFilename();
                                     File V=new File(file,H);
                                     V.delete();
-                                }
+                                }*/
                             }
                         }
                         actionMode.finish();

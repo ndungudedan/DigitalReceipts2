@@ -3,10 +3,12 @@ package com.example.dedan.digitalreceipts;
 import android.Manifest;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
@@ -18,15 +20,13 @@ import android.widget.TextView;
 
 import java.util.Calendar;
 
+import static java.util.Calendar.PM;
+
 public class MainActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     TextView total,yesterday,thisweek,thismonth;
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
+    String user;
+    SqlOpenHelper sqlOpenHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,9 +36,20 @@ public class MainActivity extends AppCompatActivity {
         thisweek=(TextView)findViewById(R.id.textView8);
         thismonth=(TextView)findViewById(R.id.textView9);
 
+        sqlOpenHelper = new SqlOpenHelper(getApplicationContext());
         sharedPreferences=getSharedPreferences("Data",MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Bundle bundle=getIntent().getExtras();
+        if(bundle==null){
+
+        }
+        else{
+            user=bundle.getString("logged_On");
+            editor.putString("current_user",user);
+            editor.apply();
+        }
+
         if(!sharedPreferences.getBoolean("firstTime", false)) {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
             // run your one time code
             editor.putInt("today",0);
             editor.putInt("yesterday",0);
@@ -47,19 +58,8 @@ public class MainActivity extends AppCompatActivity {
 
             editor.putBoolean("firstTime", true);
             editor.apply();
-
-            Intent yesterdayIntent=new Intent(this,MyReceiver.class);
-            PendingIntent pendingIntent=PendingIntent.getBroadcast(this,0,yesterdayIntent,0);
-            AlarmManager alarmManager=(AlarmManager)getSystemService(ALARM_SERVICE);
-
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(System.currentTimeMillis());
-            calendar.set(Calendar.HOUR_OF_DAY, 10);
-            calendar.set(Calendar.MINUTE, 29);
-            long time=calendar.getTimeInMillis();
-
-            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,time,AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
-
+            //today
+            todayAlarm();
             //week
             weeklyAlarm();
             //Monthly
@@ -72,6 +72,9 @@ public class MainActivity extends AppCompatActivity {
         thisweek.setText(""+sharedPreferences.getInt("thisWeek",0));
         thismonth.setText(""+sharedPreferences.getInt("thisMonth",0));
 
+        Calendar c=Calendar.getInstance();
+        String time= String.valueOf(c.getTime());
+        update(time);
         permissions();
     }
 
@@ -86,9 +89,10 @@ public class MainActivity extends AppCompatActivity {
         weekcalendar.set(Calendar.HOUR_OF_DAY, 0);
         long timeWeek=weekcalendar.getTimeInMillis();
 
-        weekalarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,timeWeek,AlarmManager.INTERVAL_DAY*7, weekpendingIntent);
+        if (weekalarmManager != null) {
+            weekalarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,timeWeek,AlarmManager.INTERVAL_DAY*7, weekpendingIntent);
+        }
     }
-
     private void monthlyAlarm() {
         Intent monthIntent=new Intent(this,monthReceiver.class);
         PendingIntent monthpendingIntent=PendingIntent.getBroadcast(this,0,monthIntent,0);
@@ -101,7 +105,22 @@ public class MainActivity extends AppCompatActivity {
         monthcalendar.set(Calendar.HOUR_OF_DAY,0);
         long timeMonth=monthcalendar.getTimeInMillis();
 
-        monthalarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,timeMonth,AlarmManager.INTERVAL_DAY, monthpendingIntent);
+        if (monthalarmManager != null) {
+            monthalarmManager.set(AlarmManager.RTC_WAKEUP,timeMonth,monthpendingIntent);
+        }
+    }
+    private void todayAlarm(){
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR, 11);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.AM_PM, Calendar.PM);
+        Intent myIntent = new Intent(this, receiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, myIntent,0);
+        if (alarmManager != null) {
+            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                    AlarmManager.INTERVAL_DAY, pendingIntent);
+        }
     }
 
     public void open(View view) {
@@ -116,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void drop(View view) {
-        Intent drop=new Intent(this,dropDown.class);
+        Intent drop=new Intent(this,unit.class);
         startActivity(drop);
     }
 
@@ -158,5 +177,18 @@ public class MainActivity extends AppCompatActivity {
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+    public void update(String time){
+        String select=SqlOpenHelper.KEY_ID+"=?";
+        String[]selectArgs={user};
+        ContentValues values=new ContentValues();
+        values.put(SqlOpenHelper.KEY_LOG,time);
+        SQLiteDatabase db=sqlOpenHelper.getWritableDatabase();
+        db.update(SqlOpenHelper.TABLE_USER,values,select,selectArgs);
+    }
+
 
 }

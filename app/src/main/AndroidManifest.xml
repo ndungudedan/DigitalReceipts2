@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -73,10 +74,6 @@
         </activity>
 
         <receiver
-            android:name=".MyReceiver"
-            android:enabled="true"
-            android:exported="true" />
-        <receiver
             android:name=".onBootReceiver"
             android:enabled="false"
             android:exported="true">
@@ -91,9 +88,45 @@
         <receiver
             android:name=".monthReceiver"
             android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".logIn"
+            android:label="@string/LogIn"
+            android:theme="@style/AppTheme">
+
+        </activity>
+
+        <activity android:name=".Register"
+            android:label="@string/register"
+            android:theme="@style/AppTheme">
+        </activity>
+
+        <activity android:name=".security"
+            android:label="Security"
+            android:parentActivityName=".createReceipt"
+            android:theme="@style/AppTheme">
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.example.dedan.digitalreceipts.createReceipt" />
+        </activity>
+
+
+
+        <receiver
+            android:name=".receiver"
+            android:enabled="true"
             android:exported="true">
+
         </receiver>
 
+        <activity android:name=".unit"
+            android:label="Units"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppThemeNo">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.dedan.digitalreceipts.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

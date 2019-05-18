@@ -93,14 +93,14 @@
             android:text="EDIT" />
 
         <Button
-            android:id="@+id/drop"
+            android:id="@+id/security"
             style="@style/Widget.AppCompat.Button.Borderless.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10sp"
             android:layout_toRightOf="@id/save"
             android:onClick="dropLIST"
-            android:text="droplist" />
+            android:text="Security" />
 
     </RelativeLayout>
 

@@ -7,18 +7,18 @@ import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
-public class MyReceiver extends BroadcastReceiver {
+public class receiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i("meso", "receiver called");
-        Toast.makeText(context.getApplicationContext(),"Please save pdf",Toast.LENGTH_SHORT).show();
+        // TODO: This method is called when the BroadcastReceiver is receiving
+        // an Intent broadcast.
+        Log.i("meso", "todayaayyreceiver called");
+        Toast.makeText(context.getApplicationContext(),"yipi todayayaykaiyee",Toast.LENGTH_SHORT).show();
         SharedPreferences sharedPreferences=context.getSharedPreferences("Data",Context.MODE_PRIVATE);
-        int y=sharedPreferences.getInt("today",0);
+        int y=sharedPreferences.getInt("thisWeek",0);
         SharedPreferences.Editor editor=sharedPreferences.edit();
-        editor.putInt("today",0);
-        editor.putInt("yesterday",y);
+        editor.putInt("thisWeek",0);
         editor.apply();
-
     }
 }

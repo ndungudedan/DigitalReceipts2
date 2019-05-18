@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -85,7 +86,10 @@ public class dropDown extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 CharSequence T = droptxt.getText().toString();
-                receiptList.add(new load((String) T));
+                load load=new load((String) T);
+               // load.setFilename((String) T);
+            //    receiptList.add(new load((String) T));
+                receiptList.add(load);
 
                 //dropAdapt.add(T);
               //  dropAdapt.notifyDataSetChanged();
@@ -99,8 +103,8 @@ public class dropDown extends AppCompatActivity {
                     File file = new File(dir, "Items" + ".txt");
                     try {
                         FileOutputStream fileOutputStream = new FileOutputStream(file);
-                        for (int i = 0; i < dropList.size(); i++) {
-                            CharSequence a = dropList.get(i)+"\n";
+                        for (int i = 0; i < receiptList.size(); i++) {
+                            CharSequence a = receiptList.get(i).getFilename()+"\n";
                             fileOutputStream.write(a.toString().getBytes());
                         }
                         fileOutputStream.close();
@@ -291,19 +295,38 @@ public class dropDown extends AppCompatActivity {
                             if  (selected.valueAt(i)) {
                                 load load;
                                 load= finalCustomListAdapter.getItem(selected.keyAt(i));
+                                String  selecteditem =finalCustomListAdapter.getItem(selected.keyAt(i)).getFilename();
                                 finalCustomListAdapter.remove(load);
 
-                                // String  selecteditem =customListAdapter.getItem(selected.keyAt(i));
                                 // Remove  selected items following the ids
                                 String path = Environment.getExternalStorageDirectory().toString()+"/DIGITALRECEIPTS";
                                 File directory = new File(path,"Resources");
-                                File dir = new File(directory,"/Items.txt");
-                                String H= null;
-                                if (load != null) {
-                                    H = load.getFilename();
+                              //  File dir = new File(directory,"/Items.txt");
+
+                                if (!directory.exists()) {
+                                    directory.mkdir();
                                 }
-                                File V=new File(dir,H);
-                                V.delete();
+                                File file = new File(directory, "Items" + ".txt");
+                                try {
+                                    FileOutputStream fileOutputStream = new FileOutputStream(file);
+                                    for (int j = 0; j < receiptList.size(); j++) {
+                                        CharSequence a = receiptList.get(j).getFilename()+"\n";
+                                        fileOutputStream.write(a.toString().getBytes());
+                                    }
+                                    fileOutputStream.close();
+                                } catch (IOException e1) {
+                                    e1.printStackTrace();
+                                }
+                                /*load=finalCustomListAdapter.getMyList().get(i);
+                                String H=null;
+                                if (load != null) {
+                                    H=load.getFilename();
+                                   File V=new File(dir,H);
+                                   if(!V.exists()){
+                                       boolean isSuccess = V.delete();
+                                       Toast.makeText(dropDown.this, selecteditem, Toast.LENGTH_LONG).show();
+                                   }
+                                }*/
                             }
                         }
                         actionMode.finish();

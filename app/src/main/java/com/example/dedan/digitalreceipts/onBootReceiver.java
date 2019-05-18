@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import java.util.Calendar;
+import java.util.Objects;
 
 import static android.content.Context.ALARM_SERVICE;
 
@@ -14,17 +15,19 @@ public class onBootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")){
-            Intent yesterdayintent=new Intent(context,MyReceiver.class);
+        if (Objects.equals(intent.getAction(), "android.intent.action.BOOT_COMPLETED")){
+            Intent yesterdayintent=new Intent(context,receiver.class);
             PendingIntent pendingIntent=PendingIntent.getBroadcast(context,0,yesterdayintent,0);
             AlarmManager alarmManager=(AlarmManager)context.getSystemService(ALARM_SERVICE);
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(System.currentTimeMillis());
-            calendar.set(Calendar.HOUR_OF_DAY, 11);
-            calendar.set(Calendar.MINUTE, 10);
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
+            calendar.set(Calendar.MINUTE, 59);
             long time=calendar.getTimeInMillis();
-            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,time,AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
+            if (alarmManager != null) {
+                alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,time,AlarmManager.INTERVAL_DAY, pendingIntent);
+            }
 
             //week
             Intent weekIntent=new Intent(context,weekReceiver.class);
@@ -33,10 +36,12 @@ public class onBootReceiver extends BroadcastReceiver {
 
             Calendar weekcalendar = Calendar.getInstance();
             weekcalendar.setTimeInMillis(System.currentTimeMillis());
-            weekcalendar.set(Calendar.DAY_OF_WEEK, 3);
-            weekcalendar.set(Calendar.HOUR_OF_DAY, 18);
+            weekcalendar.set(Calendar.DAY_OF_WEEK, 1);
+            weekcalendar.set(Calendar.HOUR_OF_DAY, 0);
             long timeWeek=weekcalendar.getTimeInMillis();
-            weekalarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,timeWeek,AlarmManager.INTERVAL_DAY*7, weekpendingIntent);
+            if (weekalarmManager != null) {
+                weekalarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,timeWeek,AlarmManager.INTERVAL_DAY*7, weekpendingIntent);
+            }
 
             //month
             Intent monthIntent=new Intent(context,monthReceiver.class);
@@ -49,7 +54,9 @@ public class onBootReceiver extends BroadcastReceiver {
             monthcalendar.set(Calendar.DAY_OF_WEEK, 1);
             monthcalendar.set(Calendar.HOUR_OF_DAY,0);
             long timeMonth=monthcalendar.getTimeInMillis();
-            monthalarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,timeMonth,AlarmManager.INTERVAL_DAY, monthpendingIntent);
+            if (monthalarmManager != null) {
+                monthalarmManager.set(AlarmManager.RTC_WAKEUP,timeMonth, monthpendingIntent);
+            }
         }
     }
 }

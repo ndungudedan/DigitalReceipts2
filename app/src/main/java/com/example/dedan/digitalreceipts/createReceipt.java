@@ -169,7 +169,7 @@ public class createReceipt extends AppCompatActivity {
 
 
     public void dropLIST(View view) {
-        Intent dropOpen=new Intent(this,dropDown.class);
+        Intent dropOpen=new Intent(this,security.class);
         startActivity(dropOpen);
     }
 }

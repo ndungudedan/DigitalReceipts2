@@ -16,7 +16,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="0"
         android:background="@color/colorPrimary"
-        android:minHeight="?attr/actionBarSize" />
+        android:minHeight="?attr/actionBarSize"
+        app:titleTextColor="@android:color/white"/>
 
     <android.widget.ListView
         android:id="@+id/listActivity"
