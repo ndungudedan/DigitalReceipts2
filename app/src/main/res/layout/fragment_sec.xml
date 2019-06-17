@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.widget.RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".security">
+    tools:context=".secFragment"
+    android:id="@+id/secfrag">
 
+    <Button
+        android:id="@+id/auth_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="AUTHENTICATE"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="20sp"
+        android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/inval_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="INVALIDATE"
+        android:textColor="@color/red"
+        android:textSize="24sp"
+        android:visibility="invisible" />
 
     <RelativeLayout
         android:id="@+id/rel"
@@ -18,7 +35,14 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="-8dp"
             android:layout_marginBottom="55dp"
-            android:text="credentials" />
+            android:text="credentials:" />
+
+        <TextView
+            android:id="@+id/empno_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/textView18"
+            android:text="empNO" />
 
         <EditText
             android:id="@+id/user_txt"
@@ -42,20 +66,22 @@
             android:layout_marginStart="188dp"
             android:layout_marginLeft="1dp"
             android:layout_marginTop="26dp"
-
             android:layout_toRightOf="@id/user_txt"
             android:ems="10"
             android:hint="password"
             android:inputType="textPassword" />
+
     </RelativeLayout>
 
     <LinearLayout
-        android:layout_below="@id/rel"
         android:layout_width="305dp"
         android:layout_height="385dp"
+        android:layout_below="@id/rel"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="-1dp"
+        android:layout_marginBottom="0dp"
         android:orientation="vertical">
 
         <TextView
@@ -77,16 +103,6 @@
             android:inputType="textPersonName" />
 
         <EditText
-            android:id="@+id/user_residence"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/dob"
-            android:layout_alignParentStart="true"
-            android:ems="10"
-            android:hint="Residence"
-            android:inputType="textPersonName" />
-
-        <EditText
             android:id="@+id/user_sec_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -97,14 +113,24 @@
             android:inputType="textPersonName" />
 
         <EditText
-            android:id="@+id/user_emp_no"
+            android:id="@+id/user_id_no"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/sec_name"
             android:layout_alignParentStart="true"
             android:ems="10"
-            android:hint="employeeNo"
+            android:hint="National_ID"
             android:inputType="text|textCapWords" />
+
+        <EditText
+            android:id="@+id/user_residence"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/dob"
+            android:layout_alignParentStart="true"
+            android:ems="10"
+            android:hint="Residence"
+            android:inputType="textPersonName" />
 
         <EditText
             android:id="@+id/user_dob"
@@ -141,26 +167,31 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/edit_btn"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="36dp"
-        android:layout_marginBottom="8dp"
-        android:onClick="edit"
-        android:text="Edit" />
+        android:layout_marginBottom="41dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/edit_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="36dp"
+            android:layout_marginBottom="8dp"
+            android:text="Edit"
+            />
 
 
-    <Button
-        android:id="@+id/button6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="118dp"
-        android:layout_marginBottom="0dp"
-        android:onClick="saveUpdate"
-        android:text="Save" />
-</android.widget.RelativeLayout>
+        <Button
+            android:id="@+id/save_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="118dp"
+            android:layout_marginBottom="0dp"
+            android:text="Save"
+            />
+    </LinearLayout>
+</RelativeLayout>

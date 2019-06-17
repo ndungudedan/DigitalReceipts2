@@ -1,6 +1,8 @@
 package com.example.dedan.digitalreceipts;
 
 import android.app.LoaderManager;
+import android.bluetooth.BluetoothSocket;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,6 +19,8 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -66,7 +70,6 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
     int count=0,initCount;
     int total=0,initTotal;
     int receiptCount;
-    int Todaytot=0;
 
     ArrayList<CharSequence> spinList;
     ArrayList<CharSequence> spinListQ;
@@ -95,8 +98,6 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
     String timeStamp;
     int pdfCount=0;
     SharedPreferences shp;
-    //String Title ="nameKey";
-    //String email ="emailKey";
     String contact ="contactKey";
     private SimpleCursorAdapter adapter;
     private SimpleCursorAdapter adapterQ;
@@ -106,6 +107,11 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
     private Cursor pcursor;
     private SQLiteDatabase db;
     ArrayList selectSpinid;
+    private String itemfrmspin;
+    private String packfrmspin;
+    private String costfrmspin;
+
+    private String user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,7 +125,6 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         selectSpinid=new ArrayList();
         Gpoint=new ArrayList<>();
         sqlOpenHelper = new SqlOpenHelper(this);
-
 
         quant= findViewById(R.id.quantity);
         item= findViewById(R.id.items);
@@ -151,6 +156,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
 
         adapterQ = new SimpleCursorAdapter(this,android.R.layout.simple_spinner_item,null,new String[]
                 {SqlOpenHelper.KEY_PACK},new int[]{android.R.id.text1},0);
+
         //spinAdaptQ=new ArrayAdapter<CharSequence>(this,android.R.layout.simple_spinner_item,spinListQ);
         adapterQ.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinQ.setAdapter(adapterQ);
@@ -165,12 +171,19 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 (this, android.R.layout.simple_list_item_1, itemList);
         list.setAdapter(arrayAdapter);
 
+        shp=getSharedPreferences("Data",Context.MODE_PRIVATE);
+        user = shp.getString("current_username","");
+
         addClick();
         delete();
         //graphAmount();
 
     }
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+//        mcursor.close();
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu,menu);
@@ -193,9 +206,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                         pdfCount++;
                         if(pdfCount==1){
                             pdf();
-                            oneDay();
-                            thisWeek();
-                            thisMonth();
+                            stats();
                             Toast.makeText(getApplicationContext(),"SAVED",Toast.LENGTH_SHORT).show();
                             }
                             else{
@@ -228,28 +239,65 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         finish();
         overridePendingTransition(0,0);
     }
-    public void oneDay(){
-        shp=getSharedPreferences("Data",Context.MODE_PRIVATE);
-        int Tt=shp.getInt("today",0)+total;
-        SharedPreferences.Editor editor = shp.edit();
-        editor.putInt("today",Tt);
-        editor.apply();
-    }
-    public void thisWeek(){
-        shp=getSharedPreferences("Data",Context.MODE_PRIVATE);
-        int Tt=shp.getInt("thisWeek",0)+total;
-        SharedPreferences.Editor editor = shp.edit();
-        editor.putInt("thisWeek",Tt);
-        editor.apply();
-    }
-    public void thisMonth(){
-        shp=getSharedPreferences("Data",Context.MODE_PRIVATE);
-        int Tt=shp.getInt("thisMonth",0)+total;
-        SharedPreferences.Editor editor = shp.edit();
-        editor.putInt("thisMonth",Tt);
-        editor.apply();
-    }
+    public int getUser() {
+        SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
+        String[] columns = {SqlOpenHelper.KEY_NAME, SqlOpenHelper.KEY_empNO};
+        Cursor cursor = db.query(SqlOpenHelper.TABLE_USER, columns, null, null,
+                null, null, null);
 
+        //int IdPos = cursor.getColumnIndex(SqlOpenHelper.KEY_ID);
+        int userPos = cursor.getColumnIndex(SqlOpenHelper.KEY_NAME);
+        int empPos = cursor.getColumnIndex(SqlOpenHelper.KEY_empNO);
+        //refresh views here so that they can load again
+        int n = 0;
+        while (cursor.moveToNext()) {
+            String c = cursor.getString(userPos);
+            if (c.equals(user)) {
+                n = cursor.getInt(empPos);
+            }
+
+        }
+        cursor.close();
+        return n;
+    }
+    public void stats(){
+        SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
+        String[] columns = {SqlOpenHelper.KEY_TALLY, SqlOpenHelper.KEY_MONTH,SqlOpenHelper.KEY_WEEK,SqlOpenHelper.KEY_YESTERDAY,
+                SqlOpenHelper.KEY_TODAY};
+        Cursor cursor = db.query(SqlOpenHelper.TABLE_SALES, columns, null, null,
+                null, null, null);
+
+        //int IdPos = cursor.getColumnIndex(SqlOpenHelper.KEY_ID);
+        int yesterdayPos = cursor.getColumnIndex(SqlOpenHelper.KEY_YESTERDAY);
+        int weekPos = cursor.getColumnIndex(SqlOpenHelper.KEY_WEEK);
+        int todayPos = cursor.getColumnIndex(SqlOpenHelper.KEY_TODAY);
+        int monthPos = cursor.getColumnIndex(SqlOpenHelper.KEY_MONTH);
+        int tallyPos = cursor.getColumnIndex(SqlOpenHelper.KEY_TALLY);
+        //refresh views here so that they can load again
+        while (cursor.moveToNext()) {
+            int n = cursor.getInt(yesterdayPos);
+            int c = cursor.getInt(weekPos);
+            int l = cursor.getInt(todayPos);
+            int p=cursor.getInt(monthPos);
+            int h=cursor.getInt(tallyPos);
+            update(n,c,l,p,h);
+        }
+        cursor.close();
+    }
+    private void update(int n,int c,int l,int p,int h){
+        int j=getUser();
+        String select=SqlOpenHelper.KEY_TODAY+"=?";
+        String[]selectArgs={String.valueOf(j)};
+        ContentValues values=new ContentValues();
+        values.put(SqlOpenHelper.KEY_TODAY,l+total);
+        values.put(SqlOpenHelper.KEY_YESTERDAY,n);
+        values.put(SqlOpenHelper.KEY_MONTH,p+total);
+        values.put(SqlOpenHelper.KEY_WEEK,c+total);
+        values.put(SqlOpenHelper.KEY_TALLY,h+pdfCount);
+
+        SQLiteDatabase db=sqlOpenHelper.getWritableDatabase();
+        db.update(SqlOpenHelper.TABLE_USER,values,select,selectArgs);
+    }
 
     public void addClick() {
         btn.setOnClickListener(new View.OnClickListener() {
@@ -405,33 +453,42 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
     }
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
         switch (adapterView.getId()){
             case R.id.quanSpin:
-                spinItem=adapterView.getItemAtPosition(i).toString();
+                //bcoz spiiner id starts at 0 while db rows from 1
+
+                load(l);
+                spinItem=packfrmspin;
 
                 break;
             case R.id.spinner2:
-                /*int selid=adapterView.getSelectedItemPosition();
-                mcursor=(Cursor)adapterView.getItemAtPosition(i);
-                int id=mcursor.getInt(mcursor.getColumnIndex(SqlOpenHelper.KEY_ITEM));*/
-                //loadfromDatabase(spin,kila);
-                String q= String.valueOf(adapterView.getItemAtPosition(i));
-                item.setText(q); 
-                /*int IDpos=mcursor.getColumnIndex(SqlOpenHelper._ID);
-                while (mcursor.moveToNext()) {
-                    int cd=mcursor.getInt(IDpos);
-                    if(cd==selid){
-                        String d = mcursor.getString(cd);
-                        item.setText(d);
-                        break;
-                    }*/
-                   // String n = mcursor.getString(itemPos);
-                   // String c = mcursor.getString(packPos);
-                  //  String h = mcursor.getString(costPos);
-               // }
+                int x=i+1;
+                load(l);
+                item.setText(itemfrmspin);
+                kila.setText(costfrmspin);
+                spinQ.setSelection(i);
 
-               // break;
+        }
+    }
+    public void load(long spinid){
+        SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
+        String[] columns = {SqlOpenHelper._ID,SqlOpenHelper.KEY_ITEM,SqlOpenHelper.KEY_PACK,SqlOpenHelper.KEY_COST};
+        mcursor = db.query(SqlOpenHelper.TABLE_ITEM_DETAILS, columns, null, null,
+                null, null, null);
+        int IdPos = mcursor.getColumnIndex(SqlOpenHelper._ID);
+        int itemPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_ITEM);
+        int packPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_PACK);
+        int costPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_COST);
+        //refresh views here so that they can load again
+        while (mcursor.moveToNext()) {
+            long id = mcursor.getLong(IdPos);
+            if(id==spinid){
+                itemfrmspin = mcursor.getString(itemPos);
+                packfrmspin = mcursor.getString(packPos);
+                costfrmspin = mcursor.getString(costPos);
+                break;
+            }
+
         }
     }
 

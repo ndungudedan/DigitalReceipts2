@@ -14,38 +14,52 @@ import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
 import java.util.Calendar;
+import java.util.Objects;
 
 import static java.util.Calendar.PM;
 
 public class MainActivity extends AppCompatActivity {
+    Toolbar maintool;
     SharedPreferences sharedPreferences;
-    TextView total,yesterday,thisweek,thismonth;
-    String user;
+
     SqlOpenHelper sqlOpenHelper;
+    private String loggedIn_user;
+    private String loggedIn_username;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        total=(TextView)findViewById(R.id.textView6);
-        yesterday=(TextView)findViewById(R.id.textView7);
-        thisweek=(TextView)findViewById(R.id.textView8);
-        thismonth=(TextView)findViewById(R.id.textView9);
+        maintool = findViewById(R.id.mainActivitybar);
+        setSupportActionBar(maintool);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
+
 
         sqlOpenHelper = new SqlOpenHelper(getApplicationContext());
         sharedPreferences=getSharedPreferences("Data",MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        Bundle bundle=getIntent().getExtras();
-        if(bundle==null){
 
+        try{
+            loggedIn_user = getIntent().getExtras().getString("loggedIn_user");
+            loggedIn_username=getIntent().getExtras().getString("loggedIn_username");
+        }catch (NullPointerException e){
+            e.printStackTrace();
         }
-        else{
-            user=bundle.getString("logged_On");
-            editor.putString("current_user",user);
+
+        if(loggedIn_user !=null){
+            editor.putInt("current_user",0);
+            editor.putInt("current_user_no.of_sales",0);
+            editor.putString("current_user",loggedIn_user);
+            editor.putString("current_username",loggedIn_username);
             editor.apply();
         }
 
@@ -67,15 +81,39 @@ public class MainActivity extends AppCompatActivity {
         }
         Log.i("mesooi", " main called");
 
-        total.setText(""+sharedPreferences.getInt("today",0));
-        yesterday.setText(""+sharedPreferences.getInt("yesterday",0));
-        thisweek.setText(""+sharedPreferences.getInt("thisWeek",0));
-        thismonth.setText(""+sharedPreferences.getInt("thisMonth",0));
-
         Calendar c=Calendar.getInstance();
         String time= String.valueOf(c.getTime());
         update(time);
         permissions();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        finish();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.logout:
+                finish();
+                Intent logout=new Intent(this,logIn.class);
+                startActivity(logout);
+                break;
+            case R.id.secmenu:
+                Intent sec=new Intent(this,security.class);
+                startActivity(sec);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void weeklyAlarm() {
@@ -183,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void update(String time){
         String select=SqlOpenHelper.KEY_ID+"=?";
-        String[]selectArgs={user};
+        String[]selectArgs={loggedIn_user};
         ContentValues values=new ContentValues();
         values.put(SqlOpenHelper.KEY_LOG,time);
         SQLiteDatabase db=sqlOpenHelper.getWritableDatabase();

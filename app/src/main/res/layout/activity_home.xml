@@ -36,13 +36,13 @@
             android:inputType="number"
             android:textColor="@color/colorPrimary"
             android:textColorHint="@color/colorPrimary"
-            android:textSize="16sp"
-            />
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/items"
-            android:layout_width="220dp"
+            android:layout_width="208dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
             android:layout_toRightOf="@+id/quantity"
             android:hint="Items"
             android:inputType="textCapWords"
@@ -87,25 +87,26 @@
         <ListView
             android:id="@+id/list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_below="@id/btnadd"
             android:background="@color/lightBackground" />
 
-    <TextView
+        <TextView
         android:id="@+id/itemCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/quantity"
         android:text="0"/>
 
-    <TextView
-        android:id="@+id/totalCount"
-        android:layout_width="85dp"
-        android:layout_height="35dp"
-        android:layout_alignBottom="@+id/btnadd"
-        android:layout_alignEnd="@+id/items"
-        android:layout_marginEnd="-49dp"
-        android:text="0" />
+        <TextView
+            android:id="@+id/totalCount"
+            android:layout_width="115dp"
+            android:layout_height="31dp"
+            android:layout_alignEnd="@+id/items"
+            android:layout_alignBottom="@+id/btnadd"
+            android:layout_marginEnd="-45dp"
+            android:layout_marginBottom="4dp"
+            android:text="0" />
 
         <Spinner
             android:id="@+id/spinner2"
@@ -122,7 +123,5 @@
             android:layout_alignBottom="@+id/btnadd"
              />
 
-
     </android.widget.RelativeLayout>
-
 </android.widget.RelativeLayout>

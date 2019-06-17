@@ -12,6 +12,10 @@ public class logIn extends AppCompatActivity {
     EditText user;
     EditText pass;
     SqlOpenHelper sqlOpenHelper;
+
+    private static String loggedIn_user;
+    private static String loggedIn_username;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,12 +32,16 @@ public class logIn extends AppCompatActivity {
             // login user
             int x= checkLogin(sqlOpenHelper,name, password);
             if(x == 1){
-                user.getText().clear();
-                pass.getText().clear();
-                Bundle bundle=new Bundle();
-                bundle.putString("logged_On",name);
+                housekeeping();
                 Intent main=new Intent(this,MainActivity.class);
-                startActivity(main,bundle);
+                main.putExtra("loggedIn_user",loggedIn_user);
+                main.putExtra("loggedIn_username",loggedIn_username);
+                startActivity(main);
+            }
+            else if(x==2){
+                Toast.makeText(getApplicationContext(),
+                        "NOT YET APPROVED!", Toast.LENGTH_LONG)
+                        .show();
             }
             else{
                 Toast.makeText(getApplicationContext(),
@@ -49,22 +57,33 @@ public class logIn extends AppCompatActivity {
     }
     public static int checkLogin(SqlOpenHelper sqlOpenHelper,String name, String password) {
         SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
-        String[] columns = {SqlOpenHelper.KEY_ID, SqlOpenHelper.KEY_NAME,SqlOpenHelper.KEY_PASS};
+        String[] columns = {SqlOpenHelper.KEY_ID, SqlOpenHelper.KEY_NAME,SqlOpenHelper.KEY_PASS,SqlOpenHelper.KEY_FIRSTNAME,
+        SqlOpenHelper.KEY_ACCESS};
         Cursor cursor = db.query(SqlOpenHelper.TABLE_USER, columns, null, null,
                 null, null, null);
 
         int IdPos = cursor.getColumnIndex(SqlOpenHelper.KEY_ID);
         int namePos = cursor.getColumnIndex(SqlOpenHelper.KEY_NAME);
+        int userpos = cursor.getColumnIndex(SqlOpenHelper.KEY_FIRSTNAME);
         int passwordPos = cursor.getColumnIndex(SqlOpenHelper.KEY_PASS);
+        int accessPos = cursor.getColumnIndex(SqlOpenHelper.KEY_ACCESS);
         //refresh views here so that they can load again
         int x = 0;
         while (cursor.moveToNext()) {
             String n = cursor.getString(namePos);
             String c = cursor.getString(passwordPos);
+            String d=cursor.getString(accessPos);
             if (n.equals(name)&&c.equals(password)) {
+                loggedIn_username=n;
+                loggedIn_user = cursor.getString(userpos);
+                if(d.equals("ACCESS_DENIED")){
+                    x = 2;
+                    break;
+                }
                 x = 1;
                 break;
             }
+
         }
         cursor.close();
         return x;
@@ -86,16 +105,13 @@ public class logIn extends AppCompatActivity {
             // login user
             int x=checkLogin(sqlOpenHelper,name,password);
             if(x == 1){
-                user.getText().clear();
-                pass.getText().clear();
-                Bundle bundle=new Bundle();
-                bundle.putString("logged_On",name);
-                Intent main=new Intent(this,MainActivity.class);
-                startActivity(main,bundle);
+                housekeeping();
 
-                /*Intent main=new Intent(this,MainActivity.class);
-                main.putExtra("logged_On",name);
-                startActivity(main);*/
+                Intent main=new Intent(this,MainActivity.class);
+                main.putExtra("loggedIn_user",loggedIn_user);
+                main.putExtra("loggedIn_username",loggedIn_username);
+                startActivity(main);
+
             }
             else{
                 Toast.makeText(getApplicationContext(),
@@ -109,4 +125,10 @@ public class logIn extends AppCompatActivity {
                     .show();
         }
     }
+    public void housekeeping(){
+        user.getText().clear();
+        pass.getText().clear();
+        //finish();
+    }
+
 }

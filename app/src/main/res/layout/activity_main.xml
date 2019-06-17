@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.widget.RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.widget.LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,8 +7,19 @@
     android:orientation="vertical"
     tools:context=".MainActivity"
     >
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/mainActivitybar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="@color/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        app:titleTextColor="@android:color/white"
+        />
 
-
+<RelativeLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
     <ImageButton
         android:id="@+id/button2"
         android:layout_width="184dp"
@@ -27,10 +38,12 @@
         android:layout_height="185dp"
         android:layout_below="@+id/button2"
         android:layout_alignParentStart="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="3dp"
         android:onClick="drop"
         android:scaleType="centerInside"
-        android:text="droplist"
-        android:src="@drawable/icons8add96" />
+        android:src="@drawable/icons8add96"
+        android:text="droplist" />
 
     <ImageButton
         android:id="@+id/button5"
@@ -38,7 +51,7 @@
         android:layout_height="185dp"
         android:layout_below="@+id/button2"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="0dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="0dp"
         android:onClick="list"
         android:src="@drawable/icons8list48" />
@@ -54,84 +67,7 @@
         android:onClick="open"
         android:scaleType="fitXY"
         android:src="@drawable/icons8businessman80" />
-    <LinearLayout
-        android:id="@+id/linear1"
-        android:layout_width="85dp"
-        android:layout_height="141dp"
-        android:layout_below="@id/button5"
-        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="Today:"
-            android:layout_weight="1"/>
+</RelativeLayout>
 
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_weight="1"
-            android:padding="5dp"
-            android:paddingTop="-5dp"
-            android:text="Yesterday:" />
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="76dp"
-            android:layout_height="30dp"
-            android:padding="5dp"
-            android:text="ThisWeek:"
-            android:layout_weight="1"/>
-
-        <TextView
-            android:id="@+id/textView5"
-            android:layout_width="83dp"
-            android:layout_height="30dp"
-            android:padding="5dp"
-            android:text="ThisMonth:"
-            android:layout_weight="1"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="102dp"
-        android:layout_height="141dp"
-        android:layout_below="@id/button5"
-        android:layout_marginLeft="0dp"
-        android:layout_marginTop="0dp"
-        android:layout_toRightOf="@id/linear1"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/textView6"
-            android:layout_width="wrap_content"
-            android:layout_height="18dp"
-            android:layout_weight="1"
-            android:text="0" />
-
-        <TextView
-            android:id="@+id/textView7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="0" />
-
-        <TextView
-            android:id="@+id/textView8"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="0" />
-
-        <TextView
-            android:id="@+id/textView9"
-            android:layout_width="wrap_content"
-            android:layout_height="15dp"
-            android:layout_weight="1"
-            android:text="0" />
-    </LinearLayout>
-
-
-</android.widget.RelativeLayout>
+</android.widget.LinearLayout>

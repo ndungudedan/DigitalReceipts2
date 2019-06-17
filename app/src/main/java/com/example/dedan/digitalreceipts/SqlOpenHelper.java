@@ -11,14 +11,13 @@ import android.util.Log;
 
 import java.util.HashMap;
 
-import static android.provider.BaseColumns._ID;
-
 public class SqlOpenHelper extends SQLiteOpenHelper {
     public static final String TAG =SQLiteOpenHelper.class.getSimpleName();
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "DigitalReceipts";
     public static final String TABLE_USER = "user";
     public static final String TABLE_ITEM_DETAILS="item_details";
+    public static final String TABLE_SALES="sales";
 
     public static final String KEY_ID = "id";
     public static final String KEY_FIRSTNAME = "first_name";
@@ -30,33 +29,48 @@ public class SqlOpenHelper extends SQLiteOpenHelper {
     public static final String KEY_NAME = "username";
     public static final String KEY_EMAIL = "email";
     public static final String KEY_PASS = "password";
+    public static final String KEY_NATNLID="national_ID";
     public static final String KEY_LOG = "last_log";
+    public static final String KEY_ACCESS="access";
 
     public static final String KEY_ITEM_ID="id";
     public static final String KEY_ITEM="Items";
     public static final String KEY_PACK ="Pack" ;
     public static final String KEY_COST ="Cost" ;
-   public static String _ID=BaseColumns._ID;
 
+    public static final String KEY_TODAY="today";
+    public static final String KEY_YESTERDAY="yesterday";
+    public static final String KEY_WEEK="week";
+    public static final String KEY_MONTH="month";
+    public static final String KEY_TALLY="sales_count";
+    public static final String KEY_EMP_FOREIGN="empNo_foreignKey";
+
+   public static String _ID=BaseColumns._ID;
+    public static String _USERID=BaseColumns._ID;
 
     public SqlOpenHelper(@Nullable Context context) {
         super(context,DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        String CREATE_LOGIN_TABLE="CREATE TABLE IF NOT EXISTS  "+TABLE_USER+"("+
-                KEY_ID+" INTEGER PRIMARY KEY,"+KEY_FIRSTNAME+" TEXT NOT NULL,"+KEY_SECNAME+" TEXT NOT NULL,"+KEY_empNO+" VARCHAR,"
+        String CREATE_LOGIN_TABLE="CREATE TABLE IF NOT EXISTS  "+TABLE_USER+"("+_USERID+" INTEGER PRIMARY KEY,"
+                +KEY_ID+" INTEGER UNIQUE,"+KEY_FIRSTNAME+" TEXT NOT NULL,"+KEY_SECNAME+" TEXT NOT NULL,"+KEY_empNO+" INTEGER,"+KEY_NATNLID+" INTEGER,"
                 +KEY_DOB+" VARCHAR," +KEY_residence+" VARCHAR,"+KEY_MOBILENO+" VARCHAR ,"
                 +KEY_NAME+" TEXT NOT NULL,"+KEY_PASS+" VARCHAR NOT NULL,"+
-                KEY_EMAIL+" TEXT NOT NULL,"+KEY_LOG+" VARCHAR"+")";
+                KEY_EMAIL+" TEXT NOT NULL,"+KEY_LOG+" VARCHAR,"+KEY_ACCESS+" TEXT "+")";
 
         String CREATE_ITEM_DETAILS_TABLE="CREATE TABLE IF NOT EXISTS  "+TABLE_ITEM_DETAILS+"("+_ID+" INTEGER PRIMARY KEY,"
                 +KEY_ITEM_ID+" INTEGER UNIQUE,"+KEY_ITEM+" TEXT NOT NULL,"+KEY_PACK+" VARCHAR,"+
                 KEY_COST+" INTEGER "+")";
 
+        String CREATE_STATS_TABLE="CREATE TABLE IF NOT EXISTS "+TABLE_SALES+"("+KEY_ID+" INTEGER PRIMARY KEY, "+KEY_TODAY+" INTEGER , "+KEY_YESTERDAY+" INTEGER ,"
+                +KEY_WEEK+" INTEGER ,"+KEY_MONTH+" INTEGER , "+KEY_TALLY+" INTEGER "+")";
+
         sqLiteDatabase.execSQL(CREATE_LOGIN_TABLE);
         sqLiteDatabase.execSQL(CREATE_ITEM_DETAILS_TABLE);
+        sqLiteDatabase.execSQL(CREATE_STATS_TABLE);
 
         Log.d(TAG, "Database tables created");
 
@@ -67,6 +81,7 @@ public class SqlOpenHelper extends SQLiteOpenHelper {
         // Drop older table if existed
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEM_DETAILS);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_SALES);
 
         // Create tables again
         onCreate(sqLiteDatabase);
@@ -87,8 +102,8 @@ public class SqlOpenHelper extends SQLiteOpenHelper {
     /**
      * Storing user details in database
      * */
-    public void addUser(String userfname,String userscName,String userempNo,String userDOB,String userresid,String usermobile,
-            String name, String password,String email) {
+    public void addUser(String userfname,String userscName,String userIDNo,String userDOB,String userresid,String usermobile,
+            String name, String password,String email,int empNO) {
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor c = null;
@@ -100,19 +115,22 @@ public class SqlOpenHelper extends SQLiteOpenHelper {
             values.put(KEY_EMAIL, email); // Email
             values.put(KEY_PASS, password); // Password
             values.put(KEY_LOG,"WELCOME");
+            values.put(KEY_ACCESS,"ACCESS_GRANTED");
         }
         else{
             values.put(KEY_NAME, name); // Name
             values.put(KEY_EMAIL, email); // Email
             values.put(KEY_PASS, password);// Email
             values.put(KEY_LOG,"WELCOME");
+            values.put(KEY_ACCESS,"ACCESS_DENIED");
         }
         values.put(KEY_FIRSTNAME,userfname);
         values.put(KEY_SECNAME,userscName);
-        values.put(KEY_empNO,userempNo);
+        values.put(KEY_NATNLID,userIDNo);
         values.put(KEY_DOB,userDOB);
         values.put(KEY_residence,userresid);
         values.put(KEY_MOBILENO,usermobile);
+        values.put(KEY_empNO,empNO);
 
         // Inserting Row
         long id = db.insert(TABLE_USER, null, values);
@@ -120,6 +138,7 @@ public class SqlOpenHelper extends SQLiteOpenHelper {
 
         Log.d(TAG, "New user inserted into sqlite: " + id);
     }
+
 
     /**
      * Getting user data from database

@@ -5,89 +5,17 @@
     android:layout_height="match_parent">
 
 
-    <RelativeLayout
-        android:id="@+id/line"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/admin_user"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="user" />
-
-        <EditText
-            android:id="@+id/admin_pass"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="54dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="password" />
-
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="0dp"
-            android:layout_marginEnd="0dp"
-            android:onClick="change"
-            android:text="Change" />
-    </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/linear"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="124dp"
-        android:orientation="vertical"
-        android:layout_below="@id/line">
-
-        <TableLayout
-            android:id="@+id/user_table"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" >
-
-                <TextView
-                    android:id="@+id/textView17"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="name" />
-
-                <TextView
-                    android:id="@+id/textView16"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="id_no" />
-
-                <TextView
-                    android:id="@+id/textView15"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="TextView" />
-
-                <TextView
-                    android:id="@+id/textView14"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="TextView" />
-            </TableRow>
-
-        </TableLayout>
-    </LinearLayout>
-
+        android:layout_alignParentTop="true" >
+<android.support.v4.view.PagerTabStrip
+    android:layout_height="wrap_content"
+    android:layout_width="wrap_content"
+    android:padding="10dp"
+    android:id="@+id/pager_header"
+    />
+    </android.support.v4.view.ViewPager>
 </android.widget.RelativeLayout>

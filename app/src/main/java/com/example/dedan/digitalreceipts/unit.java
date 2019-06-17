@@ -56,6 +56,11 @@ public class unit extends AppCompatActivity implements LoaderManager.LoaderCallb
         //load();
 
     }
+    public void refresh(){
+        startActivity(getIntent());
+        finish();
+        overridePendingTransition(0,0);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -75,8 +80,7 @@ public class unit extends AppCompatActivity implements LoaderManager.LoaderCallb
         switch(menuitem.getItemId()){
             case R.id.delete:
                 delete();
-
-
+                refresh();
                 break;
     }
         return super.onOptionsItemSelected(menuitem);
@@ -86,18 +90,22 @@ public class unit extends AppCompatActivity implements LoaderManager.LoaderCallb
         String goods=item.getText().toString();
         String container=pack.getText().toString();
         String cost=unit.getText().toString();
+        if(goods.isEmpty())
+        {
+            item.setError("empty");
+            return;
+        }
 
         sqlOpenHelper.add_item_to_database(goods,container,cost);
-        tableLayout.removeAllViews();
-        //load();
-        getLoaderManager().restartLoader(LOAD,null,this);
+        refresh();
     }
     public void delete(){
         SQLiteDatabase db =sqlOpenHelper.getWritableDatabase();
         String selection=SqlOpenHelper._ID + " = ?";
-        String[] selectionArgs=new String[checkid.size()];
+        //String[] selectionArgs=new String[checkid.size()];
         for(int i=0; i<checkid.size();i++){
-            selectionArgs[i]=Integer.toString((Integer) checkid.get(i));
+            String[] selectionArgs=new String[]{Integer.toString((Integer) checkid.get(i))};
+            //selectionArgs[i]=Integer.toString((Integer) checkid.get(i));
             db.delete(TABLE_ITEM_DETAILS, selection,selectionArgs );
         }
         db.close();
@@ -128,16 +136,23 @@ public class unit extends AppCompatActivity implements LoaderManager.LoaderCallb
         tableRow.setLayoutParams(layoutParams);
 
         TextView no=new TextView(this);
-        //no.setText(count);
+        no.setPadding(5,5,5,5);
+//        no.setText(count);
         tableRow.addView(no);
+
         TextView txt=new TextView(this);
+        txt.setPadding(5,5,5,5);
         txt.setText(goods);
         tableRow.addView(txt);
+
         TextView txt1=new TextView(this);
         txt1.setText(container);
+        txt1.setPadding(5 ,5,5,5);
         tableRow.addView(txt1);
+
         TextView txt2=new TextView(this);
         txt2.setText(cost);
+        txt2.setPadding(5,5,5,5);
         tableRow.addView(txt2);
 
         checkBox = new CheckBox(this);
@@ -183,7 +198,7 @@ public class unit extends AppCompatActivity implements LoaderManager.LoaderCallb
             @Override
             public Cursor loadInBackground() {
                 SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
-                String[] columns = {SqlOpenHelper._ID,SqlOpenHelper.KEY_ITEM,SqlOpenHelper.KEY_PACK,SqlOpenHelper.KEY_COST};
+                String[] columns = {SqlOpenHelper._ID,SqlOpenHelper.KEY_ITEM_ID,SqlOpenHelper.KEY_ITEM,SqlOpenHelper.KEY_PACK,SqlOpenHelper.KEY_COST};
                 return db.query(SqlOpenHelper.TABLE_ITEM_DETAILS, columns, null, null,
                         null, null, null);
             }
@@ -200,17 +215,19 @@ public class unit extends AppCompatActivity implements LoaderManager.LoaderCallb
 
     private void loadFinishedValues(Cursor cursor) {
         mcursor=cursor;
-        int IdPos = mcursor.getColumnIndex(SqlOpenHelper._ID);
+        int IdPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_ITEM_ID);
         int itemPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_ITEM);
         int packPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_PACK);
         int costPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_COST);
         //refresh views here so that they can load again
+        int x=0;
         while (mcursor.moveToNext()) {
-            int id = mcursor.getInt(IdPos);
+            String id = mcursor.getString(IdPos);
             String n = mcursor.getString(itemPos);
             String c = mcursor.getString(packPos);
             String h = mcursor.getString(costPos);
-            table_load(id,n,c,h);
+            table_load(x,n,c,h);
+            x++;
         }
     }
 

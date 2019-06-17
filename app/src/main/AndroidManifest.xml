@@ -15,7 +15,7 @@
         android:theme="@style/Theme.AppCompat.Light">
         <activity
             android:name=".MainActivity"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppThemeNo">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
@@ -110,13 +110,10 @@
             android:value="com.example.dedan.digitalreceipts.createReceipt" />
         </activity>
 
-
-
         <receiver
             android:name=".receiver"
             android:enabled="true"
             android:exported="true">
-
         </receiver>
 
         <activity android:name=".unit"

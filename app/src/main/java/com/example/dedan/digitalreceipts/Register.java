@@ -9,15 +9,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.util.Calendar;
-
 public class Register extends AppCompatActivity {
     EditText fName,scName,empNo,DOB,resid,mobileNo;
     EditText user;
     EditText pass;
     EditText email;
     SqlOpenHelper sqlOpenHelper;
-
+    int empNO =000;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,11 +31,10 @@ public class Register extends AppCompatActivity {
         mobileNo=findViewById(R.id.tel_no);
         sqlOpenHelper = new SqlOpenHelper(getApplicationContext());
     }
-
     public void register(View view) {
         String userfname=fName.getText().toString();
         String userscName=scName.getText().toString();
-        String userempNo=empNo.getText().toString();
+        String usernationalID=empNo.getText().toString();
         String userDOB=DOB.getText().toString();
         String userresid=resid.getText().toString();
         String usermobile=mobileNo.getText().toString();
@@ -57,13 +54,14 @@ public class Register extends AppCompatActivity {
                     .show();
         }
         SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
-        String[] columns = {SqlOpenHelper.KEY_ID, SqlOpenHelper.KEY_NAME,SqlOpenHelper.KEY_PASS,SqlOpenHelper.KEY_EMAIL};
+        String[] columns = {SqlOpenHelper.KEY_ID, SqlOpenHelper.KEY_NAME,SqlOpenHelper.KEY_PASS,SqlOpenHelper.KEY_EMAIL,SqlOpenHelper.KEY_empNO};
         Cursor cursor = db.query(SqlOpenHelper.TABLE_USER, columns, null, null,
                 null, null, null);
 
         int IdPos = cursor.getColumnIndex(SqlOpenHelper.KEY_ID);
         int namePos = cursor.getColumnIndex(SqlOpenHelper.KEY_NAME);
         int emailPos = cursor.getColumnIndex(SqlOpenHelper.KEY_EMAIL);
+        int empPos = cursor.getColumnIndex(SqlOpenHelper.KEY_empNO);
         //refresh views here so that they can load again
         while (cursor.moveToNext()) {
             String n = cursor.getString(namePos);
@@ -75,9 +73,13 @@ public class Register extends AppCompatActivity {
                 break;
             }
         }
+        while(cursor.moveToLast()){
+            empNO =cursor.getInt(empPos)+1;
+            break;
+        }
         cursor.close();
 
-        sqlOpenHelper.addUser(userfname,userscName,userempNo,userDOB,userresid,usermobile,username,userpass,useremail);
+        sqlOpenHelper.addUser(userfname,userscName,usernationalID,userDOB,userresid,usermobile,username,userpass,useremail, empNO);
         Toast.makeText(getApplicationContext(),
                 "registered!", Toast.LENGTH_SHORT)
                 .show();
