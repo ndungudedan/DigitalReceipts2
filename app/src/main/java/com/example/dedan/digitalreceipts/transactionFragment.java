@@ -1,28 +1,22 @@
 package com.example.dedan.digitalreceipts;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link transactionFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link transactionFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class transactionFragment extends Fragment {
-    TextView total,yesterday,thisweek,thismonth;
+    TextView today,yesterday,thisweek,thismonth;
+    SqlOpenHelper sqlOpenHelper;
+    Cursor mcursor;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -30,20 +24,13 @@ public class transactionFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private OnFragmentInteractionListener mListener;
+    private TextView tally;
+    private long transId=1;
 
     public transactionFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment transactionFragment.
-     */
     // TODO: Rename and change types and number of parameters
     public static transactionFragment newInstance(String param1, String param2) {
         transactionFragment fragment = new transactionFragment();
@@ -57,6 +44,7 @@ public class transactionFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sqlOpenHelper=new SqlOpenHelper(getActivity());
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -68,49 +56,61 @@ public class transactionFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_transaction, container, false);
-       /* total=(TextView)view.findViewById(R.id.textView6);
-        yesterday=(TextView)view.findViewById(R.id.textView7);
-        thisweek=(TextView)view.findViewById(R.id.textView8);
-        thismonth=(TextView)view.findViewById(R.id.textView9);*/
+        today =(TextView)view.findViewById(R.id.today_text);
+        yesterday=(TextView)view.findViewById(R.id.yester_text);
+        thisweek=(TextView)view.findViewById(R.id.week_text);
+        thismonth=(TextView)view.findViewById(R.id.month_text);
+        tally=(TextView)view.findViewById(R.id.tally_text);
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        fragload(transId,sqlOpenHelper);
+
+    }
+
+    public void fragload(long passedid, SqlOpenHelper sqlOpenHelper) {
+        String n=null ,y=null,c=null,l=null,f=null,h=null,k=null,b=null,t=null,s=null,w=null;
+        SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
+        String[] columns = { SqlOpenHelper.KEY_EMP_FOREIGN, SqlOpenHelper.KEY_MONTH, SqlOpenHelper.KEY_WEEK, SqlOpenHelper.KEY_YESTERDAY,SqlOpenHelper.KEY_TODAY,
+                SqlOpenHelper.KEY_TALLY};
+        mcursor = db.query(SqlOpenHelper.TABLE_SALES, columns, null, null,
+                null, null, null);
+        int monthPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_MONTH);
+        int weekPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_WEEK);
+        int yestPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_YESTERDAY);
+        int todayPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_TODAY);
+        int tallyPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_TALLY);
+        long id=mcursor.getColumnIndex(SqlOpenHelper.KEY_EMP_FOREIGN);
+        //refresh views here so that they can load again
+        while (mcursor.moveToNext()) {
+            if(passedid==id){
+                n = mcursor.getString(todayPos);
+                y = mcursor.getString(weekPos);
+                c = mcursor.getString(yestPos);
+                l=mcursor.getString(monthPos);
+                f=mcursor.getString(tallyPos);
+                break;
+            }
         }
+            today.setText(n);
+            yesterday.setText(c);
+            thisweek.setText(y);
+            thismonth.setText(l);
+            tally.setText(f);
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        /*if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }*/
+
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
 }

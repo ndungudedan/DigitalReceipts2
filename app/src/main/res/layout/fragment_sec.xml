@@ -136,7 +136,7 @@
             android:id="@+id/user_dob"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/emp_no"
+            android:layout_below="@id/id_no"
             android:layout_alignParentStart="true"
             android:layout_marginStart="5dp"
             android:ems="10"

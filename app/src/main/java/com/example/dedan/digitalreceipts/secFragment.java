@@ -1,6 +1,7 @@
 package com.example.dedan.digitalreceipts;
 
 import android.app.LoaderManager;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
@@ -44,15 +45,21 @@ public class secFragment extends Fragment implements View.OnClickListener {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static secFragment fragment;
+    String accessCheck=null;
+    RelativeLayout relative;
+    private Button authenticate;
+    private Button invalidate;
 
 
     public secFragment() {
     }
 
-    public static secFragment newInstance(long param1) {
-        secFragment fragment = new secFragment();
+    public static secFragment newInstance(long param1,String userCheck) {
+        fragment = new secFragment();
         Bundle args = new Bundle();
         args.putLong(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2,userCheck);
         fragment.setArguments(args);
         return fragment;
     }
@@ -66,6 +73,7 @@ public class secFragment extends Fragment implements View.OnClickListener {
         security=new security();
         if (getArguments() != null) {
             hid = getArguments().getLong(ARG_PARAM1);
+            accessCheck= getArguments().getString(ARG_PARAM2);
         }
     }
 
@@ -77,6 +85,8 @@ public class secFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        //container.removeAllViews();
+        container.removeAllViewsInLayout();
 
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_sec, container, false);
@@ -91,8 +101,8 @@ public class secFragment extends Fragment implements View.OnClickListener {
         user_resid=view.findViewById(R.id.user_residence);
         user_email=view.findViewById(R.id.user_email_reg);
         user_empno=view.findViewById(R.id.empno_text);
-        Button authenticate=(Button)view.findViewById(R.id.auth_btn);
-        Button invalidate=(Button)view.findViewById(R.id.inval_btn);
+        authenticate = (Button)view.findViewById(R.id.auth_btn);
+        invalidate = (Button)view.findViewById(R.id.inval_btn);
         Button edit=(Button)view.findViewById(R.id.edit_btn);
         Button save=(Button)view.findViewById(R.id.save_btn);
 
@@ -103,18 +113,22 @@ public class secFragment extends Fragment implements View.OnClickListener {
             save.setVisibility(View.INVISIBLE);
             edit.setVisibility(View.INVISIBLE);
 
-            authenticate.setVisibility(View.VISIBLE);
-            invalidate.setVisibility(View.VISIBLE);
-
+            if(accessCheck.equals("ACCESS_GRANTED")){
+                invalidate.setVisibility(View.VISIBLE);
+                invalidate.setOnClickListener(this);
+                authenticate.setVisibility(View.INVISIBLE);
+            }
+            else{
+                authenticate.setVisibility(View.VISIBLE);
+                invalidate.setVisibility(View.INVISIBLE);
+                authenticate.setOnClickListener(this);
+            }
         }
         else{
             authenticate.setVisibility(View.INVISIBLE);
             invalidate.setVisibility(View.INVISIBLE);
         }
-
-
         edit.setOnClickListener(this);
-
         save.setOnClickListener(this);
         return view;
     }
@@ -140,7 +154,13 @@ public class secFragment extends Fragment implements View.OnClickListener {
     public void onResume() {
         super.onResume();
     }
-    public void fragload(long passedid,SqlOpenHelper sqlOpenHelper) {
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+    }
+
+    public void fragload(long passedid, SqlOpenHelper sqlOpenHelper) {
         String n=null ,y=null,c=null,l=null,f=null,h=null,k=null,b=null,t=null,s=null,w=null;
         String passeduser = user;
         SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
@@ -216,18 +236,75 @@ else {
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.edit_btn:
-                security.setEditable();
+                setEditable();
                 break;
             case R.id.save_btn:
-                security.update();
-                security.notEditable();
+                update();
+                notEditable();
                 break;
             case R.id.auth_btn:
-                security.authorise();
+                authorise();
                 break;
             case R.id.inval_btn:
-                security.invalidate();
+                invalidate();
                 break;
         }
     }
+    public void update(){
+        String select=SqlOpenHelper.KEY_ID+"=?";
+        String[]selectArgs={user};
+        ContentValues values=new ContentValues();
+        values.put(SqlOpenHelper.KEY_NAME,txt_user.getText().toString().trim());
+        values.put(SqlOpenHelper.KEY_PASS,txt_pass.getText().toString().trim());
+        values.put(SqlOpenHelper.KEY_FIRSTNAME,user_fName.getText().toString().trim());
+        values.put(SqlOpenHelper.KEY_SECNAME,user_scName.getText().toString().trim());
+        values.put(SqlOpenHelper.KEY_MOBILENO,user_mobileNo.getText().toString().trim());
+        values.put(SqlOpenHelper.KEY_residence,user_resid.getText().toString().trim());
+        values.put(SqlOpenHelper.KEY_DOB,user_DOB.getText().toString().trim());
+        values.put(SqlOpenHelper.KEY_EMAIL,user_email.getText().toString().trim());
+        SQLiteDatabase db=sqlOpenHelper.getWritableDatabase();
+        db.update(SqlOpenHelper.TABLE_USER,values,select,selectArgs);
+    }
+    public void notEditable(){
+        txt_user.setEnabled(false);
+        txt_pass.setEnabled(false);
+        user_email.setEnabled(false);
+        user_DOB.setEnabled(false);
+        user_resid.setEnabled(false);
+        user_mobileNo.setEnabled(false);
+        user_fName.setEnabled(false);
+        user_scName.setEnabled(false);
+        user_idNo.setEnabled(false);
+    }
+    public void setEditable(){
+        txt_user.setEnabled(true);
+        txt_pass.setEnabled(true);
+        user_email.setEnabled(true);
+        user_DOB.setEnabled(true);
+        user_resid.setEnabled(true);
+        user_mobileNo.setEnabled(true);
+        user_fName.setEnabled(true);
+        user_scName.setEnabled(true);
+    }
+    public void invalidate() {
+        String select = SqlOpenHelper._USERID + "=?";
+        String[] selectArgs = {String.valueOf(hid)};
+        ContentValues values = new ContentValues();
+        values.put(SqlOpenHelper.KEY_ACCESS, "ACCESS_DENIED");
+        SQLiteDatabase db = sqlOpenHelper.getWritableDatabase();
+        db.update(SqlOpenHelper.TABLE_USER, values, select, selectArgs);
+        invalidate.setVisibility(View.INVISIBLE);
+        authenticate.setVisibility(View.VISIBLE);
+    }
+    public void authorise() {
+        String select = SqlOpenHelper._USERID + "=?";
+        String[] selectArgs = {String.valueOf(hid)};
+        ContentValues values = new ContentValues();
+        values.put(SqlOpenHelper.KEY_ACCESS, "ACCESS_GRANTED");
+        SQLiteDatabase db = sqlOpenHelper.getWritableDatabase();
+        db.update(SqlOpenHelper.TABLE_USER, values, select, selectArgs);
+        authenticate.setVisibility(View.INVISIBLE);
+        invalidate.setVisibility(View.VISIBLE);
+    }
+
 }

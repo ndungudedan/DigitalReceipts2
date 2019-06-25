@@ -6,30 +6,51 @@
     android:layout_height="match_parent"
     tools:context=".logIn">
 
-    <EditText
-        android:id="@+id/username_edit"
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="72dp"
-        android:layout_marginTop="142dp"
-        android:ems="10"
-        android:hint="Username"
-        android:inputType="textPersonName" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="173dp">
 
-    <EditText
-        android:id="@+id/password_edit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/username_edit"
-        android:layout_alignEnd="@+id/username_edit"
-        android:ems="10"
-        android:hint="Password"
-        android:inputType="textPersonName" />
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_layout_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            >
+
+            <EditText
+                android:id="@+id/username_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/input_layout_username"
+                android:ems="10"
+                android:hint="Username"
+                android:inputType="textPersonName" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_layout_password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/input_layout_username"
+            android:layout_centerHorizontal="true"
+            >
+
+            <EditText
+                android:id="@+id/password_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Password"
+                android:inputType="textPassword|numberPassword" />
+        </android.support.design.widget.TextInputLayout>
+    </RelativeLayout>
 
     <Button
         android:id="@+id/login_btn"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
@@ -62,26 +83,14 @@
 
     <Button
         android:id="@+id/admin_login"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/login_btn"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="0dp"
         android:layout_marginEnd="87dp"
-        android:text="ADMIN"
-        android:onClick="admin_login"/>
+        android:onClick="admin_login"
+        android:text="ADMIN" />
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="127dp"
-        android:layout_marginTop="86dp">
-
-        <android.support.design.widget.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="hint" />
-    </android.support.design.widget.TextInputLayout>
 </android.widget.RelativeLayout>

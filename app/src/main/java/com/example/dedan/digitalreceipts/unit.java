@@ -136,23 +136,23 @@ public class unit extends AppCompatActivity implements LoaderManager.LoaderCallb
         tableRow.setLayoutParams(layoutParams);
 
         TextView no=new TextView(this);
-        no.setPadding(5,5,5,5);
+        no.setPadding(10,5,10,5);
 //        no.setText(count);
         tableRow.addView(no);
 
         TextView txt=new TextView(this);
-        txt.setPadding(5,5,5,5);
+        txt.setPadding(10,5,10,5);
         txt.setText(goods);
         tableRow.addView(txt);
 
         TextView txt1=new TextView(this);
         txt1.setText(container);
-        txt1.setPadding(5 ,5,5,5);
+        txt1.setPadding(10 ,5,10,5);
         tableRow.addView(txt1);
 
         TextView txt2=new TextView(this);
         txt2.setText(cost);
-        txt2.setPadding(5,5,5,5);
+        txt2.setPadding(10,5,10,5);
         tableRow.addView(txt2);
 
         checkBox = new CheckBox(this);

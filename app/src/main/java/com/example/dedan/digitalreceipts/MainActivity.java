@@ -22,7 +22,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Objects;
 
 import static java.util.Calendar.PM;
@@ -34,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     SqlOpenHelper sqlOpenHelper;
     private String loggedIn_user;
     private String loggedIn_username;
+    private int loggedIn_baseId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         try{
             loggedIn_user = getIntent().getExtras().getString("loggedIn_user");
             loggedIn_username=getIntent().getExtras().getString("loggedIn_username");
+            loggedIn_baseId=getIntent().getExtras().getInt("loggedIn_baseId");
         }catch (NullPointerException e){
             e.printStackTrace();
         }
@@ -63,7 +67,15 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
         }
 
+        Date date=new Date();
+        String dateToday = new SimpleDateFormat("dd/MM/yyyy").format(date);
+        String month=new SimpleDateFormat("MM/yyyy").format(date);
+        String year=new SimpleDateFormat("yyyy").format(date);
+
         if(!sharedPreferences.getBoolean("firstTime", false)) {
+            editor.putString("todays_date",dateToday);
+            editor.putString("currentMonth",month);
+            editor.putString("currentYear",year);
             // run your one time code
             editor.putInt("today",0);
             editor.putInt("yesterday",0);
@@ -72,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
 
             editor.putBoolean("firstTime", true);
             editor.apply();
+
             //today
             todayAlarm();
             //week
@@ -81,12 +94,33 @@ public class MainActivity extends AppCompatActivity {
         }
         Log.i("mesooi", " main called");
 
+        String checkDate=sharedPreferences.getString("todays_date","");
+        String checkMonth=sharedPreferences.getString("currentMonth","");
+        String checkYear=sharedPreferences.getString("currentYear","");
+        if(!checkDate.equals(dateToday)){
+            updateStats();
+            editor.putString("todays_date",dateToday);
+        }
+        if(!checkMonth.equals(month)){
+            editor.putString("currentMonth",month);
+        }
+        if(!checkYear.equals(year)){
+            editor.putString("currentYear",year);
+        }
         Calendar c=Calendar.getInstance();
         String time= String.valueOf(c.getTime());
         update(time);
         permissions();
     }
+    public void updateStats() {
+        String select = SqlOpenHelper.KEY_EMP_FOREIGN + "=?";
+        String[] selectArgs = {String.valueOf(loggedIn_baseId)};
+        ContentValues values = new ContentValues();
+        values.put(SqlOpenHelper.KEY_TODAY,"0" );
+        SQLiteDatabase db = sqlOpenHelper.getWritableDatabase();
+        db.update(SqlOpenHelper.TABLE_SALES, values, select, selectArgs);
 
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater=getMenuInflater();

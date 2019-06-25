@@ -22,4 +22,7 @@
         <item name="actionMenuTextColor">@android:color/white</item>
     </style>
 
+    <style name="TextAppearence.App.TextInputLayout" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
 </resources>

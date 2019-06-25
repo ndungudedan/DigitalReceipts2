@@ -506,7 +506,8 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 dir.mkdirs();
             }
             Date date=new Date();
-            timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(date);
+            SimpleDateFormat currentDate = new SimpleDateFormat("ddMMyyyy_HHmmss");
+            timeStamp= currentDate.format(date);
 
              file=new File(dir,name+"_"+timeStamp+".pdf");
             try {

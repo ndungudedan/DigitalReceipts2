@@ -10,7 +10,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class Register extends AppCompatActivity {
-    EditText fName,scName,empNo,DOB,resid,mobileNo;
+    EditText fName,scName, idN0,DOB,resid,mobileNo;
     EditText user;
     EditText pass;
     EditText email;
@@ -25,7 +25,7 @@ public class Register extends AppCompatActivity {
         email=findViewById(R.id.email_reg);
         fName=findViewById(R.id.first_name);
         scName=findViewById(R.id.sec_name);
-        empNo=findViewById(R.id.emp_no);
+        idN0=findViewById(R.id.id_no);
         DOB=findViewById(R.id.dob);
         resid=findViewById(R.id.residence);
         mobileNo=findViewById(R.id.tel_no);
@@ -34,7 +34,7 @@ public class Register extends AppCompatActivity {
     public void register(View view) {
         String userfname=fName.getText().toString();
         String userscName=scName.getText().toString();
-        String usernationalID=empNo.getText().toString();
+        String usernationalID= idN0.getText().toString();
         String userDOB=DOB.getText().toString();
         String userresid=resid.getText().toString();
         String usermobile=mobileNo.getText().toString();

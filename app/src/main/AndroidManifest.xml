@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.dedan.digitalreceipts">
 
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -90,33 +93,31 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".logIn"
+        <activity
+            android:name=".logIn"
             android:label="@string/LogIn"
-            android:theme="@style/AppTheme">
-
-        </activity>
-
-        <activity android:name=".Register"
+            android:theme="@style/AppTheme"></activity>
+        <activity
+            android:name=".Register"
             android:label="@string/register"
-            android:theme="@style/AppTheme">
-        </activity>
-
-        <activity android:name=".security"
+            android:theme="@style/AppTheme"></activity>
+        <activity
+            android:name=".security"
             android:label="Security"
             android:parentActivityName=".createReceipt"
             android:theme="@style/AppTheme">
-        <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value="com.example.dedan.digitalreceipts.createReceipt" />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.dedan.digitalreceipts.createReceipt" />
         </activity>
 
         <receiver
             android:name=".receiver"
             android:enabled="true"
-            android:exported="true">
-        </receiver>
+            android:exported="true"></receiver>
 
-        <activity android:name=".unit"
+        <activity
+            android:name=".unit"
             android:label="Units"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppThemeNo">
@@ -124,6 +125,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.dedan.digitalreceipts.MainActivity" />
         </activity>
+        <activity android:name=".BTDeviceList"></activity>
     </application>
 
 </manifest>
