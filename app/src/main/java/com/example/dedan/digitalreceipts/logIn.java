@@ -2,18 +2,34 @@ package com.example.dedan.digitalreceipts;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import java.util.Objects;
+
 public class logIn extends AppCompatActivity {
+    private ProgressBar progressBar;
+    private FirebaseAuth mAuth;
     private static int loggedIn_baseId;
-    EditText user;
-    EditText pass;
+    EditText user,emailtxt;
+    TextInputEditText pass;
     SqlOpenHelper sqlOpenHelper;
 
     private static String loggedIn_user;
@@ -25,30 +41,79 @@ public class logIn extends AppCompatActivity {
         setContentView(R.layout.activity_log_in);
         user=findViewById(R.id.username_edit);
         pass=findViewById(R.id.password_edit);
+        emailtxt=findViewById(R.id.email_edit);
         inputLayoutName = (TextInputLayout) findViewById(R.id.input_layout_username);
         inputLayoutPassword = (TextInputLayout) findViewById(R.id.input_layout_password);
+        //inputLayoutEmail=findViewById(R.id.input_layout_useremail);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         sqlOpenHelper = new SqlOpenHelper(getApplicationContext());
+        mAuth = FirebaseAuth.getInstance();
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+      //  alreadySignedIn(currentUser);
+    }
+    public void alreadySignedIn(FirebaseUser currentUser){
+        if(currentUser!=null){
+            Intent main=new Intent(this,MainActivity.class);
+            main.putExtra("loggedIn_user",loggedIn_user);
+            main.putExtra("loggedIn_username",loggedIn_username);
+            main.putExtra("loggedIn_baseId",loggedIn_baseId);
+            startActivity(main);
+        }
     }
 
     public void login(View view) {
         String name=user.getText().toString();
         String password=pass.getText().toString();
-        if (!validateName()) {
+        if (!validateCredentials()) {
             return;
         }
-        if (!validatePassword()) {
-            return;
-        }
+        progressBar.setVisibility(View.VISIBLE);
             // login user
             int x= checkLogin(sqlOpenHelper,name, password);
-            if(x == 1){
-                housekeeping();
-                Intent main=new Intent(this,MainActivity.class);
-                main.putExtra("loggedIn_user",loggedIn_user);
-                main.putExtra("loggedIn_username",loggedIn_username);
-                main.putExtra("loggedIn_baseId",loggedIn_baseId);
-                startActivity(main);
+        if(x==1 & !internetIsConnected()){
+            housekeeping();
+            Intent main=new Intent(logIn.this,MainActivity.class);
+            main.putExtra("loggedIn_user",loggedIn_user);
+            main.putExtra("loggedIn_username",loggedIn_username);
+            main.putExtra("loggedIn_baseId",loggedIn_baseId);
+            startActivity(main);
+        }
+            if(x == 1 & internetIsConnected()){
+                mAuth.signInWithEmailAndPassword(emailtxt.getText().toString().trim(), pass.getText().toString().trim())
+                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    // Sign in success, update UI with the signed-in user's information
+                                    if(mAuth.getCurrentUser().isEmailVerified()){
+                                        housekeeping();
+                                        Intent main=new Intent(logIn.this,MainActivity.class);
+                                        main.putExtra("loggedIn_user",loggedIn_user);
+                                        main.putExtra("loggedIn_username",loggedIn_username);
+                                        main.putExtra("loggedIn_baseId",loggedIn_baseId);
+                                        startActivity(main);
+                                    }
+                                    else{
+                                        Toast.makeText(logIn.this, "Please verify email",
+                                                Toast.LENGTH_SHORT).show();
+
+                                    }
+                                    progressBar.setVisibility(View.INVISIBLE);
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(logIn.this, ""+e.getLocalizedMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
             else if(x==2){
                 Toast.makeText(getApplicationContext(),
@@ -60,8 +125,10 @@ public class logIn extends AppCompatActivity {
                         "Wrong credentials!", Toast.LENGTH_LONG)
                         .show();
             }
+        progressBar.setVisibility(View.INVISIBLE);
+
     }
-    public static int checkLogin(SqlOpenHelper sqlOpenHelper,String name, String password) {
+    public int checkLogin(SqlOpenHelper sqlOpenHelper, String name, String password) {
         SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
         String[] columns = {SqlOpenHelper._USERID, SqlOpenHelper.KEY_NAME,SqlOpenHelper.KEY_PASS,SqlOpenHelper.KEY_FIRSTNAME,
         SqlOpenHelper.KEY_ACCESS};
@@ -74,7 +141,7 @@ public class logIn extends AppCompatActivity {
         int passwordPos = cursor.getColumnIndex(SqlOpenHelper.KEY_PASS);
         int accessPos = cursor.getColumnIndex(SqlOpenHelper.KEY_ACCESS);
         //refresh views here so that they can load again
-        int x = 0;
+         int x = 0;
         while (cursor.moveToNext()) {
             String n = cursor.getString(namePos);
             String c = cursor.getString(passwordPos);
@@ -85,60 +152,127 @@ public class logIn extends AppCompatActivity {
                 loggedIn_user = cursor.getString(userpos);
                 if(d.equals("ACCESS_DENIED")){
                     x = 2;
-                    break;
+                    return x;
                 }
                 x = 1;
-                break;
+                return x;
             }
-
         }
         cursor.close();
         return x;
     }
 
+    private void updateUI(FirebaseUser user) {
+        if(user!=null){
+            Intent main=new Intent(this,MainActivity.class);
+            main.putExtra("loggedIn_user",loggedIn_user);
+            main.putExtra("loggedIn_username",loggedIn_username);
+            main.putExtra("loggedIn_baseId",loggedIn_baseId);
+            startActivity(main);
+        }
+    }
     public void Reg_link(View view) {
         Intent intent=new Intent(this,Register.class);
         startActivity(intent);
     }
 
     public void Forgot_password(View view) {
+        String emailAddress = emailtxt.getText().toString().trim();
+        if (TextUtils.isEmpty(emailtxt.getText().toString().trim())) {
+            emailtxt.setError("Required.");
+            return;
+        } else {
+            emailtxt.setError(null);
+        }
+            mAuth.sendPasswordResetEmail(emailAddress)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(logIn.this, ""+"Reset email sent",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                            else{
+                                Toast.makeText(logIn.this, Objects.requireNonNull(task.getException()).getMessage(),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(logIn.this, ""+e.getLocalizedMessage(),
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
 
     }
-
     public void admin_login(View view) {
         String name="ADMIN_"+user.getText().toString();
         String password=pass.getText().toString();
-        if (!name.isEmpty() && !password.isEmpty()) {
+        if (!validateCredentials()) {
+            return;
+        }
+        progressBar.setVisibility(View.VISIBLE);
+
             // login user
             int x=checkLogin(sqlOpenHelper,name,password);
-            if(x == 1){
+            if(x==1 & !internetIsConnected()){
                 housekeeping();
-
-                Intent main=new Intent(this,MainActivity.class);
+                Intent main=new Intent(logIn.this,MainActivity.class);
                 main.putExtra("loggedIn_user",loggedIn_user);
                 main.putExtra("loggedIn_username",loggedIn_username);
                 main.putExtra("loggedIn_baseId",loggedIn_baseId);
                 startActivity(main);
+            }
+            if(x == 1 & internetIsConnected()){
+                mAuth.signInWithEmailAndPassword(emailtxt.getText().toString().trim(), pass.getText().toString().trim())
+                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    // Sign in success, update UI with the signed-in user's information
+                                    if(mAuth.getCurrentUser().isEmailVerified()){
+                                        housekeeping();
+                                        Intent main=new Intent(logIn.this,MainActivity.class);
+                                        main.putExtra("loggedIn_user",loggedIn_user);
+                                        main.putExtra("loggedIn_username",loggedIn_username);
+                                        main.putExtra("loggedIn_baseId",loggedIn_baseId);
+                                        startActivity(main);
+                                    }
+                                    else{
+                                        Toast.makeText(logIn.this, "Please verify email",
+                                                Toast.LENGTH_SHORT).show();
 
+                                    }
+                                    progressBar.setVisibility(View.INVISIBLE);
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(logIn.this, ""+e.getLocalizedMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+                progressBar.setVisibility(View.INVISIBLE);
             }
             else{
                 Toast.makeText(getApplicationContext(),
                         "Wrong credentials!", Toast.LENGTH_LONG)
                         .show();
             }
-        } else {
-            // Prompt user to enter credentials
-            Toast.makeText(getApplicationContext(),
-                    "Please enter the credentials!", Toast.LENGTH_LONG)
-                    .show();
         }
-    }
     public void housekeeping(){
         user.getText().clear();
         pass.getText().clear();
-        //finish();
     }
-    private boolean validateName() {
+    private boolean validateCredentials() {
+        if (internetIsConnected() & TextUtils.isEmpty(emailtxt.getText().toString().trim())) {
+            emailtxt.setError("Required.");
+            return false;
+        } else {
+            emailtxt.setError(null);
+        }
         if (user.getText().toString().trim().isEmpty()) {
             inputLayoutName.setError("invalid username");
             requestFocus(user);
@@ -146,24 +280,24 @@ public class logIn extends AppCompatActivity {
         } else {
             inputLayoutName.setErrorEnabled(false);
         }
-
-        return true;
-    }
-    private boolean validatePassword() {
-        if (user.getText().toString().trim().isEmpty()) {
+        if(pass.getText().toString().trim().isEmpty()){
             inputLayoutPassword.setError("invalid password");
-            requestFocus(pass);
-            return false;
-        } else {
+        }
+        else{
             inputLayoutPassword.setErrorEnabled(false);
         }
-
         return true;
     }
     private void requestFocus(View view) {
         if (view.requestFocus()) {
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        } }
+    public boolean internetIsConnected() {
+        try {
+            String command = "ping -c 1 google.com";
+            return (Runtime.getRuntime().exec(command).waitFor() == 0);
+        } catch (Exception e) {
+            return false;
         }
     }
-
 }

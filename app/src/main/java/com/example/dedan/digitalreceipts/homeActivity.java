@@ -263,11 +263,11 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
     public void stats(){
         SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
         String[] columns = {SqlOpenHelper.KEY_TALLY, SqlOpenHelper.KEY_MONTH,SqlOpenHelper.KEY_WEEK,SqlOpenHelper.KEY_YESTERDAY,
-                SqlOpenHelper.KEY_TODAY};
+                SqlOpenHelper.KEY_TODAY,SqlOpenHelper.KEY_EMP_FOREIGN};
         Cursor cursor = db.query(SqlOpenHelper.TABLE_SALES, columns, null, null,
                 null, null, null);
 
-        //int IdPos = cursor.getColumnIndex(SqlOpenHelper.KEY_ID);
+        int IdPos = cursor.getColumnIndex(SqlOpenHelper.KEY_EMP_FOREIGN);
         int yesterdayPos = cursor.getColumnIndex(SqlOpenHelper.KEY_YESTERDAY);
         int weekPos = cursor.getColumnIndex(SqlOpenHelper.KEY_WEEK);
         int todayPos = cursor.getColumnIndex(SqlOpenHelper.KEY_TODAY);
@@ -275,18 +275,22 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         int tallyPos = cursor.getColumnIndex(SqlOpenHelper.KEY_TALLY);
         //refresh views here so that they can load again
         while (cursor.moveToNext()) {
-            int n = cursor.getInt(yesterdayPos);
-            int c = cursor.getInt(weekPos);
-            int l = cursor.getInt(todayPos);
-            int p=cursor.getInt(monthPos);
-            int h=cursor.getInt(tallyPos);
-            update(n,c,l,p,h);
+            int j=getUser();
+            if(j==cursor.getInt(IdPos)){
+                int n = cursor.getInt(yesterdayPos);
+                int c = cursor.getInt(weekPos);
+                int l = cursor.getInt(todayPos);
+                int p=cursor.getInt(monthPos);
+                int h=cursor.getInt(tallyPos);
+                update(n,c,l,p,h);
+                break;
+            }
         }
         cursor.close();
     }
     private void update(int n,int c,int l,int p,int h){
         int j=getUser();
-        String select=SqlOpenHelper.KEY_TODAY+"=?";
+        String select=SqlOpenHelper.KEY_EMP_FOREIGN+"=?";
         String[]selectArgs={String.valueOf(j)};
         ContentValues values=new ContentValues();
         values.put(SqlOpenHelper.KEY_TODAY,l+total);
@@ -296,7 +300,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         values.put(SqlOpenHelper.KEY_TALLY,h+pdfCount);
 
         SQLiteDatabase db=sqlOpenHelper.getWritableDatabase();
-        db.update(SqlOpenHelper.TABLE_USER,values,select,selectArgs);
+        db.update(SqlOpenHelper.TABLE_SALES,values,select,selectArgs);
     }
 
     public void addClick() {

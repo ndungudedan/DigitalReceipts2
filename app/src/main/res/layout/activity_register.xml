@@ -148,16 +148,18 @@
             android:layout_toEndOf="@id/user_reg_inputLayout"
             app:hintAnimationEnabled="true"
             app:hintEnabled="true"
-            app:passwordToggleDrawable="@drawable/ic_outline_visibility_24px"
-            app:passwordToggleEnabled="true">
+            app:passwordToggleEnabled="true"
+            app:passwordToggleTint="@android:color/holo_blue_dark"
+            app:counterEnabled="true"
+            app:counterMaxLength="10">
 
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/pass_reg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="password"
-                android:inputType="textPassword|textWebPassword|numberPassword"
+                android:inputType="textPassword|textWebPassword"
                 android:password="true" />
         </android.support.design.widget.TextInputLayout>
 

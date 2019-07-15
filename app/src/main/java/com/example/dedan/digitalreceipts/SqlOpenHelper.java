@@ -66,7 +66,7 @@ public class SqlOpenHelper extends SQLiteOpenHelper {
                 KEY_COST+" INTEGER "+")";
 
         String CREATE_STATS_TABLE="CREATE TABLE IF NOT EXISTS "+TABLE_SALES+"("+KEY_EMP_FOREIGN+" INTEGER, " +KEY_TODAY+" INTEGER , "+KEY_YESTERDAY+" INTEGER ,"
-                +KEY_WEEK+" INTEGER ,"+KEY_MONTH+" INTEGER , "+KEY_TALLY+" INTEGER, "+ " FOREIGN KEY ("+KEY_EMP_FOREIGN+") REFERENCES "+TABLE_USER+"("+KEY_empNO+"));";
+                +KEY_WEEK+" INTEGER ,"+KEY_MONTH+" INTEGER , "+KEY_TALLY+" INTEGER "+")";
 
         sqLiteDatabase.execSQL(CREATE_LOGIN_TABLE);
         sqLiteDatabase.execSQL(CREATE_ITEM_DETAILS_TABLE);
@@ -134,11 +134,21 @@ public class SqlOpenHelper extends SQLiteOpenHelper {
 
         // Inserting Row
         long id = db.insert(TABLE_USER, null, values);
+        statsFirstInsert(db,empNO);
         db.close(); // Closing database connection
 
         Log.d(TAG, "New user inserted into sqlite: " + id);
     }
-
+public void statsFirstInsert(SQLiteDatabase db,int empNO){
+        ContentValues values=new ContentValues();
+        values.put(KEY_TODAY,"0");
+        values.put(KEY_TALLY,"0");
+        values.put(KEY_WEEK,"0");
+        values.put(KEY_MONTH,"0");
+        values.put(KEY_YESTERDAY,"0");
+        values.put(KEY_EMP_FOREIGN,empNO);
+        db.insert(TABLE_SALES,null,values);
+}
 
     /**
      * Getting user data from database

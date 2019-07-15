@@ -10,8 +10,11 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,6 +31,8 @@ import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import static com.example.dedan.digitalreceipts.secFragment.newInstance;
+
 public class security extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemSelectedListener {
     SharedPreferences sharedPreferences;
     SqlOpenHelper sqlOpenHelper;
@@ -38,14 +43,14 @@ public class security extends AppCompatActivity implements LoaderManager.LoaderC
     private int USER_LOAD = 4;
     private SQLiteDatabase db;
     private SimpleCursorAdapter simpleCursorAdapter;
-    public long empID = 0;
+    public static long empID = 0;
+    public static String checkuser="";
     public String user;
     private Spinner spinner;
     Cursor mcursor;
-    private ViewpagerAdapter adapter;
+    private FragmentStatePagerAdapter adapter;
     private ViewPager viewPager;
-    private com.example.dedan.digitalreceipts.secFragment secFragment;
-    private transactionFragment transactionFragment;
+    PagerTabStrip pagerTabStrip;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +58,12 @@ public class security extends AppCompatActivity implements LoaderManager.LoaderC
         setContentView(R.layout.admin);
         viewPager = findViewById(R.id.viewpager);
         if (viewPager != null) {
+            pagerTabStrip=findViewById(R.id.pager_header);
             adapter = new ViewpagerAdapter(getSupportFragmentManager());
             viewPager.setAdapter(adapter);
+            pagerTabStrip=findViewById(R.id.pager_header);
+            //adapter = new ViewpagerAdapter(getSupportFragmentManager());
+            //viewPager.setAdapter(adapter);
 
             sharedPreferences = getSharedPreferences("Data", MODE_PRIVATE);
             //SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -210,13 +219,11 @@ public class security extends AppCompatActivity implements LoaderManager.LoaderC
                 }
             }
             cursor.close();
+            empID=l;
+            checkuser=z;
+            //viewPager.setCurrentItem(viewPager.getCurrentItem());
 
-            Fragment fragment =com.example.dedan.digitalreceipts.secFragment.newInstance(l,z);
-            FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.add(R.id.secfrag, fragment);
-            fragmentTransaction.commit();
             adapter.notifyDataSetChanged();
-
             }
         }
     @Override

@@ -74,6 +74,7 @@
     </RelativeLayout>
 
     <LinearLayout
+        android:id="@+id/linear_views"
         android:layout_width="305dp"
         android:layout_height="385dp"
         android:layout_below="@id/rel"

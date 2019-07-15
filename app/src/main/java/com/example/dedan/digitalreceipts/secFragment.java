@@ -14,6 +14,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,10 +24,18 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -51,11 +60,12 @@ public class secFragment extends Fragment implements View.OnClickListener {
     private Button authenticate;
     private Button invalidate;
 
+    private FirebaseAuth mAuth;
 
     public secFragment() {
     }
 
-    public static secFragment newInstance(long param1,String userCheck) {
+    public static Fragment newInstance(long param1,String userCheck) {
         fragment = new secFragment();
         Bundle args = new Bundle();
         args.putLong(ARG_PARAM1, param1);
@@ -71,6 +81,7 @@ public class secFragment extends Fragment implements View.OnClickListener {
         user = sharedPreferences.getString("current_username","");
         sqlOpenHelper=new SqlOpenHelper(getActivity());
         security=new security();
+        mAuth = FirebaseAuth.getInstance();
         if (getArguments() != null) {
             hid = getArguments().getLong(ARG_PARAM1);
             accessCheck= getArguments().getString(ARG_PARAM2);
@@ -86,7 +97,7 @@ public class secFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         //container.removeAllViews();
-        container.removeAllViewsInLayout();
+        //container.removeAllViewsInLayout();
 
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_sec, container, false);
@@ -106,8 +117,10 @@ public class secFragment extends Fragment implements View.OnClickListener {
         Button edit=(Button)view.findViewById(R.id.edit_btn);
         Button save=(Button)view.findViewById(R.id.save_btn);
 
-        //security.notEditable();
-
+        if (getArguments() != null) {
+            user_fName.getText().clear();
+            user_scName.getText().clear();
+        }
         if(hid>1){
             relativeLayout.setVisibility(View.INVISIBLE);
             save.setVisibility(View.INVISIBLE);
@@ -134,14 +147,19 @@ public class secFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         if(!user.startsWith("ADMIN")){
             fragload(0,sqlOpenHelper);
         }
         else{
             fragload(hid,sqlOpenHelper);
         }
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -251,19 +269,61 @@ else {
         }
     }
     public void update(){
-        String select=SqlOpenHelper.KEY_ID+"=?";
-        String[]selectArgs={user};
-        ContentValues values=new ContentValues();
-        values.put(SqlOpenHelper.KEY_NAME,txt_user.getText().toString().trim());
-        values.put(SqlOpenHelper.KEY_PASS,txt_pass.getText().toString().trim());
-        values.put(SqlOpenHelper.KEY_FIRSTNAME,user_fName.getText().toString().trim());
-        values.put(SqlOpenHelper.KEY_SECNAME,user_scName.getText().toString().trim());
-        values.put(SqlOpenHelper.KEY_MOBILENO,user_mobileNo.getText().toString().trim());
-        values.put(SqlOpenHelper.KEY_residence,user_resid.getText().toString().trim());
-        values.put(SqlOpenHelper.KEY_DOB,user_DOB.getText().toString().trim());
-        values.put(SqlOpenHelper.KEY_EMAIL,user_email.getText().toString().trim());
-        SQLiteDatabase db=sqlOpenHelper.getWritableDatabase();
-        db.update(SqlOpenHelper.TABLE_USER,values,select,selectArgs);
+        if(internetIsConnected()){
+            FirebaseUser fireuser = FirebaseAuth.getInstance().getCurrentUser();
+            String newPassword =txt_pass.getText().toString().trim();
+            fireuser.updatePassword(newPassword)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(getActivity(), "password updated",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(getActivity(), ""+e.getLocalizedMessage(),
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+            fireuser.updateEmail(user_email.getText().toString().trim())
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(getActivity(), "email updated",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(getActivity(), ""+e.getLocalizedMessage(),
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            String select=SqlOpenHelper.KEY_ID+"=?";
+            String[]selectArgs={user};
+            ContentValues values=new ContentValues();
+            values.put(SqlOpenHelper.KEY_NAME,txt_user.getText().toString().trim());
+            values.put(SqlOpenHelper.KEY_PASS,txt_pass.getText().toString().trim());
+            values.put(SqlOpenHelper.KEY_FIRSTNAME,user_fName.getText().toString().trim());
+            values.put(SqlOpenHelper.KEY_SECNAME,user_scName.getText().toString().trim());
+            values.put(SqlOpenHelper.KEY_MOBILENO,user_mobileNo.getText().toString().trim());
+            values.put(SqlOpenHelper.KEY_residence,user_resid.getText().toString().trim());
+            values.put(SqlOpenHelper.KEY_DOB,user_DOB.getText().toString().trim());
+            values.put(SqlOpenHelper.KEY_EMAIL,user_email.getText().toString().trim());
+            SQLiteDatabase db=sqlOpenHelper.getWritableDatabase();
+            db.update(SqlOpenHelper.TABLE_USER,values,select,selectArgs);
+        }
+        else{
+            Toast.makeText(getActivity(), "failed!!!No network access",
+                    Toast.LENGTH_SHORT).show();
+        }
+
     }
     public void notEditable(){
         txt_user.setEnabled(false);
@@ -306,5 +366,12 @@ else {
         authenticate.setVisibility(View.INVISIBLE);
         invalidate.setVisibility(View.VISIBLE);
     }
-
+    public boolean internetIsConnected() {
+        try {
+            String command = "ping -c 1 google.com";
+            return (Runtime.getRuntime().exec(command).waitFor() == 0);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
