@@ -46,7 +46,7 @@ public class customListAdapter extends ArrayAdapter<load> {
         if(convertView==null){
             viewholder = new viewHolder();
             convertView = inflater.inflate(R.layout.adapter_view, null);
-            viewholder.txt = (TextView)convertView.findViewById(R.id.rcpt);
+            viewholder.txt = convertView.findViewById(R.id.rcpt);
             convertView.setTag(viewholder);
         }
         else{

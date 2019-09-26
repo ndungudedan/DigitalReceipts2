@@ -20,8 +20,10 @@
 <RelativeLayout
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
+
     <ImageButton
         android:id="@+id/button2"
+        style="@android:style/Widget.DeviceDefault.ImageButton"
         android:layout_width="184dp"
         android:layout_height="185dp"
         android:layout_alignParentStart="true"

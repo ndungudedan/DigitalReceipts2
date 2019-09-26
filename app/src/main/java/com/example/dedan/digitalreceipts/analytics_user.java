@@ -1,6 +1,7 @@
 package com.example.dedan.digitalreceipts;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -12,13 +13,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class analytics_user extends Fragment {
     TextView today,yesterday,thisweek,thismonth;
     SqlOpenHelper sqlOpenHelper;
     Cursor mcursor;
     private TextView tally;
-    private long transId=0;
-
+    public long transId=1;
+    long current_empNo=0;
+    public String user;
+    SharedPreferences sharedPreferences;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -29,6 +34,7 @@ public class analytics_user extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+    private static analytics_user fragment;
 
     public analytics_user() {
         // Required empty public constructor
@@ -36,7 +42,7 @@ public class analytics_user extends Fragment {
 
     // TODO: Rename and change types and number of parameters
     public static analytics_user newInstanceAnalytics (Long param1) {
-        analytics_user fragment = new analytics_user();
+        fragment = new analytics_user();
         Bundle args = new Bundle();
         args.putLong(ARG_PARAM1, param1);
         //args.putString(ARG_PARAM2, param2);
@@ -48,7 +54,10 @@ public class analytics_user extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sqlOpenHelper=new SqlOpenHelper(getActivity());
-
+        sharedPreferences=getContext().getSharedPreferences("Data",MODE_PRIVATE);
+        //SharedPreferences.Editor editor = sharedPreferences.edit();
+        user = sharedPreferences.getString("current_username","");
+        current_empNo=sharedPreferences.getLong("current_empNo",0);
         if (getArguments() != null) {
             transId = getArguments().getLong(ARG_PARAM1);
            // mParam2 = getArguments().getString(ARG_PARAM2);
@@ -59,19 +68,29 @@ public class analytics_user extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view=inflater.inflate(R.layout.fragment_user, container, false);
-        today =(TextView)view.findViewById(R.id.today_text);
-        yesterday=(TextView)view.findViewById(R.id.yester_text);
-        thisweek=(TextView)view.findViewById(R.id.week_text);
-        thismonth=(TextView)view.findViewById(R.id.month_text);
-        tally=(TextView)view.findViewById(R.id.tally_text);
+        View view=inflater.inflate(R.layout.fragment_analytics_user, container, false);
+        today = view.findViewById(R.id.today_text);
+        yesterday= view.findViewById(R.id.yester_text);
+        thisweek= view.findViewById(R.id.week_text);
+        thismonth= view.findViewById(R.id.month_text);
+        tally= view.findViewById(R.id.tally_text);
         return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        fragload(transId,sqlOpenHelper);
+        if(!user.startsWith("ADMIN")){
+            fragload(current_empNo,sqlOpenHelper);
+        }
+        else{
+            fragload(transId,sqlOpenHelper);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     public void fragload(long passedid, SqlOpenHelper sqlOpenHelper) {
@@ -86,11 +105,10 @@ public class analytics_user extends Fragment {
         int yestPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_YESTERDAY);
         int todayPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_TODAY);
         int tallyPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_TALLY);
-        int id=mcursor.getColumnIndex(SqlOpenHelper.KEY_EMP_FOREIGN);
+        int idPos=mcursor.getColumnIndex(SqlOpenHelper.KEY_EMP_FOREIGN);
         //refresh views here so that they can load again
         while (mcursor.moveToNext()) {
-            long confId=mcursor.getLong(id);
-            if(passedid==confId){
+            if(passedid==mcursor.getLong(idPos)){
                 n = mcursor.getString(todayPos);
                 y = mcursor.getString(weekPos);
                 c = mcursor.getString(yestPos);
@@ -105,7 +123,6 @@ public class analytics_user extends Fragment {
         thismonth.setText(l);
         tally.setText(f);
     }
-
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {

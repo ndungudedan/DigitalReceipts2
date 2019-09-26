@@ -22,35 +22,52 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/itemtxt"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:ems="10"
-            android:hint="item"
-            android:inputType="textPersonName" />
+            android:id="@+id/itemInputLayout"
+            >
+            <EditText
+                android:id="@+id/itemtxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:ems="10"
+                android:hint="item"
+                android:inputType="textPersonName" />
+        </android.support.design.widget.TextInputLayout>
 
-        <EditText
-            android:id="@+id/packtxt"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/itemtxt"
-            android:layout_alignParentStart="true"
-            android:ems="10"
-            android:hint="package"
-            android:inputType="textPersonName" />
+            android:id="@+id/packInputLayout"
+            android:layout_below="@+id/itemInputLayout">
+            <EditText
+                android:id="@+id/packtxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:ems="10"
+                android:hint="package"
+                android:inputType="textPersonName" />
 
-        <EditText
-            android:id="@+id/unittxt"
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/packtxt"
-            android:layout_alignParentStart="true"
-            android:ems="10"
-            android:hint="unit cost"
-            android:inputType="number" />
+            android:id="@+id/unitInputLayout"
+            android:layout_below="@+id/packInputLayout">
+            <EditText
+                android:id="@+id/unittxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:ems="10"
+                android:hint="unit cost"
+                android:inputType="number" />
+        </android.support.design.widget.TextInputLayout>
 
         <Button
             android:id="@+id/button4"

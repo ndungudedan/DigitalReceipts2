@@ -18,6 +18,7 @@ public class SqlOpenHelper extends SQLiteOpenHelper {
     public static final String TABLE_USER = "user";
     public static final String TABLE_ITEM_DETAILS="item_details";
     public static final String TABLE_SALES="sales";
+    public static final String TABLE_COMPANY_ANALYSIS="company_analysis";
 
     public static final String KEY_ID = "id";
     public static final String KEY_FIRSTNAME = "first_name";
@@ -41,9 +42,22 @@ public class SqlOpenHelper extends SQLiteOpenHelper {
     public static final String KEY_TODAY="today";
     public static final String KEY_YESTERDAY="yesterday";
     public static final String KEY_WEEK="week";
+    public static final String KEY_LAST_WEEK="last_week";
     public static final String KEY_MONTH="month";
+    public static final String KEY_LAST_MONTH="last_month";
     public static final String KEY_TALLY="sales_count";
+    public static final String KEY_LAST_TALLY="last_tally";
     public static final String KEY_EMP_FOREIGN="empNo_foreignKey";
+
+
+    public static final String KEY_TODAY_COMPANY="today";
+    public static final String KEY_YESTERDAY_COMPANY="yesterday";
+    public static final String KEY_WEEK_COMPANY="week";
+    public static final String KEY_LAST_WEEK_COMPANY="last_week";
+    public static final String KEY_MONTH_COMPANY="month";
+    public static final String KEY_LAST_MONTH_COMPANY="last_month";
+    public static final String KEY_TALLY_COMPANY="sales_count";
+    public static final String KEY_LAST_TALLY_COMPANY="last_tally";
 
    public static String _ID=BaseColumns._ID;
     public static String _USERID=BaseColumns._ID;
@@ -51,7 +65,6 @@ public class SqlOpenHelper extends SQLiteOpenHelper {
     public SqlOpenHelper(@Nullable Context context) {
         super(context,DATABASE_NAME, null, DATABASE_VERSION);
     }
-
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
@@ -66,22 +79,26 @@ public class SqlOpenHelper extends SQLiteOpenHelper {
                 KEY_COST+" INTEGER "+")";
 
         String CREATE_STATS_TABLE="CREATE TABLE IF NOT EXISTS "+TABLE_SALES+"("+KEY_EMP_FOREIGN+" INTEGER, " +KEY_TODAY+" INTEGER , "+KEY_YESTERDAY+" INTEGER ,"
-                +KEY_WEEK+" INTEGER ,"+KEY_MONTH+" INTEGER , "+KEY_TALLY+" INTEGER "+")";
+                +KEY_WEEK+" INTEGER ,"+KEY_LAST_WEEK+" INTEGER ,"+KEY_MONTH+" INTEGER , "+KEY_LAST_MONTH+" INTEGER ,"+KEY_TALLY+" INTEGER, "+KEY_LAST_TALLY+" INTEGER "+")";
+
+        String CREATE_COMPANY_ANALYTICS_TABLE="CREATE TABLE IF NOT EXISTS  "+TABLE_COMPANY_ANALYSIS+"("+_ID+" INTEGER PRIMARY KEY,"
+                +KEY_TODAY_COMPANY+" INTEGER ,"+KEY_YESTERDAY_COMPANY+" INTEGER ,"+KEY_WEEK_COMPANY+" INTEGER ,"+KEY_LAST_WEEK_COMPANY+" INTEGER ,"
+                +KEY_MONTH_COMPANY+" INTEGER ," +KEY_LAST_MONTH_COMPANY+" INTEGER ,"+ KEY_TALLY_COMPANY+" INTEGER ,"+KEY_LAST_TALLY_COMPANY+" INTEGER "+")";
 
         sqLiteDatabase.execSQL(CREATE_LOGIN_TABLE);
         sqLiteDatabase.execSQL(CREATE_ITEM_DETAILS_TABLE);
         sqLiteDatabase.execSQL(CREATE_STATS_TABLE);
+        sqLiteDatabase.execSQL(CREATE_COMPANY_ANALYTICS_TABLE);
 
         Log.d(TAG, "Database tables created");
-
     }
-
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         // Drop older table if existed
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEM_DETAILS);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_SALES);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_COMPANY_ANALYSIS);
 
         // Create tables again
         onCreate(sqLiteDatabase);
@@ -139,7 +156,8 @@ public class SqlOpenHelper extends SQLiteOpenHelper {
 
         Log.d(TAG, "New user inserted into sqlite: " + id);
     }
-public void statsFirstInsert(SQLiteDatabase db,int empNO){
+    public void statsFirstInsert(SQLiteDatabase db,int empNO){
+        //sales table
         ContentValues values=new ContentValues();
         values.put(KEY_TODAY,"0");
         values.put(KEY_TALLY,"0");
@@ -148,6 +166,18 @@ public void statsFirstInsert(SQLiteDatabase db,int empNO){
         values.put(KEY_YESTERDAY,"0");
         values.put(KEY_EMP_FOREIGN,empNO);
         db.insert(TABLE_SALES,null,values);
+
+        //company table
+    ContentValues comp_values=new ContentValues();
+    comp_values.put(KEY_TODAY_COMPANY,"0");
+    comp_values.put(KEY_TALLY_COMPANY,"0");
+    comp_values.put(KEY_WEEK_COMPANY,"0");
+    comp_values.put(KEY_MONTH_COMPANY,"0");
+    comp_values.put(KEY_YESTERDAY_COMPANY,"0");
+    comp_values.put(KEY_LAST_WEEK_COMPANY,"0");
+    comp_values.put(KEY_LAST_TALLY_COMPANY,"0");
+    comp_values.put(KEY_LAST_MONTH_COMPANY,"0");
+    db.insert(TABLE_COMPANY_ANALYSIS,null,comp_values);
 }
 
     /**

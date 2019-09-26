@@ -76,13 +76,6 @@ public class Register extends AppCompatActivity {
         if (!validateForm()) {
             return;
         }
-        /*if(username.isEmpty()||userpass.isEmpty()||useremail.isEmpty()||userscName.isEmpty()||userfname.isEmpty()||usernationalID.isEmpty()
-                ||userDOB.isEmpty()||userresid.isEmpty()||usermobile.isEmpty()){
-            Toast.makeText(getApplicationContext(),
-                    "Fill in all details!", Toast.LENGTH_LONG)
-                    .show();
-            return;
-        }*/
         SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
         String[] columns = {SqlOpenHelper.KEY_ID, SqlOpenHelper.KEY_NAME,SqlOpenHelper.KEY_PASS,SqlOpenHelper.KEY_EMAIL,SqlOpenHelper.KEY_empNO};
         Cursor cursor = db.query(SqlOpenHelper.TABLE_USER, columns, null, null,
@@ -175,6 +168,24 @@ public class Register extends AppCompatActivity {
         }else {
             pass.setError(null);
         }
+        if(user.getText().toString().isEmpty()){
+            user.setError("Required");
+        }else{user.setError(null);}
+        if(fName.getText().toString().isEmpty()){
+            fName.setError("Required");
+        }else{fName.setError(null);}
+        if(scName.getText().toString().isEmpty()){
+            scName.setError("Required");
+        }else{scName.setError(null);}
+        if(idN0.getText().toString().isEmpty()){
+            idN0.setError("Required");
+        }else{idN0.setError(null);}
+        if(resid.getText().toString().isEmpty()){
+            resid.setError("Required");
+        }else{resid.setError(null);}
+        if(mobileNo.getText().toString().isEmpty()){
+            mobileNo.setError("Required");
+        }else{mobileNo.setError(null);}
 
         return valid;
     }

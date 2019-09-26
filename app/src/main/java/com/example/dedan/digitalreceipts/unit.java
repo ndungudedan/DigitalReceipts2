@@ -15,6 +15,8 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ScrollView;
+import android.widget.Scroller;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -130,14 +132,14 @@ public class unit extends AppCompatActivity implements LoaderManager.LoaderCallb
         }
        // mcursor.close();
     }
-    public void table_load(int count,String goods,String container,String cost){
+    public void table_load(String count,String goods,String container,String cost){
         TableRow tableRow=new TableRow(this);
         TableRow.LayoutParams layoutParams=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
         tableRow.setLayoutParams(layoutParams);
 
         TextView no=new TextView(this);
         no.setPadding(10,5,10,5);
-//        no.setText(count);
+        no.setText(count);
         tableRow.addView(no);
 
         TextView txt=new TextView(this);
@@ -157,7 +159,7 @@ public class unit extends AppCompatActivity implements LoaderManager.LoaderCallb
 
         checkBox = new CheckBox(this);
         checkBox.setChecked(false);
-        checkBox.setId(count);
+        checkBox.setId(Integer.parseInt(count));
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -215,19 +217,17 @@ public class unit extends AppCompatActivity implements LoaderManager.LoaderCallb
 
     private void loadFinishedValues(Cursor cursor) {
         mcursor=cursor;
-        int IdPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_ITEM_ID);
+        int IdPos = mcursor.getColumnIndex(SqlOpenHelper._ID);
         int itemPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_ITEM);
         int packPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_PACK);
         int costPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_COST);
         //refresh views here so that they can load again
-        int x=0;
         while (mcursor.moveToNext()) {
             String id = mcursor.getString(IdPos);
             String n = mcursor.getString(itemPos);
             String c = mcursor.getString(packPos);
             String h = mcursor.getString(costPos);
-            table_load(x,n,c,h);
-            x++;
+            table_load(id,n,c,h);
         }
     }
 

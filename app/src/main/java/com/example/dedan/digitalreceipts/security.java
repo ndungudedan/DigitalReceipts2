@@ -31,6 +31,8 @@ import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import java.util.Objects;
+
 import static com.example.dedan.digitalreceipts.secFragment.newInstance;
 
 public class security extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemSelectedListener {
@@ -44,6 +46,7 @@ public class security extends AppCompatActivity implements LoaderManager.LoaderC
     private SQLiteDatabase db;
     private SimpleCursorAdapter simpleCursorAdapter;
     public static long empID = 0;
+    public static long check_empNo=0;  //to be used in analytics_user fragment
     public static String checkuser="";
     public String user;
     private Spinner spinner;
@@ -82,7 +85,6 @@ public class security extends AppCompatActivity implements LoaderManager.LoaderC
                         null, null, null, null, SqlOpenHelper.KEY_empNO);
                 simpleCursorAdapter.changeCursor(mcursor);
             }
-
         }
     }
 
@@ -204,16 +206,19 @@ public class security extends AppCompatActivity implements LoaderManager.LoaderC
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         if(user.startsWith("ADMIN")){
             String z=null;
+            long e=0;
             SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
-            String[] columns = {SqlOpenHelper.KEY_ACCESS,SqlOpenHelper._USERID};
+            String[] columns = {SqlOpenHelper.KEY_ACCESS,SqlOpenHelper._USERID,SqlOpenHelper.KEY_empNO};
             Cursor cursor = db.query(SqlOpenHelper.TABLE_USER, columns, null, null,
                     null, null, null);
             int accessPos = cursor.getColumnIndex(SqlOpenHelper.KEY_ACCESS);
+            int empPos=cursor.getColumnIndex(SqlOpenHelper.KEY_empNO);
             int idPos=cursor.getColumnIndex(SqlOpenHelper._USERID);
             //refresh views here so that they can load again
             while (cursor.moveToNext()) {
                 long s=cursor.getLong(idPos);
                 if(s==l){
+                    e=cursor.getLong(empPos);
                      z = cursor.getString(accessPos);
                     break;
                 }
@@ -221,8 +226,7 @@ public class security extends AppCompatActivity implements LoaderManager.LoaderC
             cursor.close();
             empID=l;
             checkuser=z;
-            //viewPager.setCurrentItem(viewPager.getCurrentItem());
-
+            check_empNo=e;
             adapter.notifyDataSetChanged();
             }
         }

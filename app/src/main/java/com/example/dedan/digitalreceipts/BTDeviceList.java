@@ -1,4 +1,3 @@
-/*
 package com.example.dedan.digitalreceipts;
 
 import android.app.ListActivity;
@@ -21,12 +20,12 @@ import java.util.Set;
 import java.util.UUID;
 
 public class BTDeviceList extends ListActivity {
-    static public final int REQUEST_CONNECT_BT = 0 * 2300;
-    static private final int REQUEST_ENABLE_BT = 0 * 1000;
-    static private BluetoothAdapter bluetoothAdapter = null;
-    static private ArrayAdapter<String> arrayAdapter = null;
-    static private ArrayAdapter<BluetoothDevice> btDevices = null;
-    private static final UUID SPP_UUID = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
+     public final int REQUEST_CONNECT_BT = 0 * 2300;
+     private final int REQUEST_ENABLE_BT = 0 * 1000;
+     private BluetoothAdapter bluetoothAdapter = null;
+     private ArrayAdapter<String> arrayAdapter = null;
+     private ArrayAdapter<BluetoothDevice> btDevices = null;
+    private  final UUID SPP_UUID = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
     private static BluetoothSocket btSocket = null;
 
 
@@ -142,14 +141,14 @@ public class BTDeviceList extends ListActivity {
                 try {
                     if (btDevices == null) {
                         btDevices = new ArrayAdapter<BluetoothDevice>(
-                                getApplicationContext(), android.R.layout.te);
+                                getApplicationContext(), android.R.layout.simple_list_item_1);
                     }
 
                     if (btDevices.getPosition(device) < 0) {
                         btDevices.add(device);
-                        ArrayAdapter.add(device.getName() + “\n”
-                                + device.getAddress() + “\n” );
-                        ArrayAdapter.notifyDataSetInvalidated();
+                        arrayAdapter.add(device.getName() + "\n"
+                                + device.getAddress() + "\n" );
+                        arrayAdapter.notifyDataSetInvalidated();
                     }
                 } catch (Exception ex) {
 // ex.fillInStackTrace();
@@ -162,17 +161,17 @@ public class BTDeviceList extends ListActivity {
                                    long id) {
         super.onListItemClick(l, v, position, id);
 
-        if (mBluetoothAdapter == null) {
+        if (bluetoothAdapter == null) {
             return;
         }
 
-        if (mBluetoothAdapter.isDiscovering()) {
-            mBluetoothAdapter.cancelDiscovery();
+        if (bluetoothAdapter.isDiscovering()) {
+            bluetoothAdapter.cancelDiscovery();
         }
 
         Toast.makeText(
                 getApplicationContext(),
-                “Connecting to ” + btDevices.getItem(position).getName() + “,”
+                "Connecting to " + btDevices.getItem(position).getName() + ","
         + btDevices.getItem(position).getAddress(),
                 Toast.LENGTH_SHORT).show();
 
@@ -185,18 +184,18 @@ public class BTDeviceList extends ListActivity {
                             .fetchUuidsWithSdp();
                     UUID uuid = btDevices.getItem(position).getUuids()[0]
                             .getUuid();
-                    mbtSocket = btDevices.getItem(position)
+                    btSocket = btDevices.getItem(position)
                             .createRfcommSocketToServiceRecord(uuid);
 
-                    mbtSocket.connect();
+                    btSocket.connect();
                 } catch (IOException ex) {
                     runOnUiThread(socketErrorRunnable);
                     try {
-                        mbtSocket.close();
+                        btSocket.close();
                     } catch (IOException e) {
 // e.printStackTrace();
                     }
-                    mbtSocket = null;
+                    btSocket = null;
                     return;
                 } finally {
                     runOnUiThread(new Runnable() {
@@ -215,15 +214,13 @@ public class BTDeviceList extends ListActivity {
     }
 
     private Runnable socketErrorRunnable = new Runnable() {
-
         @Override
         public void run() {
             Toast.makeText(getApplicationContext(),"Cannot establish connection", Toast.LENGTH_SHORT).show();
-            BluetoothAdapter.startDiscovery();
+            BluetoothAdapter.getDefaultAdapter().startDiscovery();
 
         }
     };
 
 }
 
-*/

@@ -168,7 +168,7 @@ public class rcptList extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                TextView v = (TextView) view.findViewById(R.id.rcpt);
+                TextView v = view.findViewById(R.id.rcpt);
                 name_of_file=v.getText().toString();
                // name_of_file =adapterView.getItemAtPosition(i).toString();
                 openPdf();

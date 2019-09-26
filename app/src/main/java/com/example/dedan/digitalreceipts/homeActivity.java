@@ -94,7 +94,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
     ArrayAdapter<String> arrayAdapter;
     Toolbar tool;
     File file;      //pdf file
-    String name,email,no,pay;
+    String name="",email,no,pay;
     String timeStamp;
     int pdfCount=0;
     SharedPreferences shp;
@@ -198,8 +198,10 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 break;
             case R.id.save:
-
-                    if(name==null){
+                if(itemList.isEmpty()){
+                    Toast.makeText(getApplicationContext(),"Cannot save empty receipt",Toast.LENGTH_SHORT).show();
+                }
+                    else if(name.isEmpty()){
                         inputDialog();
                     }
                     else{
@@ -207,6 +209,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                         if(pdfCount==1){
                             pdf();
                             stats();
+                            company_update();
                             Toast.makeText(getApplicationContext(),"SAVED",Toast.LENGTH_SHORT).show();
                             }
                             else{
@@ -301,6 +304,41 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
 
         SQLiteDatabase db=sqlOpenHelper.getWritableDatabase();
         db.update(SqlOpenHelper.TABLE_SALES,values,select,selectArgs);
+    }
+    private void company_update(){
+        int n=0;int c=0;int l=0;int p=0;int h=0;
+            SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
+            String[] columns = {SqlOpenHelper.KEY_MONTH_COMPANY,SqlOpenHelper.KEY_WEEK_COMPANY,
+                    SqlOpenHelper.KEY_YESTERDAY_COMPANY, SqlOpenHelper.KEY_TODAY_COMPANY,SqlOpenHelper.KEY_TALLY_COMPANY};
+            Cursor cursor = db.query(SqlOpenHelper.TABLE_COMPANY_ANALYSIS, columns, null, null,
+                    null, null, null);
+
+            int yesterdayPos = cursor.getColumnIndex(SqlOpenHelper.KEY_YESTERDAY_COMPANY);
+            int weekPos = cursor.getColumnIndex(SqlOpenHelper.KEY_WEEK_COMPANY);
+            int todayPos = cursor.getColumnIndex(SqlOpenHelper.KEY_TODAY_COMPANY);
+            int monthPos = cursor.getColumnIndex(SqlOpenHelper.KEY_MONTH_COMPANY);
+            int tallyPos = cursor.getColumnIndex(SqlOpenHelper.KEY_TALLY_COMPANY);
+            //refresh views here so that they can load again
+        while(cursor.moveToNext()){
+            n = cursor.getInt(yesterdayPos);
+            c = cursor.getInt(weekPos);
+            l = cursor.getInt(todayPos);
+            p = cursor.getInt(monthPos);
+            h = cursor.getInt(tallyPos);
+        }
+            cursor.close();
+
+        //String select=SqlOpenHelper.TABLE_COMPANY_ANALYSIS;
+        //String[]selectArgs={String.valueOf(j)};
+        ContentValues values=new ContentValues();
+        values.put(SqlOpenHelper.KEY_TODAY_COMPANY,l+total);
+        values.put(SqlOpenHelper.KEY_YESTERDAY_COMPANY,n);
+        values.put(SqlOpenHelper.KEY_MONTH_COMPANY,p+total);
+        values.put(SqlOpenHelper.KEY_WEEK_COMPANY,c+total);
+        values.put(SqlOpenHelper.KEY_TALLY_COMPANY,h+pdfCount);
+
+        db=sqlOpenHelper.getWritableDatabase();
+        db.update(SqlOpenHelper.TABLE_COMPANY_ANALYSIS,values,null,null);
     }
 
     public void addClick() {
@@ -681,6 +719,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 if (jina.getText().toString().isEmpty()){
                     jina.setError("Name is empty");
                     jina.requestFocus();
+                    return;
                 }
             }
         });

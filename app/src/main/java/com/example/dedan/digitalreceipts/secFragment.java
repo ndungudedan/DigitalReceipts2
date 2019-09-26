@@ -11,9 +11,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -42,8 +44,8 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class secFragment extends Fragment implements View.OnClickListener {
     EditText user_fName,user_scName,user_idNo,user_DOB,user_resid,user_mobileNo,user_email;
+    TextInputEditText txt_pass;
     EditText txt_user;
-    EditText txt_pass;
     TextView user_empno;
     Cursor mcursor;
     security security;
@@ -51,6 +53,7 @@ public class secFragment extends Fragment implements View.OnClickListener {
     SharedPreferences sharedPreferences;
     public String user;
     public long hid=1;
+
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -61,7 +64,6 @@ public class secFragment extends Fragment implements View.OnClickListener {
     private Button invalidate;
 
     private FirebaseAuth mAuth;
-
     public secFragment() {
     }
 
@@ -111,17 +113,13 @@ public class secFragment extends Fragment implements View.OnClickListener {
         user_mobileNo=view.findViewById(R.id.user_tel_no);
         user_resid=view.findViewById(R.id.user_residence);
         user_email=view.findViewById(R.id.user_email_reg);
-        user_empno=view.findViewById(R.id.empno_text);
-        authenticate = (Button)view.findViewById(R.id.auth_btn);
-        invalidate = (Button)view.findViewById(R.id.inval_btn);
-        Button edit=(Button)view.findViewById(R.id.edit_btn);
-        Button save=(Button)view.findViewById(R.id.save_btn);
+        //user_empno=view.findViewById(R.id.empno_text);
+        authenticate = view.findViewById(R.id.auth_btn);
+        invalidate = view.findViewById(R.id.inval_btn);
+        Button edit= view.findViewById(R.id.edit_btn);
+        Button save= view.findViewById(R.id.save_btn);
 
-        if (getArguments() != null) {
-            user_fName.getText().clear();
-            user_scName.getText().clear();
-        }
-        if(hid>1){
+        if(hid>1&user.startsWith("ADMIN")){
             relativeLayout.setVisibility(View.INVISIBLE);
             save.setVisibility(View.INVISIBLE);
             edit.setVisibility(View.INVISIBLE);
@@ -149,6 +147,7 @@ public class secFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        //to cater for the admin and user logins
         if(!user.startsWith("ADMIN")){
             fragload(0,sqlOpenHelper);
         }
@@ -167,17 +166,16 @@ public class secFragment extends Fragment implements View.OnClickListener {
         super.onAttach(context);
 
     }
-
     @Override
     public void onResume() {
         super.onResume();
+        if(getArguments()!=null){
+            fragload(hid,sqlOpenHelper); }
     }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
     }
-
     public void fragload(long passedid, SqlOpenHelper sqlOpenHelper) {
         String n=null ,y=null,c=null,l=null,f=null,h=null,k=null,b=null,t=null,s=null,w=null;
         String passeduser = user;
@@ -204,7 +202,9 @@ public class secFragment extends Fragment implements View.OnClickListener {
             long id = mcursor.getLong(IdPos);
             if(passedid!=0) {
                 if (id == passedid) {
-                     n = mcursor.getString(namePos);
+                    if(id==1){
+                        n = mcursor.getString(namePos).substring(6);
+                    }else{n = mcursor.getString(namePos);}
                      y = mcursor.getString(passPos);
                      c = mcursor.getString(emailPos);
                      f = mcursor.getString(fnamePos);
@@ -219,8 +219,7 @@ public class secFragment extends Fragment implements View.OnClickListener {
                     break;
                 }
             }
-else {
-                 n = mcursor.getString(namePos);
+else { n = mcursor.getString(namePos);
                 if (n.equals(passeduser)) {
                      y = mcursor.getString(passPos);
                      c = mcursor.getString(emailPos);
@@ -245,11 +244,53 @@ else {
         user_resid.setText(k);
         user_DOB.setText(b);
         user_mobileNo.setText(t);
-        user_empno.setText(w);
+        //user_empno.setText(w);
     }
                 }
+    private boolean validateForm() {
+        boolean valid = true;
 
+        String emailtxt = user_email.getText().toString();
+        if (TextUtils.isEmpty(emailtxt)) {
+            user_email.setError("Required.");
+            valid = false;
+        }
+        else {
+            user_email.setError(null);
+        }
 
+        String password = txt_pass.getText().toString();
+        if (TextUtils.isEmpty(password)) {
+            txt_pass.setError("Required.");
+            valid = false;
+        }
+        if(password.length()<6){
+            txt_pass.setError("Not Less Than 6 Characters.");
+            valid = false;
+        }else {
+            txt_pass.setError(null);
+        }
+        if(txt_user.getText().toString().isEmpty()){
+            txt_user.setError("Required");
+        }else{txt_user.setError(null);}
+        if(user_fName.getText().toString().isEmpty()){
+            user_fName.setError("Required");
+        }else{user_fName.setError(null);}
+        if(user_scName.getText().toString().isEmpty()){
+            user_scName.setError("Required");
+        }else{user_scName.setError(null);}
+        if(user_idNo.getText().toString().isEmpty()){
+            user_idNo.setError("Required");
+        }else{user_idNo.setError(null);}
+        if(user_resid.getText().toString().isEmpty()){
+            user_resid.setError("Required");
+        }else{user_resid.setError(null);}
+        if(user_mobileNo.getText().toString().isEmpty()){
+            user_mobileNo.setError("Required");
+        }else{user_mobileNo.setError(null);}
+
+        return valid;
+    }
     @Override
     public void onClick(View view) {
         switch (view.getId()){
@@ -257,6 +298,9 @@ else {
                 setEditable();
                 break;
             case R.id.save_btn:
+                if (!validateForm()) {
+                    return;
+                }
                 update();
                 notEditable();
                 break;
@@ -308,7 +352,9 @@ else {
             String select=SqlOpenHelper.KEY_ID+"=?";
             String[]selectArgs={user};
             ContentValues values=new ContentValues();
-            values.put(SqlOpenHelper.KEY_NAME,txt_user.getText().toString().trim());
+            if(user.startsWith("ADMIN")){
+                values.put(SqlOpenHelper.KEY_NAME,"ADMIN_"+txt_user.getText().toString().trim());
+            }else{values.put(SqlOpenHelper.KEY_NAME,txt_user.getText().toString().trim()); }
             values.put(SqlOpenHelper.KEY_PASS,txt_pass.getText().toString().trim());
             values.put(SqlOpenHelper.KEY_FIRSTNAME,user_fName.getText().toString().trim());
             values.put(SqlOpenHelper.KEY_SECNAME,user_scName.getText().toString().trim());

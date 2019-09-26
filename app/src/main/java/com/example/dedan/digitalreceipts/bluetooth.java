@@ -1,4 +1,3 @@
-/*
 package com.example.dedan.digitalreceipts;
 
 import android.bluetooth.BluetoothSocket;
@@ -13,8 +12,7 @@ public class bluetooth {
     OutputStream outputStream;
     protected void connect(){
         if(bluetoothSocket==null){
-            Intent bt=new Intent(this,BTDeviceList.class);
-
+           // Intent bt=new Intent(bluetooth.this,BTDeviceList.class);
         }
         else{
             OutputStream opstream=null;
@@ -27,7 +25,6 @@ public class bluetooth {
             print();
         }
     }
-
     private void print() {
         try{
             try{
@@ -36,13 +33,13 @@ public class bluetooth {
                 e.printStackTrace();
             }
             outputStream=bluetoothSocket.getOutputStream();
-            byte[] printformat={0*1B,0*21,FONT_TYPE};
+            byte[] printformat={0*1,0*21,FONT_TYPE};
             outputStream.write(printformat);
             String hy="first...............print";
             outputStream.write(hy.getBytes());
-            outputStream.write(0*0D);
-            outputStream.write(0*0D);
-            outputStream.write(0*0D);
+            outputStream.write((int) (0*0D));
+            outputStream.write((int) (0*0D));
+            outputStream.write((int) (0*0D));
             outputStream.flush();
         } catch (IOException e) {
             e.printStackTrace();
@@ -71,4 +68,3 @@ public class bluetooth {
         }
     }
 }
-*/

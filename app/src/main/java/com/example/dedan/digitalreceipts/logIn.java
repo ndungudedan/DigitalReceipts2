@@ -2,6 +2,7 @@ package com.example.dedan.digitalreceipts;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
@@ -23,11 +24,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class logIn extends AppCompatActivity {
     private ProgressBar progressBar;
     private FirebaseAuth mAuth;
     private static int loggedIn_baseId;
+    private static long loggedIn_empNO;
     EditText user,emailtxt;
     TextInputEditText pass;
     SqlOpenHelper sqlOpenHelper;
@@ -49,6 +52,9 @@ public class logIn extends AppCompatActivity {
 
         sqlOpenHelper = new SqlOpenHelper(getApplicationContext());
         mAuth = FirebaseAuth.getInstance();
+        if(!internetIsConnected()){
+            emailtxt.setVisibility(View.INVISIBLE);
+        }
     }
     @Override
     public void onStart() {
@@ -63,10 +69,10 @@ public class logIn extends AppCompatActivity {
             main.putExtra("loggedIn_user",loggedIn_user);
             main.putExtra("loggedIn_username",loggedIn_username);
             main.putExtra("loggedIn_baseId",loggedIn_baseId);
+            main.putExtra("loggedIn_empNo",loggedIn_empNO);
             startActivity(main);
         }
     }
-
     public void login(View view) {
         String name=user.getText().toString();
         String password=pass.getText().toString();
@@ -82,6 +88,7 @@ public class logIn extends AppCompatActivity {
             main.putExtra("loggedIn_user",loggedIn_user);
             main.putExtra("loggedIn_username",loggedIn_username);
             main.putExtra("loggedIn_baseId",loggedIn_baseId);
+            main.putExtra("loggedIn_empNo",loggedIn_empNO);
             startActivity(main);
         }
             if(x == 1 & internetIsConnected()){
@@ -97,6 +104,7 @@ public class logIn extends AppCompatActivity {
                                         main.putExtra("loggedIn_user",loggedIn_user);
                                         main.putExtra("loggedIn_username",loggedIn_username);
                                         main.putExtra("loggedIn_baseId",loggedIn_baseId);
+                                        main.putExtra("loggedIn_empNo",loggedIn_empNO);
                                         startActivity(main);
                                     }
                                     else{
@@ -120,6 +128,29 @@ public class logIn extends AppCompatActivity {
                         "NOT YET APPROVED!", Toast.LENGTH_LONG)
                         .show();
             }
+            else if(x==0 & internetIsConnected()){
+                mAuth.signInWithEmailAndPassword(emailtxt.getText().toString().trim(), pass.getText().toString().trim())
+                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    // Sign in success, update UI with the signed-in user's information
+                                    Objects.requireNonNull(mAuth.getCurrentUser()).delete();
+                                    housekeeping();
+                                    Toast.makeText(getApplicationContext(),
+                                            "Please register Again!", Toast.LENGTH_LONG)
+                                            .show();
+                                    progressBar.setVisibility(View.INVISIBLE);
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(logIn.this, ""+e.getLocalizedMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
             else{
                 Toast.makeText(getApplicationContext(),
                         "Wrong credentials!", Toast.LENGTH_LONG)
@@ -130,7 +161,7 @@ public class logIn extends AppCompatActivity {
     }
     public int checkLogin(SqlOpenHelper sqlOpenHelper, String name, String password) {
         SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
-        String[] columns = {SqlOpenHelper._USERID, SqlOpenHelper.KEY_NAME,SqlOpenHelper.KEY_PASS,SqlOpenHelper.KEY_FIRSTNAME,
+        String[] columns = {SqlOpenHelper._USERID, SqlOpenHelper.KEY_NAME,SqlOpenHelper.KEY_PASS,SqlOpenHelper.KEY_FIRSTNAME,SqlOpenHelper.KEY_empNO,
         SqlOpenHelper.KEY_ACCESS};
         Cursor cursor = db.query(SqlOpenHelper.TABLE_USER, columns, null, null,
                 null, null, null);
@@ -140,16 +171,22 @@ public class logIn extends AppCompatActivity {
         int userpos = cursor.getColumnIndex(SqlOpenHelper.KEY_FIRSTNAME);
         int passwordPos = cursor.getColumnIndex(SqlOpenHelper.KEY_PASS);
         int accessPos = cursor.getColumnIndex(SqlOpenHelper.KEY_ACCESS);
+        int empPos=cursor.getColumnIndex(SqlOpenHelper.KEY_empNO);
         //refresh views here so that they can load again
          int x = 0;
         while (cursor.moveToNext()) {
             String n = cursor.getString(namePos);
             String c = cursor.getString(passwordPos);
             String d=cursor.getString(accessPos);
+            if(n.isEmpty()&&c.isEmpty()){
+                x=99;
+                return x;
+            }
             if (n.equals(name)&&c.equals(password)) {
                 loggedIn_baseId=cursor.getInt(IdPos);
                 loggedIn_username=n;
                 loggedIn_user = cursor.getString(userpos);
+                loggedIn_empNO=cursor.getLong(empPos);
                 if(d.equals("ACCESS_DENIED")){
                     x = 2;
                     return x;
@@ -161,7 +198,6 @@ public class logIn extends AppCompatActivity {
         cursor.close();
         return x;
     }
-
     private void updateUI(FirebaseUser user) {
         if(user!=null){
             Intent main=new Intent(this,MainActivity.class);
@@ -175,7 +211,6 @@ public class logIn extends AppCompatActivity {
         Intent intent=new Intent(this,Register.class);
         startActivity(intent);
     }
-
     public void Forgot_password(View view) {
         String emailAddress = emailtxt.getText().toString().trim();
         if (TextUtils.isEmpty(emailtxt.getText().toString().trim())) {
@@ -216,12 +251,14 @@ public class logIn extends AppCompatActivity {
 
             // login user
             int x=checkLogin(sqlOpenHelper,name,password);
+
             if(x==1 & !internetIsConnected()){
                 housekeeping();
                 Intent main=new Intent(logIn.this,MainActivity.class);
                 main.putExtra("loggedIn_user",loggedIn_user);
                 main.putExtra("loggedIn_username",loggedIn_username);
                 main.putExtra("loggedIn_baseId",loggedIn_baseId);
+                main.putExtra("loggedIn_empNo",loggedIn_empNO);
                 startActivity(main);
             }
             if(x == 1 & internetIsConnected()){
@@ -237,6 +274,7 @@ public class logIn extends AppCompatActivity {
                                         main.putExtra("loggedIn_user",loggedIn_user);
                                         main.putExtra("loggedIn_username",loggedIn_username);
                                         main.putExtra("loggedIn_baseId",loggedIn_baseId);
+                                        main.putExtra("loggedIn_empNo",loggedIn_empNO);
                                         startActivity(main);
                                     }
                                     else{
@@ -255,6 +293,29 @@ public class logIn extends AppCompatActivity {
                     }
                 });
                 progressBar.setVisibility(View.INVISIBLE);
+            }
+            else if(x==0 & internetIsConnected()){
+                mAuth.signInWithEmailAndPassword(emailtxt.getText().toString().trim(), pass.getText().toString().trim())
+                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    // Sign in success, update UI with the signed-in user's information
+                                    Objects.requireNonNull(mAuth.getCurrentUser()).delete();
+                                        housekeeping();
+                                    Toast.makeText(getApplicationContext(),
+                                            "Please register Again!", Toast.LENGTH_LONG)
+                                            .show();
+                                    progressBar.setVisibility(View.INVISIBLE);
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(logIn.this, ""+e.getLocalizedMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
             else{
                 Toast.makeText(getApplicationContext(),
@@ -295,7 +356,10 @@ public class logIn extends AppCompatActivity {
     public boolean internetIsConnected() {
         try {
             String command = "ping -c 1 google.com";
-            return (Runtime.getRuntime().exec(command).waitFor() == 0);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                return (Runtime.getRuntime().exec(command).waitFor(10,TimeUnit.SECONDS));
+            }
+            return (Runtime.getRuntime().exec(command).waitFor()==0);
         } catch (Exception e) {
             return false;
         }

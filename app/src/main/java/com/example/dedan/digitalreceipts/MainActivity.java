@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     private String loggedIn_user;
     private String loggedIn_username;
     private int loggedIn_baseId;
+    private long loggedIn_empNo;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
             loggedIn_user = getIntent().getExtras().getString("loggedIn_user");
             loggedIn_username=getIntent().getExtras().getString("loggedIn_username");
             loggedIn_baseId=getIntent().getExtras().getInt("loggedIn_baseId");
+            loggedIn_empNo=getIntent().getExtras().getLong("loggedIn_empNo");
+
         }catch (NullPointerException e){
             e.printStackTrace();
         }
@@ -62,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         if(loggedIn_user !=null){
             editor.putInt("current_user",0);
             editor.putInt("current_user_no.of_sales",0);
+            editor.putLong("current_empNo",loggedIn_empNo);
             editor.putString("current_user",loggedIn_user);
             editor.putString("current_username",loggedIn_username);
             editor.apply();
@@ -139,6 +144,9 @@ public class MainActivity extends AppCompatActivity {
         switch(item.getItemId()){
             case R.id.logout:
                 finish();
+                loggedIn_user=null;
+                loggedIn_username=null;
+                loggedIn_baseId= 0;
                 Intent logout=new Intent(this,logIn.class);
                 startActivity(logout);
                 break;
