@@ -7,7 +7,7 @@
     android:orientation="vertical"
     tools:context=".MainActivity"
     >
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/mainActivitybar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,6 +19,14 @@
 
 <RelativeLayout
     android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:layout_marginStart="20dp"
+    android:layout_marginEnd="20dp">
+<LinearLayout
+    android:id="@+id/linear"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <ImageButton
@@ -26,50 +34,54 @@
         style="@android:style/Widget.DeviceDefault.ImageButton"
         android:layout_width="184dp"
         android:layout_height="185dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
         android:layout_marginTop="0dp"
+        android:layout_weight="1"
         android:onClick="temp"
         android:scaleType="centerInside"
         android:src="@drawable/icons8pdf96"
         android:text="Templates" />
 
     <ImageButton
-        android:id="@+id/button3"
+        android:id="@+id/imagebtn"
         android:layout_width="184dp"
         android:layout_height="185dp"
-        android:layout_below="@+id/button2"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="3dp"
-        android:onClick="drop"
-        android:scaleType="centerInside"
-        android:src="@drawable/icons8add96"
-        android:text="droplist" />
-
-    <ImageButton
-        android:id="@+id/button5"
-        android:layout_width="176dp"
-        android:layout_height="185dp"
-        android:layout_below="@+id/button2"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="0dp"
-        android:onClick="list"
-        android:src="@drawable/icons8list48" />
-
-    <ImageButton
-        android:id="@+id/imagebtn"
-        android:layout_width="176dp"
-        android:layout_height="185dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
         android:layout_marginTop="0dp"
         android:layout_marginEnd="0dp"
+        android:layout_weight="1"
         android:onClick="open"
         android:scaleType="fitXY"
         android:src="@drawable/icons8businessman80" />
+</LinearLayout>
+    <LinearLayout
+        android:layout_below="@+id/linear"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
+        <ImageButton
+            android:id="@+id/button3"
+            android:layout_width="184dp"
+            android:layout_height="185dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="3dp"
+            android:layout_weight="1"
+            android:onClick="drop"
+            android:scaleType="centerInside"
+            android:src="@drawable/icons8add96"
+            android:text="droplist" />
+
+        <ImageButton
+            android:id="@+id/button5"
+            android:layout_width="184dp"
+            android:layout_height="185dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginEnd="0dp"
+            android:layout_weight="1"
+            android:onClick="list"
+            android:scaleType="centerInside"
+            android:src="@drawable/icons8list48" />
+
+    </LinearLayout>
 </RelativeLayout>
 
 </android.widget.LinearLayout>

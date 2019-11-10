@@ -3,41 +3,37 @@ package com.example.dedan.digitalreceipts;
 import android.Manifest;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
-import static java.util.Calendar.PM;
-
 public class MainActivity extends AppCompatActivity {
     Toolbar maintool;
     SharedPreferences sharedPreferences;
 
-    SqlOpenHelper sqlOpenHelper;
     private String loggedIn_user;
     private String loggedIn_username;
     private int loggedIn_baseId;
     private long loggedIn_empNo;
+    private Cursor mcursor;
+    private String dataToday;
 
 
     @Override
@@ -49,9 +45,9 @@ public class MainActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
 
 
-        sqlOpenHelper = new SqlOpenHelper(getApplicationContext());
         sharedPreferences=getSharedPreferences("Data",MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
+
 
         try{
             loggedIn_user = getIntent().getExtras().getString("loggedIn_user");
@@ -73,14 +69,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Date date=new Date();
-        String dateToday = new SimpleDateFormat("dd/MM/yyyy").format(date);
-        String month=new SimpleDateFormat("MM/yyyy").format(date);
-        String year=new SimpleDateFormat("yyyy").format(date);
+        String savedToday = new SimpleDateFormat("dd/MM/yyyy").format(date);
+        String savedmonth=new SimpleDateFormat("MM/yyyy").format(date);
+        String savedyear=new SimpleDateFormat("yyyy").format(date);
 
         if(!sharedPreferences.getBoolean("firstTime", false)) {
-            editor.putString("todays_date",dateToday);
-            editor.putString("currentMonth",month);
-            editor.putString("currentYear",year);
+            editor.putString("todays_date",savedToday);
+            editor.putString("currentMonth",savedmonth);
+            editor.putString("currentYear",savedyear);
             // run your one time code
             editor.putInt("today",0);
             editor.putInt("yesterday",0);
@@ -102,29 +98,21 @@ public class MainActivity extends AppCompatActivity {
         String checkDate=sharedPreferences.getString("todays_date","");
         String checkMonth=sharedPreferences.getString("currentMonth","");
         String checkYear=sharedPreferences.getString("currentYear","");
-        if(!checkDate.equals(dateToday)){
-            updateStats();
-            editor.putString("todays_date",dateToday);
+        if(!checkDate.equals(savedToday)){
+
+            editor.putString("todays_date",checkDate);
         }
-        if(!checkMonth.equals(month)){
-            editor.putString("currentMonth",month);
+        if(!checkMonth.equals(savedmonth)){
+
+            editor.putString("currentMonth",checkMonth);
         }
-        if(!checkYear.equals(year)){
-            editor.putString("currentYear",year);
+        if(!checkYear.equals(savedyear)){
+            editor.putString("currentYear",checkYear);
         }
         Calendar c=Calendar.getInstance();
         String time= String.valueOf(c.getTime());
-        update(time);
-        permissions();
-    }
-    public void updateStats() {
-        String select = SqlOpenHelper.KEY_EMP_FOREIGN + "=?";
-        String[] selectArgs = {String.valueOf(loggedIn_baseId)};
-        ContentValues values = new ContentValues();
-        values.put(SqlOpenHelper.KEY_TODAY,"0" );
-        SQLiteDatabase db = sqlOpenHelper.getWritableDatabase();
-        db.update(SqlOpenHelper.TABLE_SALES, values, select, selectArgs);
 
+        permissions();
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -170,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         long timeWeek=weekcalendar.getTimeInMillis();
 
         if (weekalarmManager != null) {
-            weekalarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,timeWeek,AlarmManager.INTERVAL_DAY*7, weekpendingIntent);
+            weekalarmManager.setRepeating(AlarmManager.RTC_WAKEUP,timeWeek,AlarmManager.INTERVAL_DAY*7, weekpendingIntent);
         }
     }
     private void monthlyAlarm() {
@@ -190,9 +178,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void todayAlarm(){
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR, 11);
+        calendar.set(Calendar.HOUR_OF_DAY, 11);
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.AM_PM, Calendar.PM);
         Intent myIntent = new Intent(this, receiver.class);
@@ -260,14 +248,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-    }
-    public void update(String time){
-        String select=SqlOpenHelper.KEY_ID+"=?";
-        String[]selectArgs={loggedIn_user};
-        ContentValues values=new ContentValues();
-        values.put(SqlOpenHelper.KEY_LOG,time);
-        SQLiteDatabase db=sqlOpenHelper.getWritableDatabase();
-        db.update(SqlOpenHelper.TABLE_USER,values,select,selectArgs);
     }
 
 

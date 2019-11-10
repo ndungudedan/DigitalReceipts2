@@ -2,19 +2,18 @@ package com.example.dedan.digitalreceipts;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 public class summaryFragment extends Fragment {
-    SqlOpenHelper sqlOpenHelper;
+
     Cursor mcursor;
     TextView tally,today,yesterday,week,month;
     private Cursor cursor;
@@ -27,35 +26,14 @@ public class summaryFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        sqlOpenHelper=new SqlOpenHelper(getActivity());
+
     }
     public void getSales(){
         String p="";String n="";String l="";String h="";String c="";
-        SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
-        String[] columns = {SqlOpenHelper.KEY_MONTH_COMPANY,SqlOpenHelper.KEY_WEEK_COMPANY,
-                SqlOpenHelper.KEY_YESTERDAY_COMPANY, SqlOpenHelper.KEY_TODAY_COMPANY,SqlOpenHelper.KEY_TALLY_COMPANY};
-        cursor = db.query(SqlOpenHelper.TABLE_COMPANY_ANALYSIS, columns, null, null,
-                null, null, null);
 
-        int yesterdayPos = cursor.getColumnIndex(SqlOpenHelper.KEY_YESTERDAY_COMPANY);
-        int weekPos = cursor.getColumnIndex(SqlOpenHelper.KEY_WEEK_COMPANY);
-        int todayPos = cursor.getColumnIndex(SqlOpenHelper.KEY_TODAY_COMPANY);
-        int monthPos = cursor.getColumnIndex(SqlOpenHelper.KEY_MONTH_COMPANY);
-        int tallyPos = cursor.getColumnIndex(SqlOpenHelper.KEY_TALLY_COMPANY);
         //refresh views here so that they can load again
 
-        while (cursor.moveToNext()){
-            n = cursor.getString(yesterdayPos);
-            c = cursor.getString(weekPos);
-            l = cursor.getString(todayPos);
-            p = cursor.getString(monthPos);
-            h = cursor.getString(tallyPos);
-        }
-        tally.setText(h);
-        today.setText(l);
-        yesterday.setText(n);
-        week.setText(c);
-        month.setText(p);
+
     }
 
     @Override

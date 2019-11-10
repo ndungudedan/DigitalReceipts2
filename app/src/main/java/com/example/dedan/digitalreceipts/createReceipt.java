@@ -6,13 +6,11 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -102,17 +100,16 @@ public class createReceipt extends AppCompatActivity {
                    // image.setEnabled(false);
                 }});
         image.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
+            //@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
             @Override
             public void onClick(View view) {
                 Intent gallery=new Intent();
-                gallery.setType("Image/*");
+                gallery.setType("image/*");
                 gallery.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(gallery,"pictures"),pick);
             }
         });
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -159,9 +156,6 @@ public class createReceipt extends AppCompatActivity {
             if(bit==null){
                 image.setImageResource(R.mipmap.launch_foreground);
             }
-
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }

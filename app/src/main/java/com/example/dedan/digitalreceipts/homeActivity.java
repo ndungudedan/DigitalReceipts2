@@ -1,12 +1,11 @@
 package com.example.dedan.digitalreceipts;
 
-import android.app.LoaderManager;
-import android.bluetooth.BluetoothSocket;
-import android.content.ContentValues;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModelProviders;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -15,13 +14,11 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.NavUtils;
-import android.support.v4.content.CursorLoader;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+
+import androidx.core.app.NavUtils;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,7 +30,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,8 +57,12 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-public class homeActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class homeActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+    GoodsViewModel goodsViewModel;
+    GoodsRepository goodsRepository;
+    LiveData<List<GoodsEntity>> goodsTableValues;
 
     private static final int SPIN_LOAD = 1;
     private static final int SPINQ_LOAD = 2;
@@ -71,10 +71,11 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
     int total=0,initTotal;
     int receiptCount;
 
-    ArrayList<CharSequence> spinList;
-    ArrayList<CharSequence> spinListQ;
-    ArrayAdapter<CharSequence> spinAdapt;
-    ArrayAdapter<CharSequence> spinAdaptQ;
+   // ArrayList<CharSequence> spinList;
+    List<GoodsEntity> spinList;
+    List<GoodsEntity> spinListQ;
+    ArrayAdapter<GoodsEntity> spinAdapt;
+    ArrayAdapter<GoodsEntity> spinAdaptQ;
     Spinner spin,spinQ;
     String spinItem="";
 
@@ -99,9 +100,6 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
     int pdfCount=0;
     SharedPreferences shp;
     String contact ="contactKey";
-    private SimpleCursorAdapter adapter;
-    private SimpleCursorAdapter adapterQ;
-    SqlOpenHelper sqlOpenHelper;
     private int itemIdpos;
     private Cursor mcursor;
     private Cursor pcursor;
@@ -122,9 +120,11 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         getSupportActionBar().setTitle("Receipt");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        goodsViewModel= ViewModelProviders.of(this).get(GoodsViewModel.class);
+
         selectSpinid=new ArrayList();
         Gpoint=new ArrayList<>();
-        sqlOpenHelper = new SqlOpenHelper(this);
+
 
         quant= findViewById(R.id.quantity);
         item= findViewById(R.id.items);
@@ -137,32 +137,17 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         selectList = new ArrayList<>();
 
         spin= findViewById(R.id.spinner2);
-        spinList=new ArrayList<CharSequence>();
+        spinList= goodsViewModel.getItems();
 
         spinQ= findViewById(R.id.quanSpin);
-        spinListQ=new ArrayList<CharSequence>();
+        spinListQ=goodsViewModel.getPack();
 
-
-        adapter = new SimpleCursorAdapter(this,android.R.layout.simple_spinner_item,null,new String[]
-                {SqlOpenHelper.KEY_ITEM},new int[]{android.R.id.text1},0);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //spinAdapt=new ArrayAdapter<CharSequence>(this,android.R.layout.simple_spinner_item,spinList);
-       // spinAdapt.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spin.setAdapter(adapter);
-       // spinAdapt.add("");
-       // spinPop();
-        getLoaderManager().initLoader(SPIN_LOAD,null,this);
+        spinAdapt=new ArrayAdapter<GoodsEntity>(this,android.R.layout.simple_spinner_dropdown_item,spinList);
+        spin.setAdapter(spinAdapt);
         spin.setOnItemSelectedListener(this);
 
-        adapterQ = new SimpleCursorAdapter(this,android.R.layout.simple_spinner_item,null,new String[]
-                {SqlOpenHelper.KEY_PACK},new int[]{android.R.id.text1},0);
-
-        //spinAdaptQ=new ArrayAdapter<CharSequence>(this,android.R.layout.simple_spinner_item,spinListQ);
-        adapterQ.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinQ.setAdapter(adapterQ);
-//        spinAdaptQ.add("");
-        //spinPop2();
-        getLoaderManager().initLoader(SPINQ_LOAD,null,this);
+        spinAdaptQ=new ArrayAdapter<GoodsEntity>(this,android.R.layout.simple_spinner_dropdown_item,spinListQ);
+        spinQ.setAdapter(spinAdaptQ);
         spinQ.setOnItemSelectedListener(this);
 
         itemList = new ArrayList<>();
@@ -177,6 +162,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         addClick();
         delete();
         //graphAmount();
+
 
     }
     @Override
@@ -208,8 +194,6 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                         pdfCount++;
                         if(pdfCount==1){
                             pdf();
-                            stats();
-                            company_update();
                             Toast.makeText(getApplicationContext(),"SAVED",Toast.LENGTH_SHORT).show();
                             }
                             else{
@@ -242,105 +226,6 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         finish();
         overridePendingTransition(0,0);
     }
-    public int getUser() {
-        SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
-        String[] columns = {SqlOpenHelper.KEY_NAME, SqlOpenHelper.KEY_empNO};
-        Cursor cursor = db.query(SqlOpenHelper.TABLE_USER, columns, null, null,
-                null, null, null);
-
-        //int IdPos = cursor.getColumnIndex(SqlOpenHelper.KEY_ID);
-        int userPos = cursor.getColumnIndex(SqlOpenHelper.KEY_NAME);
-        int empPos = cursor.getColumnIndex(SqlOpenHelper.KEY_empNO);
-        //refresh views here so that they can load again
-        int n = 0;
-        while (cursor.moveToNext()) {
-            String c = cursor.getString(userPos);
-            if (c.equals(user)) {
-                n = cursor.getInt(empPos);
-            }
-
-        }
-        cursor.close();
-        return n;
-    }
-    public void stats(){
-        SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
-        String[] columns = {SqlOpenHelper.KEY_TALLY, SqlOpenHelper.KEY_MONTH,SqlOpenHelper.KEY_WEEK,SqlOpenHelper.KEY_YESTERDAY,
-                SqlOpenHelper.KEY_TODAY,SqlOpenHelper.KEY_EMP_FOREIGN};
-        Cursor cursor = db.query(SqlOpenHelper.TABLE_SALES, columns, null, null,
-                null, null, null);
-
-        int IdPos = cursor.getColumnIndex(SqlOpenHelper.KEY_EMP_FOREIGN);
-        int yesterdayPos = cursor.getColumnIndex(SqlOpenHelper.KEY_YESTERDAY);
-        int weekPos = cursor.getColumnIndex(SqlOpenHelper.KEY_WEEK);
-        int todayPos = cursor.getColumnIndex(SqlOpenHelper.KEY_TODAY);
-        int monthPos = cursor.getColumnIndex(SqlOpenHelper.KEY_MONTH);
-        int tallyPos = cursor.getColumnIndex(SqlOpenHelper.KEY_TALLY);
-        //refresh views here so that they can load again
-        while (cursor.moveToNext()) {
-            int j=getUser();
-            if(j==cursor.getInt(IdPos)){
-                int n = cursor.getInt(yesterdayPos);
-                int c = cursor.getInt(weekPos);
-                int l = cursor.getInt(todayPos);
-                int p=cursor.getInt(monthPos);
-                int h=cursor.getInt(tallyPos);
-                update(n,c,l,p,h);
-                break;
-            }
-        }
-        cursor.close();
-    }
-    private void update(int n,int c,int l,int p,int h){
-        int j=getUser();
-        String select=SqlOpenHelper.KEY_EMP_FOREIGN+"=?";
-        String[]selectArgs={String.valueOf(j)};
-        ContentValues values=new ContentValues();
-        values.put(SqlOpenHelper.KEY_TODAY,l+total);
-        values.put(SqlOpenHelper.KEY_YESTERDAY,n);
-        values.put(SqlOpenHelper.KEY_MONTH,p+total);
-        values.put(SqlOpenHelper.KEY_WEEK,c+total);
-        values.put(SqlOpenHelper.KEY_TALLY,h+pdfCount);
-
-        SQLiteDatabase db=sqlOpenHelper.getWritableDatabase();
-        db.update(SqlOpenHelper.TABLE_SALES,values,select,selectArgs);
-    }
-    private void company_update(){
-        int n=0;int c=0;int l=0;int p=0;int h=0;
-            SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
-            String[] columns = {SqlOpenHelper.KEY_MONTH_COMPANY,SqlOpenHelper.KEY_WEEK_COMPANY,
-                    SqlOpenHelper.KEY_YESTERDAY_COMPANY, SqlOpenHelper.KEY_TODAY_COMPANY,SqlOpenHelper.KEY_TALLY_COMPANY};
-            Cursor cursor = db.query(SqlOpenHelper.TABLE_COMPANY_ANALYSIS, columns, null, null,
-                    null, null, null);
-
-            int yesterdayPos = cursor.getColumnIndex(SqlOpenHelper.KEY_YESTERDAY_COMPANY);
-            int weekPos = cursor.getColumnIndex(SqlOpenHelper.KEY_WEEK_COMPANY);
-            int todayPos = cursor.getColumnIndex(SqlOpenHelper.KEY_TODAY_COMPANY);
-            int monthPos = cursor.getColumnIndex(SqlOpenHelper.KEY_MONTH_COMPANY);
-            int tallyPos = cursor.getColumnIndex(SqlOpenHelper.KEY_TALLY_COMPANY);
-            //refresh views here so that they can load again
-        while(cursor.moveToNext()){
-            n = cursor.getInt(yesterdayPos);
-            c = cursor.getInt(weekPos);
-            l = cursor.getInt(todayPos);
-            p = cursor.getInt(monthPos);
-            h = cursor.getInt(tallyPos);
-        }
-            cursor.close();
-
-        //String select=SqlOpenHelper.TABLE_COMPANY_ANALYSIS;
-        //String[]selectArgs={String.valueOf(j)};
-        ContentValues values=new ContentValues();
-        values.put(SqlOpenHelper.KEY_TODAY_COMPANY,l+total);
-        values.put(SqlOpenHelper.KEY_YESTERDAY_COMPANY,n);
-        values.put(SqlOpenHelper.KEY_MONTH_COMPANY,p+total);
-        values.put(SqlOpenHelper.KEY_WEEK_COMPANY,c+total);
-        values.put(SqlOpenHelper.KEY_TALLY_COMPANY,h+pdfCount);
-
-        db=sqlOpenHelper.getWritableDatabase();
-        db.update(SqlOpenHelper.TABLE_COMPANY_ANALYSIS,values,null,null);
-    }
-
     public void addClick() {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -499,13 +384,15 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
             case R.id.quanSpin:
                 //bcoz spiiner id starts at 0 while db rows from 1
 
-                load(l);
+                //method call expected
+
                 spinItem=packfrmspin;
 
                 break;
             case R.id.spinner2:
+                //method call expected
+
                 int x=i+1;
-                load(l);
                 item.setText(itemfrmspin);
                 kila.setText(costfrmspin);
                 spinQ.setSelection(i);
@@ -513,25 +400,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
     public void load(long spinid){
-        SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
-        String[] columns = {SqlOpenHelper._ID,SqlOpenHelper.KEY_ITEM,SqlOpenHelper.KEY_PACK,SqlOpenHelper.KEY_COST};
-        mcursor = db.query(SqlOpenHelper.TABLE_ITEM_DETAILS, columns, null, null,
-                null, null, null);
-        int IdPos = mcursor.getColumnIndex(SqlOpenHelper._ID);
-        int itemPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_ITEM);
-        int packPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_PACK);
-        int costPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_COST);
-        //refresh views here so that they can load again
-        while (mcursor.moveToNext()) {
-            long id = mcursor.getLong(IdPos);
-            if(id==spinid){
-                itemfrmspin = mcursor.getString(itemPos);
-                packfrmspin = mcursor.getString(packPos);
-                costfrmspin = mcursor.getString(costPos);
-                break;
-            }
 
-        }
     }
 
     @Override
@@ -583,8 +452,9 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                         e.printStackTrace();
                     }
                 }
-                Paragraph Na=new Paragraph(shp.getString("nameKey","")+"\n"+shp.getString("emailKey","")+"\n"+"P.O. BOX"+shp.getString("boxKey","")+
-                        "\n"+shp.getString("locationKey","")+"\n"+shp.getString("contactKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,18,Font.NORMAL));
+                Paragraph Na=new Paragraph(shp.getString("nameKey","")+"\n"+shp.getString("emailKey","")+"\n"+"P.O. BOX"+
+                        shp.getString("boxKey","")+ "\n"+shp.getString("locationKey","")+"\n"+
+                        shp.getString("contactKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,18,Font.NORMAL));
              /*   Paragraph Em=new Paragraph(shp.getString("emailKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL,BaseColor.MAGENTA));
                 Paragraph Bo=new Paragraph("P.O. BOX"+shp.getString("boxKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL,BaseColor.MAGENTA));
                 Paragraph Lo=new Paragraph(shp.getString("locationKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL,BaseColor.MAGENTA));
@@ -737,117 +607,5 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         dialog.show();
 
     }
-    public void spinPop(){
-/*        File route = Environment.getExternalStorageDirectory();
-        File dir = new File(route.getAbsolutePath() + "/DIGITALRECEIPTS", "Resources");
-        File g=new File(dir,"/Items.txt");
-        try (FileInputStream stream = new FileInputStream(g)) {
-            DataInputStream dataInputStream=new DataInputStream(stream);
-            BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(dataInputStream));
-            CharSequence V;
-            while ((V=bufferedReader.readLine())!=null){
 
-                //Toast.makeText(getApplicationContext(),"stacktrace1"+V,Toast.LENGTH_SHORT).show();
-                spinAdapt.add(""+V);
-            }
-            spinAdapt.notifyDataSetChanged();
-            dataInputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-        db = sqlOpenHelper.getReadableDatabase();
-        String[] columns={SqlOpenHelper.KEY_ITEM_ID,SqlOpenHelper.KEY_ITEM,SqlOpenHelper._ID,SqlOpenHelper.KEY_COST,SqlOpenHelper.KEY_PACK};
-        mcursor = db.query(SqlOpenHelper.TABLE_ITEM_DETAILS,columns,
-                null,null,null,null,SqlOpenHelper.KEY_ITEM);
-        int IDpos=mcursor.getColumnIndex(SqlOpenHelper._ID);
-        int packPos=mcursor.getColumnIndex(SqlOpenHelper.KEY_PACK);
-        int costPos=mcursor.getColumnIndex(SqlOpenHelper.KEY_COST);
-        int itemPos=mcursor.getColumnIndex(SqlOpenHelper.KEY_ITEM);
-        while(mcursor.moveToNext()){
-            String t=mcursor.getString(itemPos);
-            String c=mcursor.getString(costPos);
-            String p=mcursor.getString(packPos);
-            int d=mcursor.getInt(IDpos);
-        }
-        adapter.changeCursor(mcursor);
-    }
-    public void spinPop2(){/*
-        File route = Environment.getExternalStorageDirectory();
-        File dir = new File(route.getAbsolutePath() + "/DIGITALRECEIPTS", "Resources");
-        File g=new File(dir,"/Dominion.txt");
-        try (FileInputStream stream = new FileInputStream(g)) {
-            DataInputStream dataInputStream=new DataInputStream(stream);
-            BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(dataInputStream));
-            CharSequence V;
-            while ((V=bufferedReader.readLine())!=null){
-
-                //Toast.makeText(getApplicationContext(),"stacktrace1"+V,Toast.LENGTH_SHORT).show();
-                spinAdaptQ.add(""+V);
-            }
-            spinAdaptQ.notifyDataSetChanged();
-            dataInputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-        db=sqlOpenHelper.getReadableDatabase();
-        String[] columns={SqlOpenHelper.KEY_ITEM_ID,SqlOpenHelper.KEY_ITEM,SqlOpenHelper._ID,SqlOpenHelper.KEY_COST,SqlOpenHelper.KEY_PACK};
-        pcursor = db.query(SqlOpenHelper.TABLE_ITEM_DETAILS,columns,
-                null,null,null,null,SqlOpenHelper.KEY_ITEM);
-        adapterQ.changeCursor(pcursor);
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        android.content.CursorLoader loader=null;
-        if(i==SPIN_LOAD)
-            loader=createLoaderValues();
-        if(i==SPINQ_LOAD)
-            loader=createLoaderValuesQ();
-
-        return loader;
-    }
-
-    private android.content.CursorLoader createLoaderValuesQ() {
-        return new android.content.CursorLoader(this){
-            @Override
-            public Cursor loadInBackground() {
-                db=sqlOpenHelper.getReadableDatabase();
-                String[] columns={SqlOpenHelper.KEY_ITEM_ID,SqlOpenHelper.KEY_ITEM,SqlOpenHelper._ID,SqlOpenHelper.KEY_COST,SqlOpenHelper.KEY_PACK};
-                return db.query(SqlOpenHelper.TABLE_ITEM_DETAILS,columns,
-                        null,null,null,null,SqlOpenHelper._ID);
-            }
-        };
-    }
-
-    private android.content.CursorLoader createLoaderValues() {
-        return new android.content.CursorLoader(this) {
-            @Override
-            public Cursor loadInBackground() {
-                db = sqlOpenHelper.getReadableDatabase();
-                String[] columns={SqlOpenHelper.KEY_ITEM_ID,SqlOpenHelper.KEY_ITEM,SqlOpenHelper._ID,SqlOpenHelper.KEY_COST,SqlOpenHelper.KEY_PACK};
-                return db.query(SqlOpenHelper.TABLE_ITEM_DETAILS,columns,
-                        null,null,null,null,SqlOpenHelper._ID);
-            }
-
-        };
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if(loader.getId()==SPIN_LOAD) {
-            adapter.changeCursor(cursor);
-        }
-        if(loader.getId()==SPINQ_LOAD){
-            adapterQ.changeCursor(cursor);
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        if(loader.getId()==SPIN_LOAD)
-        adapter.changeCursor(null);
-
-        if(loader.getId()==SPINQ_LOAD)
-            adapterQ.changeCursor(null);
-    }
 }

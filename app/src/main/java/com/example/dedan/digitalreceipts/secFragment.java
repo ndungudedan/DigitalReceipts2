@@ -1,35 +1,22 @@
 package com.example.dedan.digitalreceipts;
 
-import android.app.LoaderManager;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.MenuItemCompat;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.textfield.TextInputEditText;
+import androidx.fragment.app.Fragment;
+
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.SimpleCursorAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +25,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.util.concurrent.TimeUnit;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -49,7 +38,6 @@ public class secFragment extends Fragment implements View.OnClickListener {
     TextView user_empno;
     Cursor mcursor;
     security security;
-    SqlOpenHelper sqlOpenHelper;
     SharedPreferences sharedPreferences;
     public String user;
     public long hid=1;
@@ -81,7 +69,6 @@ public class secFragment extends Fragment implements View.OnClickListener {
         sharedPreferences=getContext().getSharedPreferences("Data",MODE_PRIVATE);
         //SharedPreferences.Editor editor = sharedPreferences.edit();
         user = sharedPreferences.getString("current_username","");
-        sqlOpenHelper=new SqlOpenHelper(getActivity());
         security=new security();
         mAuth = FirebaseAuth.getInstance();
         if (getArguments() != null) {
@@ -149,10 +136,10 @@ public class secFragment extends Fragment implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
         //to cater for the admin and user logins
         if(!user.startsWith("ADMIN")){
-            fragload(0,sqlOpenHelper);
+
         }
         else{
-            fragload(hid,sqlOpenHelper);
+
         }
     }
 
@@ -170,82 +157,16 @@ public class secFragment extends Fragment implements View.OnClickListener {
     public void onResume() {
         super.onResume();
         if(getArguments()!=null){
-            fragload(hid,sqlOpenHelper); }
+        }
     }
     @Override
     public void onDestroyView() {
         super.onDestroyView();
     }
-    public void fragload(long passedid, SqlOpenHelper sqlOpenHelper) {
+    public void fragload(long passedid) {
         String n=null ,y=null,c=null,l=null,f=null,h=null,k=null,b=null,t=null,s=null,w=null;
         String passeduser = user;
-        SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
-        String[] columns = {SqlOpenHelper._USERID, SqlOpenHelper.KEY_ID, SqlOpenHelper.KEY_NAME, SqlOpenHelper.KEY_PASS, SqlOpenHelper.KEY_EMAIL
-                , SqlOpenHelper.KEY_FIRSTNAME, SqlOpenHelper.KEY_DOB, SqlOpenHelper.KEY_SECNAME,
-                SqlOpenHelper.KEY_residence, SqlOpenHelper.KEY_MOBILENO, SqlOpenHelper.KEY_empNO,SqlOpenHelper.KEY_NATNLID};
-        mcursor = db.query(SqlOpenHelper.TABLE_USER, columns, null, null,
-                null, null, null);
-        int IdPos = mcursor.getColumnIndex(SqlOpenHelper._USERID);
-        int namePos = mcursor.getColumnIndex(SqlOpenHelper.KEY_NAME);
-        int passPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_PASS);
-        int empPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_empNO);
-        int emailPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_EMAIL);
-        int logPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_LOG);
-        int fnamePos = mcursor.getColumnIndex(SqlOpenHelper.KEY_FIRSTNAME);
-        int secPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_SECNAME);
-        int resPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_residence);
-        int dobPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_DOB);
-        int mobilePos = mcursor.getColumnIndex(SqlOpenHelper.KEY_MOBILENO);
-        int natnlidPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_NATNLID);
-        //refresh views here so that they can load again
-        while (mcursor.moveToNext()) {
-            long id = mcursor.getLong(IdPos);
-            if(passedid!=0) {
-                if (id == passedid) {
-                    if(id==1){
-                        n = mcursor.getString(namePos).substring(6);
-                    }else{n = mcursor.getString(namePos);}
-                     y = mcursor.getString(passPos);
-                     c = mcursor.getString(emailPos);
-                     f = mcursor.getString(fnamePos);
-                     h = mcursor.getString(secPos);
-                     k = mcursor.getString(resPos);
-                     b = mcursor.getString(dobPos);
-                     t = mcursor.getString(mobilePos);
-                     s = mcursor.getString(natnlidPos);
-                     w=mcursor.getString(empPos);
 
-                  //  refresh();
-                    break;
-                }
-            }
-else { n = mcursor.getString(namePos);
-                if (n.equals(passeduser)) {
-                     y = mcursor.getString(passPos);
-                     c = mcursor.getString(emailPos);
-                     f = mcursor.getString(fnamePos);
-                     h = mcursor.getString(secPos);
-                     k = mcursor.getString(resPos);
-                     b = mcursor.getString(dobPos);
-                     t = mcursor.getString(mobilePos);
-                     s = mcursor.getString(natnlidPos);
-                     w=mcursor.getString(empPos);
-                     break;
-                }
-            }
-    }
-    if(txt_user!=null){
-        txt_user.setText(n);
-        txt_pass.setText(y);
-        user_email.setText(c);
-        user_fName.setText(f);
-        user_scName.setText(h);
-        user_idNo.setText(s);
-        user_resid.setText(k);
-        user_DOB.setText(b);
-        user_mobileNo.setText(t);
-        //user_empno.setText(w);
-    }
                 }
     private boolean validateForm() {
         boolean valid = true;
@@ -349,21 +270,7 @@ else { n = mcursor.getString(namePos);
                 }
             });
 
-            String select=SqlOpenHelper.KEY_ID+"=?";
-            String[]selectArgs={user};
-            ContentValues values=new ContentValues();
-            if(user.startsWith("ADMIN")){
-                values.put(SqlOpenHelper.KEY_NAME,"ADMIN_"+txt_user.getText().toString().trim());
-            }else{values.put(SqlOpenHelper.KEY_NAME,txt_user.getText().toString().trim()); }
-            values.put(SqlOpenHelper.KEY_PASS,txt_pass.getText().toString().trim());
-            values.put(SqlOpenHelper.KEY_FIRSTNAME,user_fName.getText().toString().trim());
-            values.put(SqlOpenHelper.KEY_SECNAME,user_scName.getText().toString().trim());
-            values.put(SqlOpenHelper.KEY_MOBILENO,user_mobileNo.getText().toString().trim());
-            values.put(SqlOpenHelper.KEY_residence,user_resid.getText().toString().trim());
-            values.put(SqlOpenHelper.KEY_DOB,user_DOB.getText().toString().trim());
-            values.put(SqlOpenHelper.KEY_EMAIL,user_email.getText().toString().trim());
-            SQLiteDatabase db=sqlOpenHelper.getWritableDatabase();
-            db.update(SqlOpenHelper.TABLE_USER,values,select,selectArgs);
+           //update local database
         }
         else{
             Toast.makeText(getActivity(), "failed!!!No network access",
@@ -393,29 +300,18 @@ else { n = mcursor.getString(namePos);
         user_scName.setEnabled(true);
     }
     public void invalidate() {
-        String select = SqlOpenHelper._USERID + "=?";
-        String[] selectArgs = {String.valueOf(hid)};
-        ContentValues values = new ContentValues();
-        values.put(SqlOpenHelper.KEY_ACCESS, "ACCESS_DENIED");
-        SQLiteDatabase db = sqlOpenHelper.getWritableDatabase();
-        db.update(SqlOpenHelper.TABLE_USER, values, select, selectArgs);
-        invalidate.setVisibility(View.INVISIBLE);
-        authenticate.setVisibility(View.VISIBLE);
+
     }
     public void authorise() {
-        String select = SqlOpenHelper._USERID + "=?";
-        String[] selectArgs = {String.valueOf(hid)};
-        ContentValues values = new ContentValues();
-        values.put(SqlOpenHelper.KEY_ACCESS, "ACCESS_GRANTED");
-        SQLiteDatabase db = sqlOpenHelper.getWritableDatabase();
-        db.update(SqlOpenHelper.TABLE_USER, values, select, selectArgs);
-        authenticate.setVisibility(View.INVISIBLE);
-        invalidate.setVisibility(View.VISIBLE);
+
     }
     public boolean internetIsConnected() {
         try {
             String command = "ping -c 1 google.com";
-            return (Runtime.getRuntime().exec(command).waitFor() == 0);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                return (Runtime.getRuntime().exec(command).waitFor(5, TimeUnit.SECONDS));
+            }
+            return (Runtime.getRuntime().exec(command).waitFor()==0);
         } catch (Exception e) {
             return false;
         }

@@ -3,11 +3,10 @@ package com.example.dedan.digitalreceipts;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,6 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class analytics_user extends Fragment {
     TextView today,yesterday,thisweek,thismonth;
-    SqlOpenHelper sqlOpenHelper;
     Cursor mcursor;
     private TextView tally;
     public long transId=1;
@@ -53,7 +51,7 @@ public class analytics_user extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        sqlOpenHelper=new SqlOpenHelper(getActivity());
+
         sharedPreferences=getContext().getSharedPreferences("Data",MODE_PRIVATE);
         //SharedPreferences.Editor editor = sharedPreferences.edit();
         user = sharedPreferences.getString("current_username","");
@@ -81,10 +79,10 @@ public class analytics_user extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if(!user.startsWith("ADMIN")){
-            fragload(current_empNo,sqlOpenHelper);
+
         }
         else{
-            fragload(transId,sqlOpenHelper);
+
         }
     }
 
@@ -93,35 +91,9 @@ public class analytics_user extends Fragment {
         super.onResume();
     }
 
-    public void fragload(long passedid, SqlOpenHelper sqlOpenHelper) {
+    public void fragload(long passedid) {
         String n=null ,y=null,c=null,l=null,f=null,h=null,k=null,b=null,t=null,s=null,w=null;
-        SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
-        String[] columns = { SqlOpenHelper.KEY_EMP_FOREIGN, SqlOpenHelper.KEY_MONTH, SqlOpenHelper.KEY_WEEK, SqlOpenHelper.KEY_YESTERDAY,SqlOpenHelper.KEY_TODAY,
-                SqlOpenHelper.KEY_TALLY};
-        mcursor = db.query(SqlOpenHelper.TABLE_SALES, columns, null, null,
-                null, null, null);
-        int monthPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_MONTH);
-        int weekPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_WEEK);
-        int yestPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_YESTERDAY);
-        int todayPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_TODAY);
-        int tallyPos = mcursor.getColumnIndex(SqlOpenHelper.KEY_TALLY);
-        int idPos=mcursor.getColumnIndex(SqlOpenHelper.KEY_EMP_FOREIGN);
-        //refresh views here so that they can load again
-        while (mcursor.moveToNext()) {
-            if(passedid==mcursor.getLong(idPos)){
-                n = mcursor.getString(todayPos);
-                y = mcursor.getString(weekPos);
-                c = mcursor.getString(yestPos);
-                l=mcursor.getString(monthPos);
-                f=mcursor.getString(tallyPos);
-                break;
-            }
-        }
-        today.setText(n);
-        yesterday.setText(c);
-        thisweek.setText(y);
-        thismonth.setText(l);
-        tally.setText(f);
+
     }
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

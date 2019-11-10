@@ -1,8 +1,8 @@
 package com.example.dedan.digitalreceipts;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,8 +11,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.List;
-
-import static com.example.dedan.digitalreceipts.R.layout.adapter_view;
 
 public class customListAdapter extends ArrayAdapter<load> {
     Context cont;

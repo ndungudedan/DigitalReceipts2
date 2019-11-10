@@ -1,19 +1,20 @@
 package com.example.dedan.digitalreceipts;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.design.widget.TextInputEditText;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -23,17 +24,21 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class logIn extends AppCompatActivity {
+    UserViewModel userViewModel;
+    private List<UserEntity> allUsers;
+
     private ProgressBar progressBar;
+    TextView stat_view;
     private FirebaseAuth mAuth;
-    private static int loggedIn_baseId;
+    private static int loggedIn_baseId=1;//to be removeed
     private static long loggedIn_empNO;
     EditText user,emailtxt;
     TextInputEditText pass;
-    SqlOpenHelper sqlOpenHelper;
 
     private static String loggedIn_user;
     private static String loggedIn_username;
@@ -41,6 +46,9 @@ public class logIn extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        userViewModel= ViewModelProviders.of(this).get(UserViewModel.class);
+
         setContentView(R.layout.activity_log_in);
         user=findViewById(R.id.username_edit);
         pass=findViewById(R.id.password_edit);
@@ -49,8 +57,8 @@ public class logIn extends AppCompatActivity {
         inputLayoutPassword = (TextInputLayout) findViewById(R.id.input_layout_password);
         //inputLayoutEmail=findViewById(R.id.input_layout_useremail);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        stat_view=findViewById(R.id.status_check);
 
-        sqlOpenHelper = new SqlOpenHelper(getApplicationContext());
         mAuth = FirebaseAuth.getInstance();
         if(!internetIsConnected()){
             emailtxt.setVisibility(View.INVISIBLE);
@@ -79,9 +87,14 @@ public class logIn extends AppCompatActivity {
         if (!validateCredentials()) {
             return;
         }
-        progressBar.setVisibility(View.VISIBLE);
+        stat_view.setText("Please Wait....");
+        stat_view.setTextColor(Color.CYAN);
             // login user
-            int x= checkLogin(sqlOpenHelper,name, password);
+            int x= checkLogin(name, password);
+            if(x==3){
+                Toast.makeText(logIn.this, "  No such user exists",
+                        Toast.LENGTH_SHORT).show();
+            }
         if(x==1 & !internetIsConnected()){
             housekeeping();
             Intent main=new Intent(logIn.this,MainActivity.class);
@@ -112,14 +125,16 @@ public class logIn extends AppCompatActivity {
                                                 Toast.LENGTH_SHORT).show();
 
                                     }
-                                    progressBar.setVisibility(View.INVISIBLE);
+                                    stat_view.setText("success");
                                 }
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(logIn.this, ""+e.getLocalizedMessage(),
-                                Toast.LENGTH_SHORT).show();
+                        stat_view.setText(""+e.getLocalizedMessage());
+                        stat_view.setTextColor(Color.RED);
+                       /* Toast.makeText(logIn.this, ""+e.getLocalizedMessage(),
+                                Toast.LENGTH_SHORT).show();*/
                     }
                 });
             }
@@ -128,66 +143,26 @@ public class logIn extends AppCompatActivity {
                         "NOT YET APPROVED!", Toast.LENGTH_LONG)
                         .show();
             }
-            else if(x==0 & internetIsConnected()){
-                mAuth.signInWithEmailAndPassword(emailtxt.getText().toString().trim(), pass.getText().toString().trim())
-                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()) {
-                                    // Sign in success, update UI with the signed-in user's information
-                                    Objects.requireNonNull(mAuth.getCurrentUser()).delete();
-                                    housekeeping();
-                                    Toast.makeText(getApplicationContext(),
-                                            "Please register Again!", Toast.LENGTH_LONG)
-                                            .show();
-                                    progressBar.setVisibility(View.INVISIBLE);
-                                }
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(logIn.this, ""+e.getLocalizedMessage(),
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-            else{
-                Toast.makeText(getApplicationContext(),
-                        "Wrong credentials!", Toast.LENGTH_LONG)
-                        .show();
-            }
-        progressBar.setVisibility(View.INVISIBLE);
-
     }
-    public int checkLogin(SqlOpenHelper sqlOpenHelper, String name, String password) {
-        SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
-        String[] columns = {SqlOpenHelper._USERID, SqlOpenHelper.KEY_NAME,SqlOpenHelper.KEY_PASS,SqlOpenHelper.KEY_FIRSTNAME,SqlOpenHelper.KEY_empNO,
-        SqlOpenHelper.KEY_ACCESS};
-        Cursor cursor = db.query(SqlOpenHelper.TABLE_USER, columns, null, null,
-                null, null, null);
-
-        int IdPos = cursor.getColumnIndex(SqlOpenHelper._USERID);
-        int namePos = cursor.getColumnIndex(SqlOpenHelper.KEY_NAME);
-        int userpos = cursor.getColumnIndex(SqlOpenHelper.KEY_FIRSTNAME);
-        int passwordPos = cursor.getColumnIndex(SqlOpenHelper.KEY_PASS);
-        int accessPos = cursor.getColumnIndex(SqlOpenHelper.KEY_ACCESS);
-        int empPos=cursor.getColumnIndex(SqlOpenHelper.KEY_empNO);
-        //refresh views here so that they can load again
-         int x = 0;
-        while (cursor.moveToNext()) {
-            String n = cursor.getString(namePos);
-            String c = cursor.getString(passwordPos);
-            String d=cursor.getString(accessPos);
-            if(n.isEmpty()&&c.isEmpty()){
-                x=99;
+    public int checkLogin( String name, String password) {              //0=default value
+        int x = 0;                                                      //99=credentials empty unlikely scenario
+        UserEntity user=userViewModel.getSingleUser(name,password);            //2=access denied
+        if(user!=null){                                                   //1=login good
+            String n = user.getKEY_NAME();                                      //3=no such user exists
+            String p = user.getKEY_PASS();
+            String f = user.getKEY_FIRSTNAME();
+            String a = user.getKEY_ACCESS();
+            long y=user.getKEY_empNO();
+            if (n.isEmpty() && p.isEmpty()) {
+                x = 99;
                 return x;
             }
-            if (n.equals(name)&&c.equals(password)) {
-                loggedIn_baseId=cursor.getInt(IdPos);
-                loggedIn_username=n;
-                loggedIn_user = cursor.getString(userpos);
-                loggedIn_empNO=cursor.getLong(empPos);
-                if(d.equals("ACCESS_DENIED")){
+            if (n.equals(name) && p.equals(password)) {
+                //loggedIn_baseId=cursor.getInt(IdPos);
+                loggedIn_username = n;
+                loggedIn_user = f;
+                loggedIn_empNO = y;
+                if(a.equals("ACCESS_DENIED")){
                     x = 2;
                     return x;
                 }
@@ -195,17 +170,11 @@ public class logIn extends AppCompatActivity {
                 return x;
             }
         }
-        cursor.close();
-        return x;
-    }
-    private void updateUI(FirebaseUser user) {
-        if(user!=null){
-            Intent main=new Intent(this,MainActivity.class);
-            main.putExtra("loggedIn_user",loggedIn_user);
-            main.putExtra("loggedIn_username",loggedIn_username);
-            main.putExtra("loggedIn_baseId",loggedIn_baseId);
-            startActivity(main);
+        else{
+            x=3;
+            return x;
         }
+        return x;
     }
     public void Reg_link(View view) {
         Intent intent=new Intent(this,Register.class);
@@ -247,10 +216,15 @@ public class logIn extends AppCompatActivity {
         if (!validateCredentials()) {
             return;
         }
-        progressBar.setVisibility(View.VISIBLE);
+        stat_view.setText("Please Wait.....");
 
             // login user
-            int x=checkLogin(sqlOpenHelper,name,password);
+            int x=checkLogin(name,password);
+
+        if(x==3){
+            Toast.makeText(logIn.this, "  No such user exists",
+                    Toast.LENGTH_SHORT).show();
+        }
 
             if(x==1 & !internetIsConnected()){
                 housekeeping();
@@ -282,46 +256,22 @@ public class logIn extends AppCompatActivity {
                                                 Toast.LENGTH_SHORT).show();
 
                                     }
-                                    progressBar.setVisibility(View.INVISIBLE);
+                                    stat_view.setText("success");
                                 }
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(logIn.this, ""+e.getLocalizedMessage(),
-                                Toast.LENGTH_SHORT).show();
+                        stat_view.setText(""+e.getLocalizedMessage());
+                        stat_view.setTextColor(Color.RED);
                     }
                 });
-                progressBar.setVisibility(View.INVISIBLE);
+                stat_view.setText("success");
             }
-            else if(x==0 & internetIsConnected()){
-                mAuth.signInWithEmailAndPassword(emailtxt.getText().toString().trim(), pass.getText().toString().trim())
-                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()) {
-                                    // Sign in success, update UI with the signed-in user's information
-                                    Objects.requireNonNull(mAuth.getCurrentUser()).delete();
-                                        housekeeping();
-                                    Toast.makeText(getApplicationContext(),
-                                            "Please register Again!", Toast.LENGTH_LONG)
-                                            .show();
-                                    progressBar.setVisibility(View.INVISIBLE);
-                                }
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(logIn.this, ""+e.getLocalizedMessage(),
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-            else{
-                Toast.makeText(getApplicationContext(),
-                        "Wrong credentials!", Toast.LENGTH_LONG)
-                        .show();
-            }
+            /*else{
+                stat_view.setText("Wrong Credentials!");
+                stat_view.setTextColor(Color.RED);
+            }*/
         }
     public void housekeeping(){
         user.getText().clear();
@@ -357,7 +307,7 @@ public class logIn extends AppCompatActivity {
         try {
             String command = "ping -c 1 google.com";
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                return (Runtime.getRuntime().exec(command).waitFor(10,TimeUnit.SECONDS));
+                return (Runtime.getRuntime().exec(command).waitFor(5,TimeUnit.SECONDS));
             }
             return (Runtime.getRuntime().exec(command).waitFor()==0);
         } catch (Exception e) {

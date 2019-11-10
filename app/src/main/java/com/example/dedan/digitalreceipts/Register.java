@@ -1,17 +1,22 @@
 package com.example.dedan.digitalreceipts;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModelProviders;
+
+import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.NonNull;
-import android.support.design.widget.TextInputEditText;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -21,20 +26,38 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 
 public class Register extends AppCompatActivity {
+    private UserViewModel userViewModel;
+    private LiveData<List<UserEntity>> allUsers;
+    private onlineDb onlineDb;
     private FirebaseAuth mAuth;
+    private SharedPreferences sharedPreferences;
+
     EditText fName,scName, idN0,DOB,resid,mobileNo;
     EditText user;
     TextInputEditText pass;
     EditText email;
-    SqlOpenHelper sqlOpenHelper;
     int empNO =000;
     private TextInputLayout inputName,inputsecname,inputId,inputDOB,inputresidence,inputNo,inputUsername,inputPass,inputemail;
+    private UserEntity checkUserEntity=null;
+    FirebaseFirestore firedb = FirebaseFirestore.getInstance();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+        userViewModel= ViewModelProviders.of(Register.this).get(UserViewModel.class);
+        onlineDb=new onlineDb(firedb);
+        sharedPreferences=getSharedPreferences("Data",MODE_PRIVATE);
+
         user=findViewById(R.id.user_reg);
         pass=findViewById(R.id.pass_reg);
         email=findViewById(R.id.email_reg);
@@ -44,7 +67,7 @@ public class Register extends AppCompatActivity {
         DOB=findViewById(R.id.dob);
         resid=findViewById(R.id.residence);
         mobileNo=findViewById(R.id.tel_no);
-        sqlOpenHelper = new SqlOpenHelper(getApplicationContext());
+
 
         inputName=findViewById(R.id.first_name_inputlayout);
         inputsecname=findViewById(R.id.sec_name_inputLayout);
@@ -57,6 +80,8 @@ public class Register extends AppCompatActivity {
         inputemail=findViewById(R.id.email_reg_inputLayout);
         mAuth = FirebaseAuth.getInstance();
 
+
+        DOB_picker();
     }
     private void requestFocus(View view) {
         if (view.requestFocus()) {
@@ -70,37 +95,25 @@ public class Register extends AppCompatActivity {
         final String userresid=resid.getText().toString();
         final String usermobile=mobileNo.getText().toString();
 
-        final String username=user.getText().toString().trim();
+        String username=user.getText().toString().trim();
         final String userpass=pass.getText().toString().trim();
         final String useremail=email.getText().toString().trim();
+        String access="ACCESS_DENIED";
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if(!sharedPreferences.getBoolean("firstRegistration", false)) {
+            username="ADMIN_"+username;
+            access="ACCESS_GRANTED";
+            editor.putBoolean("firstRegistration", true);
+            editor.apply();
+        }
+
+
+
         if (!validateForm()) {
             return;
         }
-        SQLiteDatabase db = sqlOpenHelper.getReadableDatabase();
-        String[] columns = {SqlOpenHelper.KEY_ID, SqlOpenHelper.KEY_NAME,SqlOpenHelper.KEY_PASS,SqlOpenHelper.KEY_EMAIL,SqlOpenHelper.KEY_empNO};
-        Cursor cursor = db.query(SqlOpenHelper.TABLE_USER, columns, null, null,
-                null, null, null);
-
-        int IdPos = cursor.getColumnIndex(SqlOpenHelper.KEY_ID);
-        int namePos = cursor.getColumnIndex(SqlOpenHelper.KEY_NAME);
-        int emailPos = cursor.getColumnIndex(SqlOpenHelper.KEY_EMAIL);
-        int empPos = cursor.getColumnIndex(SqlOpenHelper.KEY_empNO);
-        //refresh views here so that they can load again
-        while (cursor.moveToNext()) {
-            String n = cursor.getString(namePos);
-            String c = cursor.getString(emailPos);
-            if (n.equals(username)&&c.equals(useremail)) {
-                Toast.makeText(getApplicationContext(),
-                        "Already registered!", Toast.LENGTH_LONG)
-                        .show();
-                return;
-            }
-        }
-        while(cursor.moveToLast()){
-            empNO =cursor.getInt(empPos)+1;
-            break;
-        }
-        cursor.close();
+        //find a way to get and increment employee id//check soln above
 
         mAuth.createUserWithEmailAndPassword(useremail, userpass)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -111,10 +124,6 @@ public class Register extends AppCompatActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
                             Toast.makeText(Register.this, "Registration Success.",
                                     Toast.LENGTH_SHORT).show();
-                            sqlOpenHelper.addUser(userfname,userscName,usernationalID,userDOB,userresid,usermobile,username,userpass,useremail, empNO);
-                            Toast.makeText(getApplicationContext(),
-                                    "registered!", Toast.LENGTH_SHORT)
-                                    .show();
 
                             if (user != null) {
                                 user.sendEmailVerification()
@@ -137,8 +146,14 @@ public class Register extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
             }
         });
-       /* Intent intent=new Intent(this,logIn.class);
-        startActivity(intent);*/
+        FirebaseUser regUser;
+        regUser=mAuth.getCurrentUser();
+        if (regUser!=null){
+            onlineDb.registerOnline(userfname,userscName,empNO,userDOB,userresid,usermobile,username,useremail,userpass,usernationalID,access);
+            UserEntity userEntity=new UserEntity(userfname,userscName,empNO,userDOB,userresid,usermobile,username,useremail,userpass,usernationalID,"Welcome",access);
+            userViewModel.insert(userEntity);
+        }
+
     }
 
     public void login_link(View view) {
@@ -190,4 +205,28 @@ public class Register extends AppCompatActivity {
         return valid;
     }
 
+    public void DOB_picker(){
+        final Calendar calendar=Calendar.getInstance();
+        final DatePickerDialog.OnDateSetListener onDateSetListener=new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+                calendar.set(Calendar.YEAR,i);
+                calendar.set(Calendar.MONTH,i1);
+                calendar.set(Calendar.DAY_OF_MONTH,i2);
+
+                SimpleDateFormat sdfformat=new SimpleDateFormat("dd/MM/yy", Locale.ENGLISH);
+                 String dob=sdfformat.format(calendar.getTime());
+                 DOB.setText(dob);
+
+            }
+        };
+
+        DOB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new DatePickerDialog(Register.this,onDateSetListener,calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),
+                        calendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+    }
 }
