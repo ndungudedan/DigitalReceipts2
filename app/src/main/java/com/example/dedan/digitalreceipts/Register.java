@@ -104,8 +104,6 @@ public class Register extends AppCompatActivity {
         if(!sharedPreferences.getBoolean("firstRegistration", false)) {
             username="ADMIN_"+username;
             access="ACCESS_GRANTED";
-            editor.putBoolean("firstRegistration", true);
-            editor.apply();
         }
 
 
@@ -113,9 +111,11 @@ public class Register extends AppCompatActivity {
         if (!validateForm()) {
             return;
         }
+        UserEntity userEntity=new UserEntity(userfname,userscName,empNO,userDOB,userresid,usermobile,username,useremail,userpass,usernationalID,"Welcome",access);
+        userViewModel.insert(userEntity);
         //find a way to get and increment employee id//check soln above
 
-        mAuth.createUserWithEmailAndPassword(useremail, userpass)
+        /*mAuth.createUserWithEmailAndPassword(useremail, userpass)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -152,7 +152,10 @@ public class Register extends AppCompatActivity {
             onlineDb.registerOnline(userfname,userscName,empNO,userDOB,userresid,usermobile,username,useremail,userpass,usernationalID,access);
             UserEntity userEntity=new UserEntity(userfname,userscName,empNO,userDOB,userresid,usermobile,username,useremail,userpass,usernationalID,"Welcome",access);
             userViewModel.insert(userEntity);
-        }
+
+            editor.putBoolean("firstRegistration", true);   ///so that value changes only when reg is successful
+            editor.apply();
+        }*/
 
     }
 

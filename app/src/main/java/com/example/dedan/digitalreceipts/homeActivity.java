@@ -1,14 +1,14 @@
 package com.example.dedan.digitalreceipts;
 
-import androidx.lifecycle.LiveData;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -19,22 +19,20 @@ import androidx.core.app.NavUtils;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import android.view.ActionMode;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
@@ -55,127 +53,189 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class homeActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     GoodsViewModel goodsViewModel;
-    GoodsRepository goodsRepository;
-    LiveData<List<GoodsEntity>> goodsTableValues;
+    PickedGoodViewModel pickedGoodViewModel;
+    DailySalesViewModel dailySalesViewModel;
+    MonthSalesViewModel monthSalesViewModel;
+    WeekSalesViewModel weekSalesViewModel;
+    List<PickedGoodEntity> pickedGoods;
 
-    private static final int SPIN_LOAD = 1;
-    private static final int SPINQ_LOAD = 2;
+    TextView totalView;
+    public static final int GET_CUSTOMER_REQUEST=3;
+
+    String item;
+    String pack;
+    int cost;
+    int quan;
+
     int itemlistCount=0;
     int count=0,initCount;
     int total=0,initTotal;
     int receiptCount;
 
-   // ArrayList<CharSequence> spinList;
-    List<GoodsEntity> spinList;
-    List<GoodsEntity> spinListQ;
-    ArrayAdapter<GoodsEntity> spinAdapt;
-    ArrayAdapter<GoodsEntity> spinAdaptQ;
-    Spinner spin,spinQ;
-    String spinItem="";
-
-    Button btn;
-
-    EditText jina,ema,namba,lipa;
-    EditText quant;
-    EditText item;
-    EditText kila;
-    EditText price;
-    ListView list;
-    TextView countItem;
-    TextView countTotal;
-    ArrayList<String> itemList;
-    ArrayList<String> selectList;
-    ArrayList<Integer> Gpoint;
-    ArrayAdapter<String> arrayAdapter;
     Toolbar tool;
     File file;      //pdf file
-    String name="",email,no,pay;
+    String name="",email,no,pay="",pobox,address,location;
     String timeStamp;
     int pdfCount=0;
     SharedPreferences shp;
     String contact ="contactKey";
-    private int itemIdpos;
-    private Cursor mcursor;
-    private Cursor pcursor;
-    private SQLiteDatabase db;
-    ArrayList selectSpinid;
-    private String itemfrmspin;
-    private String packfrmspin;
-    private String costfrmspin;
 
     private String user;
+    private EditText lipa;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.generic_home);
         tool= findViewById(R.id.bar);
         setSupportActionBar(tool);
         getSupportActionBar().setTitle("Receipt");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        totalView=findViewById(R.id.totaltxt);
+
         goodsViewModel= ViewModelProviders.of(this).get(GoodsViewModel.class);
+        pickedGoodViewModel=ViewModelProviders.of(this).get(PickedGoodViewModel.class);
+        dailySalesViewModel= ViewModelProviders.of(this).get(DailySalesViewModel.class);
+        weekSalesViewModel=ViewModelProviders.of(this).get(WeekSalesViewModel.class);
+        monthSalesViewModel=ViewModelProviders.of(this).get(MonthSalesViewModel.class);
 
-        selectSpinid=new ArrayList();
-        Gpoint=new ArrayList<>();
 
-
-        quant= findViewById(R.id.quantity);
-        item= findViewById(R.id.items);
-        kila= findViewById(R.id.each);
-        price= findViewById(R.id.cost);
-        countItem= findViewById(R.id.itemCount);
-        countTotal= findViewById(R.id.totalCount);
-        list = findViewById(R.id.list);
-        btn= findViewById(R.id.btnadd);
-        selectList = new ArrayList<>();
-
-        spin= findViewById(R.id.spinner2);
-        spinList= goodsViewModel.getItems();
-
-        spinQ= findViewById(R.id.quanSpin);
-        spinListQ=goodsViewModel.getPack();
-
-        spinAdapt=new ArrayAdapter<GoodsEntity>(this,android.R.layout.simple_spinner_dropdown_item,spinList);
-        spin.setAdapter(spinAdapt);
-        spin.setOnItemSelectedListener(this);
-
-        spinAdaptQ=new ArrayAdapter<GoodsEntity>(this,android.R.layout.simple_spinner_dropdown_item,spinListQ);
-        spinQ.setAdapter(spinAdaptQ);
-        spinQ.setOnItemSelectedListener(this);
-
-        itemList = new ArrayList<>();
-        // create an array adapter from listView
-        arrayAdapter = new ArrayAdapter<String>
-                (this, android.R.layout.simple_list_item_1, itemList);
-        list.setAdapter(arrayAdapter);
+        //pickedGoods=pickedGoodViewModel.getAllPickedGoodsList();
 
         shp=getSharedPreferences("Data",Context.MODE_PRIVATE);
         user = shp.getString("current_username","");
 
-        addClick();
-        delete();
-        //graphAmount();
 
+        RecyclerView GoodsrecyclerView=findViewById(R.id.homeGoodsrecycler);
+        GoodsrecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        GoodsrecyclerView.setHasFixedSize(true);
+        final UnitAdapter adapter=new UnitAdapter();
+        GoodsrecyclerView.setAdapter(adapter);
+        goodsViewModel.getAllGoods().observe(this, new Observer<List<GoodsEntity>>() {
+            @Override
+            public void onChanged(List<GoodsEntity> goodsEntities) {
+                adapter.submitList(goodsEntities);
+            }
+        });
+
+        adapter.setOnItemClickListener(new UnitAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(GoodsEntity goodsEntity) {
+                // do update, if item does not exist on picked table then insert
+                //pickedGoods=pickedGoodViewModel.getAllPickedGoodsList();
+
+                int res = 0;//no of rows updated
+                quan=1;
+                int picked_id=goodsEntity.getKEY_GOODS_ID();
+                pack=goodsEntity.getKEY_PACK();
+                cost=goodsEntity.getKEY_COST();
+                item=goodsEntity.getKEY_ITEM();
+
+                if(pickedGoods!=null){
+                    for(PickedGoodEntity good : pickedGoods) {
+                        int n = good.getKEY_picked_id();
+                        int id=good.getKEY_ID();
+                        if (n == picked_id) {
+                            quan = quan + good.getKEY_Quantity();
+                            int total=cost*quan;
+                            PickedGoodEntity pickedGoodEntity=new PickedGoodEntity(quan,pack,item,cost,total,picked_id);
+                            pickedGoodEntity.setKEY_ID(id);
+                            res = pickedGoodViewModel.update(pickedGoodEntity);
+                            break;
+                        }
+
+                    }
+                }
+                if (res == 0) {
+                    int total=cost*quan;
+                    PickedGoodEntity pickedGoodEntity=new PickedGoodEntity(quan,pack,item,cost,total,picked_id);
+                    pickedGoodViewModel.insert(pickedGoodEntity);
+                }
+            }
+        });
+
+        RecyclerView pickedRecycler=findViewById(R.id.pickedGoodsRecycler);
+        pickedRecycler.setLayoutManager(new LinearLayoutManager(this));
+        pickedRecycler.setHasFixedSize(true);
+        final pickedGoodAdapter pickedAdapter=new pickedGoodAdapter();
+        pickedRecycler.setAdapter(pickedAdapter);
+        pickedGoodViewModel.getAllPickedGoods().observe(this, new Observer<List<PickedGoodEntity>>() {
+            @Override
+            public void onChanged(List<PickedGoodEntity> pickedGoodEntities) {
+                pickedAdapter.submitList(pickedGoodEntities);
+                pickedGoods=pickedGoodEntities;
+                totalView.setText(String.valueOf(totalCount()));
+            }
+        });
+        pickedAdapter.setOnItemClickListener(new pickedGoodAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(PickedGoodEntity pickedGoodEntity) {
+                editpickedinputDialog(pickedGoodEntity.getKEY_ID(),pickedGoodEntity.getKEY_Item(),pickedGoodEntity.getKEY_Pack(),
+                        pickedGoodEntity.getKEY_Cost(),pickedGoodEntity.getKEY_Quantity(),pickedGoodEntity.getKEY_picked_id());
+
+            }
+        });
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
+                 ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                pickedGoodViewModel.delete(pickedAdapter.getGoodAt(viewHolder.getAdapterPosition()));
+            }
+        }).attachToRecyclerView(pickedRecycler);
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==GET_CUSTOMER_REQUEST && resultCode==RESULT_OK){
+            if (data != null) {
+                name=data.getStringExtra(CustomerActivity.EXT_FNAME)+""+data.getStringExtra(CustomerActivity.EXT_SNAME);
+                email=data.getStringExtra(CustomerActivity.EXT_EMAIL);
+                no= String.valueOf(data.getIntExtra(CustomerActivity.EXT_PHONE,0));
+                pobox= String.valueOf(data.getIntExtra(CustomerActivity.EXT_POBOX,0));
+                address= String.valueOf(data.getIntExtra(CustomerActivity.EXT_ADDRESS,0));
+                location=data.getStringExtra(CustomerActivity.EXT_LOCATION);
+
+                if(pay.isEmpty()){
+                    inputDialog();
+                }
+                else{
+                    pdfCount++;
+                    if(pdfCount==1){
+                        pdf();
+                        Toast.makeText(getApplicationContext(),"SAVED",Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        Toast.makeText(getApplicationContext(),"Pdf Already saved\nPlease Refresh",Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        mcursor.close();
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu,menu);
         return true;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
@@ -184,12 +244,15 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 break;
             case R.id.save:
-                if(itemList.isEmpty()){
+                if(pickedGoods.isEmpty()){
                     Toast.makeText(getApplicationContext(),"Cannot save empty receipt",Toast.LENGTH_SHORT).show();
                 }
-                    else if(name.isEmpty()){
-                        inputDialog();
+                if(name.isEmpty()){
+                    getClient();
                     }
+                else if(pay.isEmpty()){
+                    inputDialog();
+                }
                     else{
                         pdfCount++;
                         if(pdfCount==1){
@@ -211,14 +274,14 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 Toast.makeText(getApplicationContext(),"Please save pdf",Toast.LENGTH_SHORT).show();
                 break;
             case R.id.client:
-               inputDialog();
+               getClient();
                 break;
             case R.id.newPdf:
-                //recreate();
                 refresh();
 
                 break;
         }
+
         return super.onOptionsItemSelected(item);
     }
     public void refresh(){
@@ -226,181 +289,34 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         finish();
         overridePendingTransition(0,0);
     }
-    public void addClick() {
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String quantity = quant.getText().toString();
-                String items = item.getText().toString();
-                String each = kila.getText().toString();
-                if(quant.getText().toString().isEmpty()){
-                    quantity="1";
-                }
-                mCost();
-                String cost = price.getText().toString();
+    public void getClient(){
+        Intent f=new Intent(this,CustomerActivity.class);
+        f.putExtra("GetCustomer","From_homeActivity");
+        startActivityForResult(f,GET_CUSTOMER_REQUEST);
+    }
 
-                String Summary = quantity+"_"+ spinItem+":\t" + items + "\t@" + each +"\tSH." + cost ;
+    public void salesInsert(){
+        Date date=new Date();
+        String format="hh:mm:ss a dd-MMM-yyyy";
+        SimpleDateFormat sdf=new SimpleDateFormat(format);
+        sdf.format(date);
+    }
 
-                if (price.getText().toString().isEmpty()){
-                    price.setError("Cost is empty");
-                    price.requestFocus();
-                    return;
-                }
-                if (item.getText().toString().isEmpty()){
-                    item.setError("Item is empty");
-                    item.requestFocus();
-                    return;
-                }
-                arrayAdapter.add(Summary);
-                arrayAdapter.notifyDataSetChanged();
-
-                itemCount();
-               totalCount();
-                clear();
-            }
-        });
-
-  }
-    public void mCost(){
-        if(quant.getText().toString().isEmpty()){
-
+    public int totalCount(){
+        total=0;
+        for(PickedGoodEntity good:pickedGoods){
+            total=good.getKEY_total()+total;
         }
-        else{
-            try{
-                int q,e,p;
-                q=Integer.parseInt(quant.getText().toString());
-                e=Integer.parseInt(kila.getText().toString());
-                p=q*e;
-                price.setText(""+p);}
-            catch (NumberFormatException e){
-                e.printStackTrace();
-            }
-        }
-    }
-    public void clear(){
-        quant.getText().clear();
-        item.getText().clear();
-        kila.getText().clear();
-        price.getText().clear();
-    }
-
-    public void delete(){
-        final ArrayList<Integer> listIndex;
-        listIndex=new ArrayList<Integer>();
-       // listView.setLongClickable(true);
-        list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        list.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
-            @Override
-            public void onItemCheckedStateChanged(ActionMode actionMode, int i, long l, boolean b) {
-              if(b){
-                  listIndex.add(i);
-                  list.getChildAt(i).setBackgroundColor(getResources().getColor(R.color.listHighlight));
-                  count=count+1;
-                  itemlistCount=itemlistCount-1;
-                  countItem.setText(""+itemlistCount);
-                  selectList.add(itemList.get(i));
-
-                  String s=itemList.get(i).substring(itemList.get(i).indexOf(".")+1);
-                  int c=Integer.parseInt(s);
-                  total=total-c;
-                  countTotal.setText("Ksh."+total);
-              }
-                else{
-                  list.getChildAt(i).setBackgroundColor(getResources().getColor(R.color.lightBackground));
-                  count--;
-                  itemCount();
-                  selectList.remove(itemList.get(i));
-                  String t=itemList.get(i).substring(itemList.get(i).indexOf(".")+1);
-                  int c=Integer.parseInt(t);
-                  total=total+c;
-                  countTotal.setText("Ksh."+total);
-
-              }
-                actionMode.setTitle(count+"items selected");
-            }
-
-            @Override
-            public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-                MenuInflater inflater=actionMode.getMenuInflater();
-                inflater.inflate(R.menu.del_menu, menu);
-
-                return true;
-            }
-
-            @Override
-            public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-                return false;
-            }
-
-            @Override
-            public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
-                switch (menuItem.getItemId()){
-                    case R.id.delete:
-                        for(String msg:selectList){
-                            arrayAdapter.remove(msg);
-                        }
-                        count=0;
-                        actionMode.finish();
-                        return true;
-                       // break;
-                    default:
-                        return false;
-
-                }
-               // return false;
-            }
-
-            @Override
-            public void onDestroyActionMode(ActionMode actionMode) {
-                for(int x=0;x<listIndex.size();x++){
-                  int y=listIndex.get(x);
-                    list.getChildAt(y).setBackgroundColor(getResources().getColor(R.color.lightBackground));
-                }
-                count=0;
-                countTotal.setText("Ksh."+initTotal);
-                countItem.setText(""+initCount);
-                selectList.clear();
-                actionMode.finish();
-            }
-        });
-    }
-
-    public void itemCount(){
-        itemlistCount=itemlistCount+1;
-        countItem.setText(""+itemlistCount);
-        initCount=itemlistCount;
-    }
-
-    public void totalCount(){
-        String p=price.getText().toString();
-       int  tot=Integer.parseInt(p);
-        total=total+tot;
-        countTotal.setText("Ksh."+total);
-        initTotal=total;
+        return total;
     }
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         switch (adapterView.getId()){
             case R.id.quanSpin:
-                //bcoz spiiner id starts at 0 while db rows from 1
-
-                //method call expected
-
-                spinItem=packfrmspin;
 
                 break;
             case R.id.spinner2:
-                //method call expected
-
-                int x=i+1;
-                item.setText(itemfrmspin);
-                kila.setText(costfrmspin);
-                spinQ.setSelection(i);
-
         }
-    }
-    public void load(long spinid){
-
     }
 
     @Override
@@ -424,7 +340,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
             try {
 //creates pdf,saves and writes to it.
                 FileOutputStream fileOutputStream=new FileOutputStream(file);
-                com.itextpdf.text.Document doc=new com.itextpdf.text.Document();
+                Document doc=new Document();
                 PdfWriter.getInstance(doc,fileOutputStream );
                 doc.open();
                 shp=getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -455,7 +371,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 Paragraph Na=new Paragraph(shp.getString("nameKey","")+"\n"+shp.getString("emailKey","")+"\n"+"P.O. BOX"+
                         shp.getString("boxKey","")+ "\n"+shp.getString("locationKey","")+"\n"+
                         shp.getString("contactKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,18,Font.NORMAL));
-             /*   Paragraph Em=new Paragraph(shp.getString("emailKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL,BaseColor.MAGENTA));
+   Paragraph Em=new Paragraph(shp.getString("emailKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL,BaseColor.MAGENTA));
                 Paragraph Bo=new Paragraph("P.O. BOX"+shp.getString("boxKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL,BaseColor.MAGENTA));
                 Paragraph Lo=new Paragraph(shp.getString("locationKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL,BaseColor.MAGENTA));
                 Paragraph Co=new Paragraph(shp.getString("contactKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL,BaseColor.MAGENTA));
@@ -470,7 +386,8 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 doc.add(Bo);
                 doc.add(Lo);
                 doc.add(Co);
-                doc.add(new Paragraph(new Date().toString()));*/
+                doc.add(new Paragraph(new Date().toString()));
+
 
                 PdfPCell Cell=new PdfPCell(new Paragraph(Na));
                 company.addCell(Cell);
@@ -484,9 +401,12 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 doc.add(new Paragraph("NAME:"+name,FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL)));
                 doc.add(new Paragraph("EMAIL:"+email,FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL)));
                 doc.add(new Paragraph("N0   :"+no+"\n",FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL)));
+                doc.add(new Paragraph("PO.Box:"+pobox+"\n",FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL)));
+                doc.add(new Paragraph("Address:"+address+"\n",FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL)));
+                doc.add(new Paragraph("LOCATION:"+location+"\n",FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL)));
                 doc.add(new Paragraph(new Date().toString()));
                 doc.add(new Paragraph("Sale No:"+shp.getString("receiptKey","1")+".................................." +
-                        "....No.of Items:"+itemlistCount,FontFactory.getFont(FontFactory.TIMES_ROMAN,18,Font.NORMAL,BaseColor.DARK_GRAY)));
+                        "....No.of Items:"+pickedGoods.size(),FontFactory.getFont(FontFactory.TIMES_ROMAN,18,Font.NORMAL,BaseColor.DARK_GRAY)));
                 doc.add(new LineSeparator());
                 doc.add(new Paragraph("\n"));
 
@@ -497,13 +417,12 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 table.addCell("@");
                 table.addCell("Ksh");
 
-                for(int i=0;i<itemList.size();i++){
-                    String Q=itemList.get(i).substring(0,itemList.get(i).indexOf("_"));
-                    String St=itemList.get(i).substring(itemList.get(i).indexOf("_")+1,itemList.get(i).indexOf(":"));
-                    String T=itemList.get(i).substring(itemList.get(i).indexOf(":")+1,itemList.get(i).indexOf("@"));
-                   // String E=itemList.get(i).substring(itemList.get(i).indexOf("@")+1,itemList.get(i).indexOf("S"));
-                    String E=itemList.get(i).substring(itemList.get(i).indexOf("@")+1,itemList.get(i).indexOf(".")-2);
-                    String t=itemList.get(i).substring(itemList.get(i).indexOf(".")+1);
+                for(PickedGoodEntity good : pickedGoods){
+                    String Q= String.valueOf(good.getKEY_Quantity());
+                    String St=good.getKEY_Pack();
+                    String T=good.getKEY_Item();
+                    String E= String.valueOf(good.getKEY_Cost());
+                    String t= String.valueOf(good.getKEY_total());
 
                     table.addCell(Q);
                     table.addCell(St);
@@ -571,24 +490,18 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
     public void inputDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(homeActivity.this);
         View mview=getLayoutInflater().inflate(R.layout.activity_client_dialog,null);
-        ema=mview.findViewById(R.id.clEmail);
-        jina=mview.findViewById(R.id.clName);
-        namba=mview.findViewById(R.id.clNo);
         lipa=mview.findViewById(R.id.clCash);
 
         builder.setView(mview);
-        builder.setTitle("Client Details");
+        builder.setTitle("Cash Tendered");
         builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
-                 email=ema.getText().toString();
-                 name=jina.getText().toString();
-                 no=namba.getText().toString();
                  pay=lipa.getText().toString();
 
-                if (jina.getText().toString().isEmpty()){
-                    jina.setError("Name is empty");
-                    jina.requestFocus();
+                if (lipa.getText().toString().isEmpty()){
+                    lipa.setError("Name is empty");
+                    lipa.requestFocus();
                     return;
                 }
             }
@@ -598,14 +511,50 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                         dialog.dismiss();
                     }
                 });
-        ema.setText(email);
-        jina.setText(name);
-        namba.setText(no);
         lipa.setText(pay);
 
         AlertDialog dialog=builder.create();
         dialog.show();
 
+    }
+    public void editpickedinputDialog(final int key_id, String it, String pa, int co, final int q, final int pick_id) {
+        final EditText item_edit, cost_edit, pack_edit,quan_edit;
+        AlertDialog.Builder builder = new AlertDialog.Builder(homeActivity.this);
+        View mview = getLayoutInflater().inflate(R.layout.home_goods_dialog, null);
+        item_edit = mview.findViewById(R.id.hitemtxt);
+        cost_edit = mview.findViewById(R.id.hunittxt);
+        pack_edit = mview.findViewById(R.id.hpacktxt);
+        quan_edit=mview.findViewById(R.id.hquantxt);
+
+        item_edit.setText(it);
+        pack_edit.setText(pa);
+        cost_edit.setText(String.valueOf(co));
+        quan_edit.setText(String.valueOf(q));
+        builder.setView(mview);
+        builder.setTitle("Edit");
+        builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                String item = item_edit.getText().toString();
+                int cost = Integer.parseInt(cost_edit.getText().toString());
+                String pack = pack_edit.getText().toString();
+                int newq= Integer.parseInt(quan_edit.getText().toString());
+
+                int tot=cost*newq;
+
+                PickedGoodEntity pickedGoodEntity = new PickedGoodEntity(newq,pack, item, cost,tot,pick_id);
+                pickedGoodEntity.setKEY_ID(key_id);
+                pickedGoodViewModel.update(pickedGoodEntity);
+
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
 }

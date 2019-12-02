@@ -112,9 +112,9 @@ public class BTDeviceList extends ListActivity {
                 if (resultCode == RESULT_OK) {
                     Set<BluetoothDevice> btDeviceList = bluetoothAdapter.getBondedDevices();
                     try {
-                        if (((Set) btDeviceList).size() > 0) {
+                        if (btDeviceList.size() > 0) {
                             for (BluetoothDevice device : btDeviceList) {
-                                if (((Set) btDeviceList).contains(device) == false) {
+                                if (btDeviceList.contains(device) == false) {
                                     btDevices.add(device);
                                     arrayAdapter.add(device.getName() + "\n" + device.getAddress());
                                     arrayAdapter.notifyDataSetInvalidated();

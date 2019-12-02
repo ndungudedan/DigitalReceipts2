@@ -29,19 +29,12 @@ public class security extends AppCompatActivity implements AdapterView.OnItemSel
     ArrayAdapter<UserEntity> useradapter;
 
     SharedPreferences sharedPreferences;
-    EditText txt_user, txt_pass;
-    EditText user_fName, user_scName, user_empNo, user_DOB, user_resid, user_mobileNo, user_email;
-    String d;
-    private int TOOLSPIN_LOAD = 3;
-    private int USER_LOAD = 4;
-    private SQLiteDatabase db;
 
     public static long empID = 0;
     public static long check_empNo=0;  //to be used in analytics_user fragment
     public static String checkuser="";
     public String user;
     private Spinner spinner;
-    Cursor mcursor;
     private FragmentStatePagerAdapter adapter;
     private ViewPager viewPager;
     PagerTabStrip pagerTabStrip;

@@ -18,9 +18,9 @@ public class GoodsViewModel extends AndroidViewModel {
         super(application);
         goodsRepository=new GoodsRepository(application);
         allGoods=goodsRepository.getAllGoods();
-        getItems=goodsRepository.getItems();
+        /*getItems=goodsRepository.getItems();
         getPack=goodsRepository.getPack();
-        getCost=goodsRepository.getCost();
+        getCost=goodsRepository.getCost();*/
     }
     public void insert(GoodsEntity goodsEntity){
         goodsRepository.insert(goodsEntity);
@@ -32,9 +32,10 @@ public class GoodsViewModel extends AndroidViewModel {
         goodsRepository.delete(goodsEntity);
     }
     public LiveData<List<GoodsEntity>> getAllGoods(){
-        return goodsRepository.getAllGoods();
+        return allGoods;
     }
-    public List<GoodsEntity> getItems(){
+
+   /* public List<GoodsEntity> getItems(){
         return goodsRepository.getItems();
     }
     public List<GoodsEntity> getPack(){
@@ -42,5 +43,5 @@ public class GoodsViewModel extends AndroidViewModel {
     }
     public List<GoodsEntity> getCost(){
         return goodsRepository.getCost();
-    }
+    }*/
 }

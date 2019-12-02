@@ -201,7 +201,6 @@ public class MainActivity extends AppCompatActivity {
         startActivity(temp);
     }
 
-
     public void drop(View view) {
         Intent drop=new Intent(this,unit.class);
         startActivity(drop);
@@ -210,6 +209,15 @@ public class MainActivity extends AppCompatActivity {
     public void list(View view) {
         Intent l=new Intent(this,rcptList.class);
         startActivity(l);
+    }
+
+    public void cust(View view){
+        Intent j=new Intent(this,CustomerActivity.class);
+        startActivity(j);
+    }
+    public void stat(View view){
+        Intent j=new Intent(this,security.class);
+        startActivity(j);
     }
 
     public void permissions(){

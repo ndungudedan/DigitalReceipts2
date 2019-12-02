@@ -17,9 +17,9 @@ public class GoodsRepository {
         AppDatabase database=AppDatabase.getInstance(application);
         goodsDao=database.goodsDao();
         allGoods=goodsDao.getAllGoods();
-        getItems=goodsDao.getItems();
+        /*getItems=goodsDao.getItems();
         getPack=goodsDao.getPack();
-        getCost=goodsDao.getCost();
+        getCost=goodsDao.getCost();*/
 
     }
 
@@ -36,7 +36,7 @@ public class GoodsRepository {
     public LiveData<List<GoodsEntity>> getAllGoods(){
         return allGoods;
     }
-    public List<GoodsEntity> getItems(){
+   /* public List<GoodsEntity> getItems(){
         return getItems;
     }
     public List<GoodsEntity> getPack(){
@@ -45,7 +45,7 @@ public class GoodsRepository {
     public List<GoodsEntity> getCost(){
         return getCost;
     }
-
+*/
     public static class insertGoodsAsyncTask extends AsyncTask<GoodsEntity,Void,Void>{
         private GoodsDao goodsDao;
         private insertGoodsAsyncTask(GoodsDao goodsDao){

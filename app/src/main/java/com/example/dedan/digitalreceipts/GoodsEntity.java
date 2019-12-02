@@ -16,10 +16,9 @@ public class GoodsEntity {
     @ColumnInfo(name="Pack")
     private String KEY_PACK;
     @ColumnInfo(name="Cost")
-    private String KEY_COST ;
+    private int KEY_COST ;
 
-    public GoodsEntity(int KEY_GOODS_ID, String KEY_ITEM, String KEY_PACK, String KEY_COST) {
-        this.KEY_GOODS_ID = KEY_GOODS_ID;
+    public GoodsEntity(String KEY_ITEM, String KEY_PACK, int KEY_COST) {
         this.KEY_ITEM = KEY_ITEM;
         this.KEY_PACK = KEY_PACK;
         this.KEY_COST = KEY_COST;
@@ -50,11 +49,11 @@ public class GoodsEntity {
         this.KEY_PACK = KEY_PACK;
     }
 
-    public String getKEY_COST() {
+    public int getKEY_COST() {
         return KEY_COST;
     }
 
-    public void setKEY_COST(String KEY_COST) {
+    public void setKEY_COST(int KEY_COST) {
         this.KEY_COST = KEY_COST;
     }
 }

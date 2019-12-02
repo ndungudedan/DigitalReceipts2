@@ -37,6 +37,11 @@ public class onlineDb {
         user.put("access",access);
 
         DocumentReference docRef = db.collection("users").document(userfname+""+userscName);
-        docRef.set(user);
+        docRef.set(user).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.i("firestore fail", " "+e.getLocalizedMessage());
+            }
+        });
     }
 }

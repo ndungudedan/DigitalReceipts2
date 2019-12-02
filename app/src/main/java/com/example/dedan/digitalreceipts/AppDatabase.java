@@ -8,11 +8,17 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {UserEntity.class,GoodsEntity.class},version = 1)
+@Database(entities = {UserEntity.class,GoodsEntity.class,PickedGoodEntity.class,MonthSalesEntity.class,
+                        WeekSalesEntity.class,DailySalesEntity.class,CustomerEntity.class},version = 4)
 public abstract class AppDatabase extends RoomDatabase {
     private static AppDatabase dbInstance;
     public abstract UserDao userDao();
     public abstract GoodsDao goodsDao();
+    public abstract MonthSalesDao monthSalesDao();
+    public abstract WeekSalesDao weekSalesDao();
+    public abstract DailySalesDao dailySalesDao();
+    public abstract PickedGoodDao pickedGoodDao();
+    public abstract CustomerDao customerDao();
 
     public static synchronized AppDatabase getInstance(Context context) {
         if (dbInstance == null) {

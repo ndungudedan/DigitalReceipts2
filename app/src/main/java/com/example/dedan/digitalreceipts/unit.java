@@ -1,14 +1,22 @@
 package com.example.dedan.digitalreceipts;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,6 +28,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -27,15 +37,10 @@ import java.util.Objects;
 
 public class unit extends AppCompatActivity  {
     private GoodsViewModel goodsViewModel;
+    private String item;
+    private int cost;
+    private String pack;
 
-    public static final int LOAD = 0;
-    TableLayout tableLayout=null;
-    EditText item;
-    EditText pack;
-    EditText unit;
-    private Cursor mcursor;
-    private CheckBox checkBox;
-    private ArrayList checkid;
     Toolbar unittool;
     Boolean hideIcon=true;
 
@@ -47,22 +52,48 @@ public class unit extends AppCompatActivity  {
         setSupportActionBar(unittool);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
-        tableLayout=(TableLayout)findViewById(R.id.unitTable);
+        FloatingActionButton floatingActionButton=findViewById(R.id.floating_unit_btn);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                inputDialog();
+            }
+        });
 
-        item=(EditText)findViewById(R.id.itemtxt);
-        pack=(EditText)findViewById(R.id.packtxt);
-        unit=(EditText)findViewById(R.id.unittxt);
-        checkid = new ArrayList();
 
+        RecyclerView recyclerView=findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setHasFixedSize(true);
+
+        final UnitAdapter adapter=new UnitAdapter();
+        recyclerView.setAdapter(adapter);
 
         goodsViewModel= ViewModelProviders.of(this).get(GoodsViewModel.class);
         goodsViewModel.getAllGoods().observe(this, new Observer<List<GoodsEntity>>() {
             @Override
             public void onChanged(@Nullable List<GoodsEntity> goodsEntities) {
-
+                adapter.submitList(goodsEntities);
             }
         });
-        //load();
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                goodsViewModel.delete(adapter.getGoodAt(viewHolder.getAdapterPosition()));
+            }
+        }).attachToRecyclerView(recyclerView);
+
+        adapter.setOnItemClickListener(new UnitAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(GoodsEntity goodsEntity) {
+                editinputDialog(goodsEntity.getKEY_GOODS_ID(),goodsEntity.getKEY_ITEM(),goodsEntity.getKEY_PACK(),goodsEntity.getKEY_COST());
+            }
+        });
 
     }
     public void refresh(){
@@ -94,74 +125,68 @@ public class unit extends AppCompatActivity  {
         return super.onOptionsItemSelected(menuitem);
     }
 
-    public void add(View view) {
-        String goods=item.getText().toString();
-        String container=pack.getText().toString();
-        String cost=unit.getText().toString();
-        if(goods.isEmpty())
-        {
-            item.setError("empty");
-            return;
-        }
-
-//        GoodsEntity goodsEntity=new GoodsEntity(goods,container,cost);
-      //  goodsViewModel.insert(goodsEntity);
-        //sqlOpenHelper.add_item_to_database(goods,container,cost);
-    }
     public void delete(){
-
     }
-    public void table_load(String count,String goods,String container,String cost){
-        TableRow tableRow=new TableRow(this);
-        TableRow.LayoutParams layoutParams=new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
-        tableRow.setLayoutParams(layoutParams);
-
-        TextView no=new TextView(this);
-        no.setPadding(10,5,10,5);
-        no.setText(count);
-        tableRow.addView(no);
-
-        TextView txt=new TextView(this);
-        txt.setPadding(10,5,10,5);
-        txt.setText(goods);
-        tableRow.addView(txt);
-
-        TextView txt1=new TextView(this);
-        txt1.setText(container);
-        txt1.setPadding(10 ,5,10,5);
-        tableRow.addView(txt1);
-
-        TextView txt2=new TextView(this);
-        txt2.setText(cost);
-        txt2.setPadding(10,5,10,5);
-        tableRow.addView(txt2);
-
-        checkBox = new CheckBox(this);
-        checkBox.setChecked(false);
-        checkBox.setId(Integer.parseInt(count));
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+    public void inputDialog(){
+        final EditText item_edit,cost_edit,pack_edit;
+        AlertDialog.Builder builder = new AlertDialog.Builder(unit.this);
+        View mview=getLayoutInflater().inflate(R.layout.unit_goods_dialog,null);
+        item_edit=mview.findViewById(R.id.itemtxt);
+        cost_edit=mview.findViewById(R.id.unittxt);
+        pack_edit=mview.findViewById(R.id.packtxt);
+        builder.setView(mview);
+        builder.setTitle("Item");
+        builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                int cb=0;
-                if(b){
-                    cb=compoundButton.getId();
-                    checkid.add(cb);
-                    hideIcon=false;
+            public void onClick(DialogInterface dialog, int id) {
+                item=item_edit.getText().toString();
+                cost= Integer.parseInt(cost_edit.getText().toString());
+                pack=pack_edit.getText().toString();
 
-                }
-                else{
-                    checkid.remove(cb);
-                    if(checkid.isEmpty()){
-                        hideIcon=true;
-                    }
+                GoodsEntity goodsEntity=new GoodsEntity(item,pack,cost);
+                goodsViewModel.insert(goodsEntity);
 
-                }
-                invalidateOptionsMenu();
             }
         });
-//        int c=Integer.parseInt(count);
- //       checkBox.setId(c);
-        tableRow.addView(checkBox);
-        tableLayout.addView(tableRow);
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog=builder.create();
+        dialog.show();
     }
-}
+    public void editinputDialog(final int i, String it, String pa, int co) {
+        final EditText item_edit, cost_edit, pack_edit;
+        AlertDialog.Builder builder = new AlertDialog.Builder(unit.this);
+        View mview = getLayoutInflater().inflate(R.layout.unit_goods_dialog, null);
+        item_edit = mview.findViewById(R.id.itemtxt);
+        cost_edit = mview.findViewById(R.id.unittxt);
+        pack_edit = mview.findViewById(R.id.packtxt);
+        item_edit.setText(it);
+        pack_edit.setText(pa);
+        cost_edit.setText(co);
+        builder.setView(mview);
+        builder.setTitle("Edit");
+        builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                item = item_edit.getText().toString();
+                cost = Integer.parseInt(cost_edit.getText().toString());
+                pack = pack_edit.getText().toString();
+
+                GoodsEntity goodsEntity = new GoodsEntity(item, pack, cost);
+                goodsEntity.setKEY_GOODS_ID(i);
+                goodsViewModel.update(goodsEntity);
+
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+    }

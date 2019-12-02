@@ -19,6 +19,7 @@ android {
     }
     productFlavors {
     }
+
 }
 
 dependencies {
@@ -33,7 +34,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
-    implementation files('libs/gson-2.8.2.jar')
+    //implementation files('libs/gson-2.8.2.jar')
     implementation 'com.itextpdf:itext-pdfa:5.5.9'
     implementation files('libs/jar_files.zip')
     // https://mvnrepository.com/artifact/com.itextpdf/itextpdf

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "980066212126",
+    "firebase_url": "https://digitalreceipts2.firebaseio.com",
+    "project_id": "digitalreceipts2",
+    "storage_bucket": "digitalreceipts2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:980066212126:android:eb3534362a1fad2a",
+        "android_client_info": {
+          "package_name": "com.example.dedan.digitalreceipts"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "980066212126-126b9asi40fhrr81b7pq02c5lntfvteq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.dedan.digitalreceipts",
+            "certificate_hash": "cf19c85200080561f2947a24ebc7975b261b6f92"
+          }
+        },
+        {
+          "client_id": "980066212126-ls4amrr7r8daj8lu6rl6aqbj317bk5k4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAedbEQCuCJg4p24IoVPsQdwS5DdJEulg8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "980066212126-ls4amrr7r8daj8lu6rl6aqbj317bk5k4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

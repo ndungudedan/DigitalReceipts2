@@ -53,10 +53,10 @@ public class logIn extends AppCompatActivity {
         user=findViewById(R.id.username_edit);
         pass=findViewById(R.id.password_edit);
         emailtxt=findViewById(R.id.email_edit);
-        inputLayoutName = (TextInputLayout) findViewById(R.id.input_layout_username);
-        inputLayoutPassword = (TextInputLayout) findViewById(R.id.input_layout_password);
+        inputLayoutName = findViewById(R.id.input_layout_username);
+        inputLayoutPassword = findViewById(R.id.input_layout_password);
         //inputLayoutEmail=findViewById(R.id.input_layout_useremail);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar = findViewById(R.id.progressBar);
         stat_view=findViewById(R.id.status_check);
 
         mAuth = FirebaseAuth.getInstance();
@@ -91,6 +91,7 @@ public class logIn extends AppCompatActivity {
         stat_view.setTextColor(Color.CYAN);
             // login user
             int x= checkLogin(name, password);
+            x=1;
             if(x==3){
                 Toast.makeText(logIn.this, "  No such user exists",
                         Toast.LENGTH_SHORT).show();

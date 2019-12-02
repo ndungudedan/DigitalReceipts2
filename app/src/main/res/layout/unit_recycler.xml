@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="8dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="8dp"
+    >
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/txt_p"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txt_I"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="7dp"
+            android:text="Pack:"
+            android:textColor="@color/colorAccent"
+            android:layout_marginTop="10dp"/>
+
+        <TextView
+            android:id="@+id/txt_pack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="pack"
+            android:layout_marginTop="10dp"
+            android:layout_toEndOf="@id/txt_p"
+            android:layout_below="@id/txt_item"
+            />
+
+        <TextView
+            android:id="@+id/txt_I"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="7dp"
+            android:text="Item:"
+            android:textColor="@color/colorAccent" />
+        <TextView
+            android:id="@+id/txt_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/txt_I"
+            android:text="item"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Price"
+            android:textColor="@color/colorAccent"
+            android:layout_toStartOf="@id/txt_cost"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txt_cost"
+            android:layout_alignParentEnd="true"
+            android:text="0"
+            />
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

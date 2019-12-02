@@ -16,6 +16,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light">
+        <activity android:name=".CompanyStats"></activity>
+        <activity
+            android:name=".CustomerAddEdit"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.dedan.digitalreceipts.MainActivity" />
+        </activity>
+        <activity
+            android:name=".CustomerActivity"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppThemeNo">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.dedan.digitalreceipts.MainActivity" />
+        </activity>
         <activity
             android:name=".MainActivity"
             android:theme="@style/AppThemeNo">
@@ -51,14 +68,6 @@
                 android:value="com.example.dedan.digitalreceipts.MainActivity" />
         </activity>
         <activity
-            android:name=".dropDown"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.dedan.digitalreceipts.MainActivity" />
-        </activity>
-        <activity
             android:name=".splash"
             android:theme="@style/AppThemeNo">
             <intent-filter>
@@ -66,14 +75,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".dominion"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.dedan.digitalreceipts.MainActivity" />
         </activity>
 
         <receiver
@@ -96,11 +97,11 @@
         <activity
             android:name=".logIn"
             android:label="@string/LogIn"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".Register"
             android:label="@string/register"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".security"
             android:label="Security"
@@ -114,7 +115,7 @@
         <receiver
             android:name=".receiver"
             android:enabled="true"
-            android:exported="true"></receiver>
+            android:exported="true" />
 
         <activity
             android:name=".unit"
@@ -125,7 +126,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.dedan.digitalreceipts.MainActivity" />
         </activity>
-        <activity android:name=".BTDeviceList"></activity>
+        <activity android:name=".BTDeviceList" />
     </application>
 
 </manifest>
