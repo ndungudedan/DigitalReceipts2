@@ -42,14 +42,15 @@ public class User_StatsFragment2 extends Fragment {
     ImageView imageView;
     Button mbtn;
     public static String BUTTON_PRESSED="MONTH";
+    private OnFragmentInteractionListener mListener;
+
 
     public String Loggeduser;
     public String LoggeduserId;
     private int pick=1;
     private Uri uri;
     private Bitmap bitmap;
-
-    private OnFragmentInteractionListener mListener;
+    private String currentMonth;
 
     public User_StatsFragment2() {
         // Required empty public constructor
@@ -66,8 +67,7 @@ public class User_StatsFragment2 extends Fragment {
         String monthformat="MMM";
         SimpleDateFormat sdf=new SimpleDateFormat(monthformat);
         sdf.format(date);
-        String currentMonth=date.toString();
-        currMonth.setText(currentMonth);
+        currentMonth = date.toString();
 
         sharedPreferences =getContext().getSharedPreferences("Data", MODE_PRIVATE);
         //SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -94,6 +94,16 @@ public class User_StatsFragment2 extends Fragment {
         Mclients=view.findViewById(R.id.current_Mclient_served);
         currMonth=view.findViewById(R.id.current_month);
         mbtn=view.findViewById(R.id.seeMonths);
+
+        currMonth.setText(currentMonth);
+
+        mbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.changeFragment(2);
+            }
+        });
+
 
         return view;
     }
@@ -130,12 +140,6 @@ public class User_StatsFragment2 extends Fragment {
                 startActivityForResult(Intent.createChooser(gallery,"pictures"),pick);
             }
         });
-        mbtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
     }
 
     @Override
@@ -155,18 +159,16 @@ public class User_StatsFragment2 extends Fragment {
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
+        try {
             mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
     }
@@ -177,10 +179,6 @@ public class User_StatsFragment2 extends Fragment {
         mListener = null;
     }
 
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
     public void statsLoad(){
         janViewModel.getAllJanEvents().observe(this, new Observer<List<JanEntity>>() {
             @Override
@@ -194,5 +192,8 @@ public class User_StatsFragment2 extends Fragment {
                 }
             }
         });
+    }
+    public interface OnFragmentInteractionListener {
+        public void changeFragment(int id);
     }
 }

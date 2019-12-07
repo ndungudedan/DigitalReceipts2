@@ -38,7 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class security extends AppCompatActivity {
+public class security extends AppCompatActivity implements User_StatsFragment2.OnFragmentInteractionListener {
     List<UserEntity> userList;
     ArrayAdapter<UserEntity> useradapter;
     private Fragment statFrag;
@@ -103,4 +103,8 @@ public class security extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void changeFragment(int id) {
+        dispstatfrag();
+    }
 }
