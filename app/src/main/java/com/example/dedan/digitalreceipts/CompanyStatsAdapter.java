@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-class CompanyStatsAdapter extends ListAdapter<MonthSalesEntity, CompanyStatsAdapter.StatsHolder> {
+class CompanyStatsAdapter extends ListAdapter<UserEntity, CompanyStatsAdapter.StatsHolder> {
     private OnItemClickListener listener;
 
     public CompanyStatsAdapter() {
@@ -27,26 +27,27 @@ class CompanyStatsAdapter extends ListAdapter<MonthSalesEntity, CompanyStatsAdap
 
     @Override
     public void onBindViewHolder(@NonNull StatsHolder holder, int position) {
-        MonthSalesEntity currentmonthsalesEntity=getItem(position);
-
+        UserEntity currentUserEntity=getItem(position);
+        holder.txtCash.setText(currentUserEntity.getKEY_FIRSTNAME());
+        holder.txtColumn.setText(currentUserEntity.getKEY_SECNAME());
     }
 
-    private static final DiffUtil.ItemCallback<MonthSalesEntity> diff_Callback=new
-            DiffUtil.ItemCallback<MonthSalesEntity>() {
+    private static final DiffUtil.ItemCallback<UserEntity> diff_Callback=new
+            DiffUtil.ItemCallback<UserEntity>() {
 
                 @Override
-                public boolean areItemsTheSame(@NonNull MonthSalesEntity oldItem, @NonNull MonthSalesEntity newItem) {
+                public boolean areItemsTheSame(@NonNull UserEntity oldItem, @NonNull UserEntity newItem) {
                     return false;
                 }
 
                 @Override
-                public boolean areContentsTheSame(@NonNull MonthSalesEntity oldItem, @NonNull MonthSalesEntity newItem) {
+                public boolean areContentsTheSame(@NonNull UserEntity oldItem, @NonNull UserEntity newItem) {
                     return false;
                 }
             };
 
 
-    public MonthSalesEntity getSaleAt(int position){
+    public UserEntity getUserAt(int position){
         return getItem(position);
     }
 
@@ -71,7 +72,7 @@ class CompanyStatsAdapter extends ListAdapter<MonthSalesEntity, CompanyStatsAdap
         }
     }
     public interface OnItemClickListener {
-        void onItemClick(MonthSalesEntity monthSalesEntity);
+        void onItemClick(UserEntity userEntity);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {

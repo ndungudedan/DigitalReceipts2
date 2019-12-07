@@ -22,4 +22,7 @@ public interface MonthSalesDao {
 
     @Query("select * from MonthSalesEntity")
     LiveData<List<MonthSalesEntity>> getMonthSales();
+
+    /*@Query("UPDATE MonthSalesEntity SET order_price=:price WHERE order_id = :id")
+    void update(Float price, int id);*/
 }

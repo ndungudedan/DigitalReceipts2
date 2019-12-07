@@ -10,16 +10,16 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 @Dao
-public interface DailySalesDao {
+public interface ReceiptDao {
     @Insert
-    void insert(DailySalesEntity dailySalesEntity);
+    void insert(ReceiptEntity receiptEntity);
 
     @Update
-    void update(DailySalesEntity dailySalesEntity);
+    void update(ReceiptEntity receiptEntity);
 
     @Delete
-    void delete(DailySalesEntity dailySalesEntity);
+    void delete(ReceiptEntity receiptEntity);
 
-    @Query("select * from Daily_Sales")
-    LiveData<List<DailySalesEntity>> getDailySales();
+    @Query("select * from Receipts order by ID asc ")
+    LiveData<List<ReceiptEntity>> getAllReceipts();
 }

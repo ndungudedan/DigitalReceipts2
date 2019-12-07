@@ -1,45 +1,33 @@
 package com.example.dedan.digitalreceipts;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager.widget.PagerTabStrip;
+import androidx.viewpager.widget.ViewPager;
 
 import android.os.Bundle;
 
-import java.util.List;
-
 public class CompanyStats extends AppCompatActivity {
-    DailySalesViewModel dailySalesViewModel;
+    ReceiptViewModel receiptViewModel;
     MonthSalesViewModel monthSalesViewModel;
     WeekSalesViewModel weekSalesViewModel;
+
+    private FragmentStatePagerAdapter adapter;
+    private ViewPager viewPager;
+    PagerTabStrip pagerTabStrip;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_company_stats);
 
-        dailySalesViewModel= ViewModelProviders.of(this).get(DailySalesViewModel.class);
-        dailySalesViewModel.getDailySales().observe(this, new Observer<List<DailySalesEntity>>() {
-            @Override
-            public void onChanged(List<DailySalesEntity> dailySalesEntities) {
+        viewPager = findViewById(R.id.viewpager);
+        if (viewPager != null) {
+            pagerTabStrip = findViewById(R.id.pager_header);
+            adapter = new ViewpagerAdapter(getSupportFragmentManager());
+            viewPager.setAdapter(adapter);
+            pagerTabStrip = findViewById(R.id.pager_header);
+        }
 
-            }
-        });
-
-        weekSalesViewModel=ViewModelProviders.of(this).get(WeekSalesViewModel.class);
-        weekSalesViewModel.getWeekSales().observe(this, new Observer<List<WeekSalesEntity>>() {
-            @Override
-            public void onChanged(List<WeekSalesEntity> weekSalesEntities) {
-
-            }
-        });
-
-        monthSalesViewModel=ViewModelProviders.of(this).get(MonthSalesViewModel.class);
-        monthSalesViewModel.getMonthSales().observe(this, new Observer<List<MonthSalesEntity>>() {
-            @Override
-            public void onChanged(List<MonthSalesEntity> monthSalesEntities) {
-
-            }
-        });
     }
 }

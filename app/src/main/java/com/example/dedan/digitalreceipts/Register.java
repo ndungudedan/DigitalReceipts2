@@ -113,7 +113,6 @@ public class Register extends AppCompatActivity {
         }
         UserEntity userEntity=new UserEntity(userfname,userscName,empNO,userDOB,userresid,usermobile,username,useremail,userpass,usernationalID,"Welcome",access);
         userViewModel.insert(userEntity);
-        //find a way to get and increment employee id//check soln above
 
         /*mAuth.createUserWithEmailAndPassword(useremail, userpass)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {

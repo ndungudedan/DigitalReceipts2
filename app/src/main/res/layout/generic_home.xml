@@ -45,11 +45,55 @@
         android:layout_height="match_parent"
         android:layout_toEndOf="@+id/good_frame"
         >
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        <TableRow
+            android:id="@+id/tablerow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/pickedGoodsRecycler"
+            >
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="Quantity"
+                />
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="pack"
+                />
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="Each"
+                />
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="cost"
+                />
+
+        </TableRow>
+
             <androidx.recyclerview.widget.RecyclerView
+                android:layout_below="@id/tablerow"
                 android:id="@+id/pickedGoodsRecycler"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:listitem="@layout/picked_good_recycler" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/pickedfloatingBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                app:srcCompat="@android:drawable/ic_input_add"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                />
+        </RelativeLayout>
     </FrameLayout>
 
     </RelativeLayout>

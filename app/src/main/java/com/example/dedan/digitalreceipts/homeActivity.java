@@ -2,6 +2,7 @@ package com.example.dedan.digitalreceipts;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -31,6 +32,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.dedan.digitalreceipts.Month_Database.April.AprEntity;
+import com.example.dedan.digitalreceipts.Month_Database.December.DecEntity;
+import com.example.dedan.digitalreceipts.Month_Database.December.DecViewModel;
+import com.example.dedan.digitalreceipts.Month_Database.January.JanEntity;
+import com.example.dedan.digitalreceipts.Month_Database.January.JanViewModel;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -59,13 +66,18 @@ import java.util.List;
 public class homeActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     GoodsViewModel goodsViewModel;
     PickedGoodViewModel pickedGoodViewModel;
-    DailySalesViewModel dailySalesViewModel;
+    ReceiptViewModel receiptViewModel;
     MonthSalesViewModel monthSalesViewModel;
     WeekSalesViewModel weekSalesViewModel;
+    UserStatsViewModel userStatsViewModel;
+    JanViewModel janViewModel;
+    DecViewModel decViewModel;
     List<PickedGoodEntity> pickedGoods;
 
     TextView totalView;
     public static final int GET_CUSTOMER_REQUEST=3;
+    private static final int EDIT_CHECK_DIALOG=1;
+    private static final int ADD_CHECK_DIALOG=2;
 
     String item;
     String pack;
@@ -83,10 +95,13 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
     String timeStamp;
     int pdfCount=0;
     SharedPreferences shp;
+    int userTodaySales,userWeeksales,userMonthsales;
     String contact ="contactKey";
 
     private String user;
+    private String date;
     private EditText lipa;
+    private String LoggeduserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,15 +116,19 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
 
         goodsViewModel= ViewModelProviders.of(this).get(GoodsViewModel.class);
         pickedGoodViewModel=ViewModelProviders.of(this).get(PickedGoodViewModel.class);
-        dailySalesViewModel= ViewModelProviders.of(this).get(DailySalesViewModel.class);
+        receiptViewModel = ViewModelProviders.of(this).get(ReceiptViewModel.class);
         weekSalesViewModel=ViewModelProviders.of(this).get(WeekSalesViewModel.class);
         monthSalesViewModel=ViewModelProviders.of(this).get(MonthSalesViewModel.class);
+        userStatsViewModel=ViewModelProviders.of(this).get(UserStatsViewModel.class);
+        janViewModel=ViewModelProviders.of(this).get(JanViewModel.class);
+        decViewModel=ViewModelProviders.of(this).get(DecViewModel.class);
 
 
         //pickedGoods=pickedGoodViewModel.getAllPickedGoodsList();
 
         shp=getSharedPreferences("Data",Context.MODE_PRIVATE);
         user = shp.getString("current_username","");
+        LoggeduserId= String.valueOf(shp.getInt("current_userId",0));
 
 
         RecyclerView GoodsrecyclerView=findViewById(R.id.homeGoodsrecycler);
@@ -177,7 +196,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onItemClick(PickedGoodEntity pickedGoodEntity) {
                 editpickedinputDialog(pickedGoodEntity.getKEY_ID(),pickedGoodEntity.getKEY_Item(),pickedGoodEntity.getKEY_Pack(),
-                        pickedGoodEntity.getKEY_Cost(),pickedGoodEntity.getKEY_Quantity(),pickedGoodEntity.getKEY_picked_id());
+                        pickedGoodEntity.getKEY_Cost(),pickedGoodEntity.getKEY_Quantity(),pickedGoodEntity.getKEY_picked_id(),EDIT_CHECK_DIALOG);
 
             }
         });
@@ -194,6 +213,13 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         }).attachToRecyclerView(pickedRecycler);
 
+        FloatingActionButton floatingActionButton=findViewById(R.id.pickedfloatingBtn);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editpickedinputDialog(0,null,null,0,0,0,ADD_CHECK_DIALOG);
+            }
+        });
     }
 
     @Override
@@ -209,7 +235,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 location=data.getStringExtra(CustomerActivity.EXT_LOCATION);
 
                 if(pay.isEmpty()){
-                    inputDialog();
+                    inputDialog(total);
                 }
                 else{
                     pdfCount++;
@@ -251,12 +277,15 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                     getClient();
                     }
                 else if(pay.isEmpty()){
-                    inputDialog();
+                    inputDialog(total);
                 }
                     else{
                         pdfCount++;
                         if(pdfCount==1){
+                            userSalesInsert();
                             pdf();
+                            ReceiptEntity receiptEntity=new ReceiptEntity(date,file.getAbsolutePath(),user,file.getName());
+                            receiptViewModel.insert(receiptEntity);
                             Toast.makeText(getApplicationContext(),"SAVED",Toast.LENGTH_SHORT).show();
                             }
                             else{
@@ -294,12 +323,49 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         f.putExtra("GetCustomer","From_homeActivity");
         startActivityForResult(f,GET_CUSTOMER_REQUEST);
     }
+    public void userSalesInsert(){
+        Date da=new Date();
+        String monthformat="MMM";
+        SimpleDateFormat sdf=new SimpleDateFormat(monthformat);
+        sdf.format(da);
+        date=da.toString();
+        String currentMonth=da.toString();
+        currentMonth="Jan";
+        userTodaySales=userTodaySales+total;
+        userWeeksales=userWeeksales+total;
+
+        AprEntity aprEntity=new AprEntity(total,1,LoggeduserId,"user");
+
+        if(currentMonth.contains("Jan")){
+            JanEntity janEntity=new JanEntity(total,1,LoggeduserId,"user");
+            janViewModel.insert(janEntity);
+        }
+        else if(currentMonth.contains("Dec")){
+            LiveData<DecEntity> decEntity=decViewModel.getUserMonthsales(Integer.parseInt(LoggeduserId));
+            /*if(decEntity==null){
+                decEntity=new DecEntity(total,1,LoggeduserId,"user");
+                decViewModel.insert(decEntity);
+            }
+            else{
+                userMonthsales=total+decEntity.getKEY_SALES();
+                int clientsServed=decEntity.getKEY_NO_OF_CLIENTS()+1;
+                decEntity=new DecEntity(userMonthsales,clientsServed,LoggeduserId,"user");
+                decViewModel.update(decEntity);
+            }*/
+        }
+
+
+    }
 
     public void salesInsert(){
         Date date=new Date();
         String format="hh:mm:ss a dd-MMM-yyyy";
-        SimpleDateFormat sdf=new SimpleDateFormat(format);
+        String monthformat="yyyy";
+        SimpleDateFormat sdf=new SimpleDateFormat(monthformat);
         sdf.format(date);
+        MonthSalesEntity monthSalesEntity=new MonthSalesEntity(0,0,0,0,0,0,0,0,
+                0,0,0,0,date.toString(),0);
+        monthSalesViewModel.insert(monthSalesEntity);
     }
 
     public int totalCount(){
@@ -487,12 +553,15 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-    public void inputDialog(){
+    public void inputDialog(int invCash){
         AlertDialog.Builder builder = new AlertDialog.Builder(homeActivity.this);
         View mview=getLayoutInflater().inflate(R.layout.activity_client_dialog,null);
         lipa=mview.findViewById(R.id.clCash);
+        TextView bal = mview.findViewById(R.id.bal_display);
+
 
         builder.setView(mview);
+        bal.setText(String.valueOf(invCash));
         builder.setTitle("Cash Tendered");
         builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
             @Override
@@ -517,7 +586,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         dialog.show();
 
     }
-    public void editpickedinputDialog(final int key_id, String it, String pa, int co, final int q, final int pick_id) {
+    public void editpickedinputDialog(final int key_id, String it, String pa, int co, final int q, final int pick_id, final int check) {
         final EditText item_edit, cost_edit, pack_edit,quan_edit;
         AlertDialog.Builder builder = new AlertDialog.Builder(homeActivity.this);
         View mview = getLayoutInflater().inflate(R.layout.home_goods_dialog, null);
@@ -525,13 +594,19 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         cost_edit = mview.findViewById(R.id.hunittxt);
         pack_edit = mview.findViewById(R.id.hpacktxt);
         quan_edit=mview.findViewById(R.id.hquantxt);
+        if(check==EDIT_CHECK_DIALOG){
+            item_edit.setText(it);
+            pack_edit.setText(pa);
+            cost_edit.setText(String.valueOf(co));
+            quan_edit.setText(String.valueOf(q));
 
-        item_edit.setText(it);
-        pack_edit.setText(pa);
-        cost_edit.setText(String.valueOf(co));
-        quan_edit.setText(String.valueOf(q));
-        builder.setView(mview);
-        builder.setTitle("Edit");
+            builder.setView(mview);
+            builder.setTitle("Edit");
+        }
+        else{
+            builder.setView(mview);
+            builder.setTitle("Add Product");
+        }
         builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
@@ -541,10 +616,14 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 int newq= Integer.parseInt(quan_edit.getText().toString());
 
                 int tot=cost*newq;
-
                 PickedGoodEntity pickedGoodEntity = new PickedGoodEntity(newq,pack, item, cost,tot,pick_id);
-                pickedGoodEntity.setKEY_ID(key_id);
-                pickedGoodViewModel.update(pickedGoodEntity);
+                if(check==EDIT_CHECK_DIALOG){
+                    pickedGoodEntity.setKEY_ID(key_id);
+                    pickedGoodViewModel.update(pickedGoodEntity);
+                }
+                else{
+                    pickedGoodViewModel.insert(pickedGoodEntity);
+                }
 
             }
         });

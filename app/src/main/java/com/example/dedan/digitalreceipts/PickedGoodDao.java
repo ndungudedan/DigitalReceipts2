@@ -27,5 +27,10 @@ public interface PickedGoodDao {
     @Query("select * from picked_Goods order by quantity desc")
     List<PickedGoodEntity> getPickedGoodsList();
 
+    @Query("DELETE FROM picked_Goods")
+    void deleteAllRows();
+
+   // @Query("UPDATE SET COLUMN_TITLE=:text WHERE id=:id")
+   // void UpdateColumnById (String text, int id);
 
 }

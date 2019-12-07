@@ -25,6 +25,7 @@ public class WeekSalesEntity {
     private int KEY_WEEK_Sun;
     @ColumnInfo(name = "date")
     private String KEY_date;
+
     @ColumnInfo(name = "total")
     private int KEY_total;
 

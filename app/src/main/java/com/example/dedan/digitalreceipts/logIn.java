@@ -37,12 +37,12 @@ public class logIn extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private static int loggedIn_baseId=1;//to be removeed
     private static long loggedIn_empNO;
-    EditText user,emailtxt;
+    EditText emailtxt;
     TextInputEditText pass;
 
     private static String loggedIn_user;
     private static String loggedIn_username;
-    private TextInputLayout inputLayoutName, inputLayoutEmail, inputLayoutPassword;
+    private TextInputLayout inputLayoutEmail, inputLayoutPassword;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,19 +50,15 @@ public class logIn extends AppCompatActivity {
         userViewModel= ViewModelProviders.of(this).get(UserViewModel.class);
 
         setContentView(R.layout.activity_log_in);
-        user=findViewById(R.id.username_edit);
         pass=findViewById(R.id.password_edit);
         emailtxt=findViewById(R.id.email_edit);
-        inputLayoutName = findViewById(R.id.input_layout_username);
         inputLayoutPassword = findViewById(R.id.input_layout_password);
         //inputLayoutEmail=findViewById(R.id.input_layout_useremail);
         progressBar = findViewById(R.id.progressBar);
         stat_view=findViewById(R.id.status_check);
 
         mAuth = FirebaseAuth.getInstance();
-        if(!internetIsConnected()){
-            emailtxt.setVisibility(View.INVISIBLE);
-        }
+
     }
     @Override
     public void onStart() {
@@ -82,7 +78,7 @@ public class logIn extends AppCompatActivity {
         }
     }
     public void login(View view) {
-        String name=user.getText().toString();
+        String userEmail=emailtxt.getText().toString();
         String password=pass.getText().toString();
         if (!validateCredentials()) {
             return;
@@ -90,7 +86,7 @@ public class logIn extends AppCompatActivity {
         stat_view.setText("Please Wait....");
         stat_view.setTextColor(Color.CYAN);
             // login user
-            int x= checkLogin(name, password);
+            int x= checkLogin(userEmail, password);
             x=1;
             if(x==3){
                 Toast.makeText(logIn.this, "  No such user exists",
@@ -145,22 +141,23 @@ public class logIn extends AppCompatActivity {
                         .show();
             }
     }
-    public int checkLogin( String name, String password) {              //0=default value
+    public int checkLogin( String name, String password) {              //0=default value                       //name refers to email
         int x = 0;                                                      //99=credentials empty unlikely scenario
         UserEntity user=userViewModel.getSingleUser(name,password);            //2=access denied
         if(user!=null){                                                   //1=login good
-            String n = user.getKEY_NAME();                                      //3=no such user exists
+            String n = user.getKEY_EMAIL();                                 //3=no such user exists
             String p = user.getKEY_PASS();
             String f = user.getKEY_FIRSTNAME();
             String a = user.getKEY_ACCESS();
             long y=user.getKEY_empNO();
+            String h=user.getKEY_NAME();
             if (n.isEmpty() && p.isEmpty()) {
                 x = 99;
                 return x;
             }
             if (n.equals(name) && p.equals(password)) {
                 //loggedIn_baseId=cursor.getInt(IdPos);
-                loggedIn_username = n;
+                loggedIn_username = h;
                 loggedIn_user = f;
                 loggedIn_empNO = y;
                 if(a.equals("ACCESS_DENIED")){
@@ -212,7 +209,7 @@ public class logIn extends AppCompatActivity {
 
     }
     public void admin_login(View view) {
-        String name="ADMIN_"+user.getText().toString();
+        String userEmail=emailtxt.getText().toString();
         String password=pass.getText().toString();
         if (!validateCredentials()) {
             return;
@@ -220,62 +217,64 @@ public class logIn extends AppCompatActivity {
         stat_view.setText("Please Wait.....");
 
             // login user
-            int x=checkLogin(name,password);
+            int x=checkLogin(userEmail,password);
+            if(loggedIn_user.startsWith("ADMIN_")){
+                if(x==3){
+                    Toast.makeText(logIn.this, "  No such user exists",
+                            Toast.LENGTH_SHORT).show();
+                }
 
-        if(x==3){
-            Toast.makeText(logIn.this, "  No such user exists",
-                    Toast.LENGTH_SHORT).show();
-        }
+                if(x==1 & !internetIsConnected()){
+                    housekeeping();
+                    Intent main=new Intent(logIn.this,MainActivity.class);
+                    main.putExtra("loggedIn_user",loggedIn_user);
+                    main.putExtra("loggedIn_username",loggedIn_username);
+                    main.putExtra("loggedIn_baseId",loggedIn_baseId);
+                    main.putExtra("loggedIn_empNo",loggedIn_empNO);
+                    startActivity(main);
+                }
+                if(x == 1 & internetIsConnected()){
+                    mAuth.signInWithEmailAndPassword(emailtxt.getText().toString().trim(), pass.getText().toString().trim())
+                            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
+                                        // Sign in success, update UI with the signed-in user's information
+                                        if(mAuth.getCurrentUser().isEmailVerified()){
+                                            housekeeping();
+                                            Intent main=new Intent(logIn.this,MainActivity.class);
+                                            main.putExtra("loggedIn_user",loggedIn_user);
+                                            main.putExtra("loggedIn_username",loggedIn_username);
+                                            main.putExtra("loggedIn_baseId",loggedIn_baseId);
+                                            main.putExtra("loggedIn_empNo",loggedIn_empNO);
+                                            startActivity(main);
+                                        }
+                                        else{
+                                            Toast.makeText(logIn.this, "Please verify email",
+                                                    Toast.LENGTH_SHORT).show();
 
-            if(x==1 & !internetIsConnected()){
-                housekeeping();
-                Intent main=new Intent(logIn.this,MainActivity.class);
-                main.putExtra("loggedIn_user",loggedIn_user);
-                main.putExtra("loggedIn_username",loggedIn_username);
-                main.putExtra("loggedIn_baseId",loggedIn_baseId);
-                main.putExtra("loggedIn_empNo",loggedIn_empNO);
-                startActivity(main);
-            }
-            if(x == 1 & internetIsConnected()){
-                mAuth.signInWithEmailAndPassword(emailtxt.getText().toString().trim(), pass.getText().toString().trim())
-                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()) {
-                                    // Sign in success, update UI with the signed-in user's information
-                                    if(mAuth.getCurrentUser().isEmailVerified()){
-                                        housekeeping();
-                                        Intent main=new Intent(logIn.this,MainActivity.class);
-                                        main.putExtra("loggedIn_user",loggedIn_user);
-                                        main.putExtra("loggedIn_username",loggedIn_username);
-                                        main.putExtra("loggedIn_baseId",loggedIn_baseId);
-                                        main.putExtra("loggedIn_empNo",loggedIn_empNO);
-                                        startActivity(main);
+                                        }
+                                        stat_view.setText("success");
                                     }
-                                    else{
-                                        Toast.makeText(logIn.this, "Please verify email",
-                                                Toast.LENGTH_SHORT).show();
-
-                                    }
-                                    stat_view.setText("success");
                                 }
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        stat_view.setText(""+e.getLocalizedMessage());
-                        stat_view.setTextColor(Color.RED);
-                    }
-                });
-                stat_view.setText("success");
-            }
+                            }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            stat_view.setText(""+e.getLocalizedMessage());
+                            stat_view.setTextColor(Color.RED);
+                        }
+                    });
+                    stat_view.setText("success");
+                }
             /*else{
                 stat_view.setText("Wrong Credentials!");
                 stat_view.setTextColor(Color.RED);
             }*/
+            }
+
         }
     public void housekeeping(){
-        user.getText().clear();
+        emailtxt.getText().clear();
         pass.getText().clear();
     }
     private boolean validateCredentials() {
@@ -284,13 +283,6 @@ public class logIn extends AppCompatActivity {
             return false;
         } else {
             emailtxt.setError(null);
-        }
-        if (user.getText().toString().trim().isEmpty()) {
-            inputLayoutName.setError("invalid username");
-            requestFocus(user);
-            return false;
-        } else {
-            inputLayoutName.setErrorEnabled(false);
         }
         if(pass.getText().toString().trim().isEmpty()){
             inputLayoutPassword.setError("invalid password");

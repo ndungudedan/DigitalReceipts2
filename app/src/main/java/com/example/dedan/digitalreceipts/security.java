@@ -1,71 +1,87 @@
 package com.example.dedan.digitalreceipts;
 
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.core.view.MenuItemCompat;
 import androidx.viewpager.widget.PagerTabStrip;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.Spinner;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.example.dedan.digitalreceipts.Month_Database.December.DecEntity;
+import com.example.dedan.digitalreceipts.Month_Database.December.DecViewModel;
+import com.example.dedan.digitalreceipts.Month_Database.January.JanEntity;
+import com.example.dedan.digitalreceipts.Month_Database.January.JanViewModel;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
-public class security extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-    UserViewModel userViewModel;
+public class security extends AppCompatActivity {
     List<UserEntity> userList;
     ArrayAdapter<UserEntity> useradapter;
+    private Fragment statFrag;
+    private Fragment statFrag2;
 
-    SharedPreferences sharedPreferences;
-
-    public static long empID = 0;
-    public static long check_empNo=0;  //to be used in analytics_user fragment
-    public static String checkuser="";
-    public String user;
-    private Spinner spinner;
-    private FragmentStatePagerAdapter adapter;
-    private ViewPager viewPager;
-    PagerTabStrip pagerTabStrip;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.admin);
-        viewPager = findViewById(R.id.viewpager);
-        if (viewPager != null) {
-            pagerTabStrip=findViewById(R.id.pager_header);
-            adapter = new ViewpagerAdapter(getSupportFragmentManager());
-            viewPager.setAdapter(adapter);
-            pagerTabStrip=findViewById(R.id.pager_header);
-            //adapter = new ViewpagerAdapter(getSupportFragmentManager());
-            //viewPager.setAdapter(adapter);
-
-            sharedPreferences = getSharedPreferences("Data", MODE_PRIVATE);
-            //SharedPreferences.Editor editor = sharedPreferences.edit();
-            user = sharedPreferences.getString("current_username", "");
-
-            userViewModel= ViewModelProviders.of(this).get(UserViewModel.class);
-       //     userList=userViewModel.getAllUsers();
-            if (user.startsWith("ADMIN")) {
-                useradapter= new ArrayAdapter<UserEntity>(this,android.R.layout.simple_spinner_dropdown_item,userList);
-
-            }
+        setContentView(R.layout.activity_security);
+        if (savedInstanceState == null) {
+            statFrag = User_StatsFragment.newInstance();
+            statFrag2 = User_StatsFragment2.newInstance();
         }
+        dispstatfrag2();
+
+        }
+    protected void dispstatfrag() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        if (statFrag.isAdded()) {
+            ft.show(statFrag);
+        } else {
+            ft.add(R.id.userStatsFrame, statFrag, "A");
+        }
+        if (statFrag2.isAdded()) { ft.hide(statFrag2); }
+
+        ft.commit();
+    }
+    protected void dispstatfrag2() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        if (statFrag2.isAdded()) {
+            ft.show(statFrag2);
+        } else {
+            ft.add(R.id.userStatsFrame, statFrag2, "B");
+        }
+        if (statFrag.isAdded()) { ft.hide(statFrag); }
+
+        ft.commit();
     }
 
-    public void log_info() {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
     }
 
@@ -74,14 +90,6 @@ public class security extends AppCompatActivity implements AdapterView.OnItemSel
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.admin_menu, menu);
         MenuItem item = menu.findItem(R.id.toolspinner);
-        spinner = (Spinner) MenuItemCompat.getActionView(item);
-        spinner.setAdapter(useradapter);
-        // getLoaderManager().initLoader(TOOLSPIN_LOAD,null,this);
-        spinner.setOnItemSelectedListener(this);
-        if (!user.startsWith("ADMIN")) {
-            spinner.setEnabled(false);
-            spinner.setActivated(false);
-        }
 
         return true;
     }
@@ -94,24 +102,5 @@ public class security extends AppCompatActivity implements AdapterView.OnItemSel
         }
         return super.onOptionsItemSelected(item);
     }
-    public void delete(String id) {
-    }
 
-
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        if(user.startsWith("ADMIN")){
-            String z=null;
-            long e=0;
-
-            empID=l;
-            //checkuser=z;
-            check_empNo=e;
-            adapter.notifyDataSetChanged();
-            }
-        }
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-
-    }
 }

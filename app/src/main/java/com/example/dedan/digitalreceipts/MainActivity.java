@@ -13,6 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProviders;
+
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,6 +29,10 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
     Toolbar maintool;
     SharedPreferences sharedPreferences;
+
+    ReceiptViewModel receiptViewModel;
+    MonthSalesViewModel monthSalesViewModel;
+    WeekSalesViewModel weekSalesViewModel;
 
     private String loggedIn_user;
     private String loggedIn_username;
@@ -48,6 +54,10 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences=getSharedPreferences("Data",MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
+        receiptViewModel = ViewModelProviders.of(this).get(ReceiptViewModel.class);
+        weekSalesViewModel=ViewModelProviders.of(this).get(WeekSalesViewModel.class);
+        monthSalesViewModel=ViewModelProviders.of(this).get(MonthSalesViewModel.class);
+
 
         try{
             loggedIn_user = getIntent().getExtras().getString("loggedIn_user");
@@ -65,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
             editor.putLong("current_empNo",loggedIn_empNo);
             editor.putString("current_user",loggedIn_user);
             editor.putString("current_username",loggedIn_username);
+            editor.putInt("current_userId",loggedIn_baseId);
             editor.apply();
         }
 
@@ -74,6 +85,20 @@ public class MainActivity extends AppCompatActivity {
         String savedyear=new SimpleDateFormat("yyyy").format(date);
 
         if(!sharedPreferences.getBoolean("firstTime", false)) {
+            Calendar cal=Calendar.getInstance();
+
+            Date Mdate=new Date();Date Wdate=new Date();Date Tdate=new Date();
+            String monthformat="yyyy";String weekformat="w";
+            SimpleDateFormat Msdf=new SimpleDateFormat(monthformat);Msdf.format(Mdate);
+            SimpleDateFormat Wsdf=new SimpleDateFormat(weekformat);Wsdf.format(Wdate);
+            MonthSalesEntity monthSalesEntity=new MonthSalesEntity(0,0,0,0,0,0,0,0,
+                    0,0,0,0,Mdate.toString(),0);
+            monthSalesViewModel.insert(monthSalesEntity);
+            WeekSalesEntity weekSalesEntity=new WeekSalesEntity(0,0,0,0,0,0,0,
+                    Wdate.toString(),0);
+            weekSalesViewModel.insert(weekSalesEntity);
+
+
             editor.putString("todays_date",savedToday);
             editor.putString("currentMonth",savedmonth);
             editor.putString("currentYear",savedyear);
@@ -139,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(logout);
                 break;
             case R.id.secmenu:
-                Intent sec=new Intent(this,security.class);
+                Intent sec=new Intent(this,CompanyStats.class);
                 startActivity(sec);
                 break;
         }

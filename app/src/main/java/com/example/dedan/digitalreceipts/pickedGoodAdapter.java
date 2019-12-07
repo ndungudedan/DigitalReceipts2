@@ -31,7 +31,7 @@ public class pickedGoodAdapter extends ListAdapter<PickedGoodEntity, pickedGoodA
         PickedGoodEntity currentEntity=getItem(position);
         holder.txtQuan.setText(String.valueOf(currentEntity.getKEY_Quantity()));
         holder.txtPack.setText(currentEntity.getKEY_Pack());
-        holder.txtCost.setText(String.valueOf(currentEntity.getKEY_Cost()));
+        holder.txtCost.setText(String.valueOf(currentEntity.getKEY_total()));
         holder.txtItem.setText(currentEntity.getKEY_Item());
     }
     public PickedGoodEntity getGoodAt(int position){

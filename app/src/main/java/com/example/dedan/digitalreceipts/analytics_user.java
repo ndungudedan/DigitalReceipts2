@@ -67,11 +67,6 @@ public class analytics_user extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_analytics_user, container, false);
-        today = view.findViewById(R.id.today_text);
-        yesterday= view.findViewById(R.id.yester_text);
-        thisweek= view.findViewById(R.id.week_text);
-        thismonth= view.findViewById(R.id.month_text);
-        tally= view.findViewById(R.id.tally_text);
         return view;
     }
 
