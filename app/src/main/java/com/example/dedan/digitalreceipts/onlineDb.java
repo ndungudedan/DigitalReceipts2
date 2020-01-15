@@ -34,13 +34,41 @@ public class onlineDb {
         user.put("emailAddress", useremail);
         user.put("password", userpass);
         user.put("empNO", empNO);
-        user.put("access",access);
+        user.put("accessbtn",access);
 
         DocumentReference docRef = db.collection("users").document(userfname+""+userscName);
         docRef.set(user).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.i("firestore fail", " "+e.getLocalizedMessage());
+            }
+        });
+    }
+
+    public void updateOnline(String userfname, String userscName, int empNO, String userDOB, String userresid, String usermobile,
+                             String username, String useremail, String userpass, String usernationalID, String access) {
+        Map<String, Object> user = new HashMap<>();
+        user.put("firstName", userfname);
+        user.put("surName", userscName);
+        user.put("national_ID", usernationalID);
+        user.put("DOB", userDOB);
+        user.put("residence", userresid);
+        user.put("phoneNo", usermobile);
+        user.put("username", username);
+        user.put("emailAddress", useremail);
+        user.put("password", userpass);
+        user.put("empNO", empNO);
+        user.put("accessbtn",access);
+        DocumentReference docRef = db.collection("users").document(userfname+""+userscName);
+        docRef.update(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.i("firestore update", " success");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.i("firestore update", " failed");
             }
         });
     }

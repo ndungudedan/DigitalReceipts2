@@ -4,22 +4,18 @@ import android.app.Application;
 import androidx.lifecycle.LiveData;
 import android.os.AsyncTask;
 
+import com.example.dedan.digitalreceipts.Database.AppDatabase;
+
 import java.util.List;
 
 public class GoodsRepository {
     private GoodsDao goodsDao;
     private LiveData<List<GoodsEntity>> allGoods;
-    private List<GoodsEntity> getItems;
-    private List<GoodsEntity> getPack;
-    private List<GoodsEntity> getCost;
 
     public GoodsRepository(Application application){
         AppDatabase database=AppDatabase.getInstance(application);
         goodsDao=database.goodsDao();
         allGoods=goodsDao.getAllGoods();
-        /*getItems=goodsDao.getItems();
-        getPack=goodsDao.getPack();
-        getCost=goodsDao.getCost();*/
 
     }
 
@@ -36,16 +32,23 @@ public class GoodsRepository {
     public LiveData<List<GoodsEntity>> getAllGoods(){
         return allGoods;
     }
-   /* public List<GoodsEntity> getItems(){
-        return getItems;
+
+    public void deleteAll(){
+        new deleteAllAsync(goodsDao).execute();
     }
-    public List<GoodsEntity> getPack(){
-        return getPack;
+    private static class deleteAllAsync extends AsyncTask<Void,Void,Void>{
+        private GoodsDao dao;
+        public deleteAllAsync(GoodsDao dao) {
+            this.dao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            dao.deleteAll();
+            return null;
+        }
     }
-    public List<GoodsEntity> getCost(){
-        return getCost;
-    }
-*/
+
     public static class insertGoodsAsyncTask extends AsyncTask<GoodsEntity,Void,Void>{
         private GoodsDao goodsDao;
         private insertGoodsAsyncTask(GoodsDao goodsDao){

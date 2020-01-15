@@ -1,20 +1,30 @@
 package com.example.dedan.digitalreceipts;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.util.List;
+import java.util.Objects;
 
 public class CustomerActivity extends AppCompatActivity {
     public static final int ADD_CUSTOMER_REQUEST=1;
@@ -36,10 +46,15 @@ public class CustomerActivity extends AppCompatActivity {
     public static final String EXT_LOCATION=
             "com.tidtech.EXTRA_LOCATION";
 
+    Toolbar tool;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer);
+        tool=findViewById(R.id.customerbar);
+        setSupportActionBar(tool);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
         FloatingActionButton floatingActionButton=findViewById(R.id.ActionButton);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -97,6 +112,23 @@ public class CustomerActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.del_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuitem) {
+        switch(menuitem.getItemId()){
+            case R.id.delete:
+                confirmdialog();
+                break;
+        }
+        return super.onOptionsItemSelected(menuitem);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==ADD_CUSTOMER_REQUEST && resultCode==RESULT_OK){
@@ -131,4 +163,31 @@ public class CustomerActivity extends AppCompatActivity {
 
         }
     }
+    public void confirmdialog(){
+        AlertDialog.Builder builder=new AlertDialog.Builder(CustomerActivity.this);
+        View mview=getLayoutInflater().inflate(R.layout.confirm_dialogbox,null);
+        TextView mess = mview.findViewById(R.id.conf_text);
+        mess.setText("DELETE ALL CUSTOMERS");
+        builder.setTitle("CONFIRM");
+        builder.setView(mview);
+        builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                deleteAll();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog=builder.create();
+        dialog.show();
+    }
+
+    private void deleteAll() {
+        customerViewModel.deleteAll();
+    }
+
 }

@@ -71,23 +71,70 @@ public class CustomerAddEdit extends AppCompatActivity {
         else{
             setTitle("ADD_CUSTOMER");
         }
-
     }
     public void saveCustomer(){
-     Intent data=new Intent();
-        data.putExtra(EXTRA_FNAME,editfname.getText().toString());
-        data.putExtra(EXTRA_EMAIL,editemail.getText().toString());
-        data.putExtra(EXTRA_SNAME,editsname.getText().toString());
-        data.putExtra(EXTRA_PHONE,editphone.getText().toString());
-        data.putExtra(EXTRA_POBOX,editpobox.getText().toString());
-        data.putExtra(EXTRA_LOCATION,editlocation.getText().toString());
-        data.putExtra(EXTRA_ADDRESS,editaddress.getText().toString());
+        if (validate()){
+            Intent data=new Intent();
+            data.putExtra(EXTRA_FNAME,editfname.getText().toString());
+            data.putExtra(EXTRA_EMAIL,editemail.getText().toString());
+            data.putExtra(EXTRA_SNAME,editsname.getText().toString());
+            data.putExtra(EXTRA_PHONE,editphone.getText().toString());
+            data.putExtra(EXTRA_POBOX,editpobox.getText().toString());
+            data.putExtra(EXTRA_LOCATION,editlocation.getText().toString());
+            data.putExtra(EXTRA_ADDRESS,editaddress.getText().toString());
 
-        int id=getIntent().getIntExtra(EXTRA_ID,-1);
-        if(id!=-1){
-            data.putExtra(EXTRA_ID,id);
+            int id=getIntent().getIntExtra(EXTRA_ID,-1);
+            if(id!=-1){
+                data.putExtra(EXTRA_ID,id);
+            }
+            setResult(RESULT_OK,data);
+            finish();
         }
-        setResult(RESULT_OK,data);
-        finish();
+
+    }
+    public boolean validate(){
+        if (editemail.getText().toString().trim().isEmpty()) {
+            editemail.setError("Required.");
+            return false;
+        } else {
+            editemail.setError(null);
+        }
+        if (editlocation.getText().toString().trim().isEmpty()) {
+            editlocation.setError("Required.");
+            return false;
+        } else {
+            editlocation.setError(null);
+        }
+        if (editaddress.getText().toString().trim().isEmpty()) {
+            editaddress.setError("Required.");
+            return false;
+        } else {
+            editaddress.setError(null);
+        }
+        if (editpobox.getText().toString().trim().isEmpty()) {
+            editpobox.setError("Required.");
+            return false;
+        } else {
+            editpobox.setError(null);
+        }
+        if (editphone.getText().toString().trim().isEmpty()) {
+            editphone.setError("Required.");
+            return false;
+        } else {
+            editphone.setError(null);
+        }
+        if (editfname.getText().toString().trim().isEmpty()) {
+            editfname.setError("Required.");
+            return false;
+        } else {
+            editfname.setError(null);
+        }
+        if (editsname.getText().toString().trim().isEmpty()) {
+            editsname.setError("Required.");
+            return false;
+        } else {
+            editsname.setError(null);
+        }
+        return true;
     }
 }

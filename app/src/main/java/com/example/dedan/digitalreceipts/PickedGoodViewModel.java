@@ -38,5 +38,8 @@ public class PickedGoodViewModel extends AndroidViewModel {
     public List<PickedGoodEntity> getAllPickedGoodsList(){
         return allPickedGoodsList;
     }
+    public void deleteAll(){
+        pickedGoodRepo.deleteAll();
+    }
 
 }

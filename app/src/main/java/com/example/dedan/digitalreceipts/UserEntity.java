@@ -33,13 +33,14 @@ public class UserEntity {
     private  String KEY_NATNLID;
     @ColumnInfo(name="last_log")
     private  String KEY_LOG;
-    @ColumnInfo(name="access")
+    @ColumnInfo(name="accessbtn")
     private  String KEY_ACCESS;
+    @ColumnInfo(name="profilepic")
+    private  String KEY_PIC;
 
 
-    public UserEntity(String KEY_FIRSTNAME, String KEY_SECNAME, int KEY_empNO, String KEY_DOB,
-                      String KEY_residence, String KEY_MOBILENO, String KEY_NAME, String KEY_EMAIL, String KEY_PASS,
-                      String KEY_NATNLID, String KEY_LOG, String KEY_ACCESS) {
+    public UserEntity(String KEY_FIRSTNAME, String KEY_SECNAME, int KEY_empNO, String KEY_DOB, String KEY_residence, String KEY_MOBILENO, String KEY_NAME,
+                      String KEY_EMAIL, String KEY_PASS, String KEY_NATNLID, String KEY_LOG, String KEY_ACCESS, String KEY_PIC) {
         this.KEY_FIRSTNAME = KEY_FIRSTNAME;
         this.KEY_SECNAME = KEY_SECNAME;
         this.KEY_empNO = KEY_empNO;
@@ -52,7 +53,17 @@ public class UserEntity {
         this.KEY_NATNLID = KEY_NATNLID;
         this.KEY_LOG = KEY_LOG;
         this.KEY_ACCESS = KEY_ACCESS;
+        this.KEY_PIC = KEY_PIC;
     }
+
+    public String getKEY_PIC() {
+        return KEY_PIC;
+    }
+
+    public void setKEY_PIC(String KEY_PIC) {
+        this.KEY_PIC = KEY_PIC;
+    }
+
     public int getKEY_USER_ID() {
         return KEY_USER_ID;
     }

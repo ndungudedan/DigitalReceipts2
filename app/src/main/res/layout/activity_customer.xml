@@ -8,10 +8,20 @@
     tools:context=".CustomerActivity">
 
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/customerbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="@color/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        app:titleTextColor="@android:color/white" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/customerRecycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
         tools:listitem="@layout/customer_recycler" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

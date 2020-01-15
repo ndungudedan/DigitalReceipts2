@@ -3,6 +3,8 @@ package com.example.dedan.digitalreceipts;
 import android.app.Application;
 import android.os.AsyncTask;
 
+import com.example.dedan.digitalreceipts.Database.AppDatabase;
+
 import java.util.List;
 
 import androidx.lifecycle.LiveData;

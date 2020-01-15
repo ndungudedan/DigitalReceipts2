@@ -30,6 +30,7 @@ public class CustomerViewModel extends AndroidViewModel {
     public LiveData<List<CustomerEntity>> getAllCustomers(){
         return AllCustomers;
     }
-
-
+    public void deleteAll(){
+        customerRepo.deleteAll();
+    }
 }

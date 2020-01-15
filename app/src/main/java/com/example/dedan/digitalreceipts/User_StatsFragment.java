@@ -31,6 +31,7 @@ public class User_StatsFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.user__stats_fragment, container, false);
         recyclerView = view.findViewById(R.id.userStatsRecycler);
+        userStatsAdapter=new UserStatsAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(userStatsAdapter);
@@ -40,7 +41,6 @@ public class User_StatsFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        userStatsAdapter=new UserStatsAdapter();
         userStatsViewModel=ViewModelProviders.of(this).get(UserStatsViewModel.class);
         userStatsViewModel.getAllstats().observe(this, new Observer<List<UserStatsEntity>>() {
             @Override
@@ -48,7 +48,11 @@ public class User_StatsFragment extends Fragment {
                 userStatsAdapter.submitList(userStatsEntities);
             }
         });
-
     }
 
+    @Override
+    public void onDestroy() {
+        userStatsViewModel.deleteAll();
+        super.onDestroy();
+    }
 }

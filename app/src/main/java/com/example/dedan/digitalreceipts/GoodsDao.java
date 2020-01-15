@@ -21,16 +21,10 @@ public interface GoodsDao {
     @Delete
     void delete(GoodsEntity goodsEntity);
 
-    /*@Query("select * from Goods ")
-    List<GoodsEntity> getItems();
-
-    @Query("select * from Goods ")
-    List<GoodsEntity> getPack();
-
-    @Query("select * from Goods ")
-    List<GoodsEntity> getCost();*/
-
     @Query("select * from Goods order by Items desc")
     LiveData<List<GoodsEntity>> getAllGoods();
+
+    @Query("delete from Goods")
+    void deleteAll();
 
 }

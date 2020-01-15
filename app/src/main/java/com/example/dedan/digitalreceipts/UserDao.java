@@ -25,7 +25,7 @@ public interface UserDao {
     @Query("select * from Users")
      LiveData<List<UserEntity>> getAllUsers();
 
-    @Query("select * from Users where password = :pass and email = :user limit 1")
+    @Query("select * from Users where password = :pass and username = :user limit 1")
     UserEntity getUser(String pass,String user);
 
     /*@Query("select email username from Users where email = :emailaddress and username = :user limit 1")

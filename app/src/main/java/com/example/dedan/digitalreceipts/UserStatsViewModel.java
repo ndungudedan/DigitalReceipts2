@@ -28,5 +28,8 @@ public class UserStatsViewModel extends AndroidViewModel {
     public LiveData<List<UserStatsEntity>> getAllstats(){
         return allStats;
     }
+    public void deleteAll(){
+        userStatsRepo.deleteAll();
+    }
 
 }

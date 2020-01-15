@@ -3,6 +3,9 @@ package com.example.dedan.digitalreceipts;
 import android.app.Application;
 import android.os.AsyncTask;
 
+import com.example.dedan.digitalreceipts.Database.AppDatabase;
+import com.example.dedan.digitalreceipts.Database.Month_Database.April.AprDao;
+
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
@@ -42,6 +45,21 @@ public class PickedGoodRepo {
         task.repo=this;
         task.execute();
         return allPickedGoodsList;
+    }
+    public void deleteAll(){
+        new deleteAllAsync(pickedGoodDao).execute();
+    }
+    private static class deleteAllAsync extends AsyncTask<Void,Void,Void>{
+        private PickedGoodDao dao;
+        public deleteAllAsync(PickedGoodDao dao) {
+            this.dao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            dao.deleteAll();
+            return null;
+        }
     }
 
     private static class allPickedGoodsListAsync extends AsyncTask<Void,Void,List<PickedGoodEntity>>{

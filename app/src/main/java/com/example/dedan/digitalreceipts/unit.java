@@ -42,7 +42,6 @@ public class unit extends AppCompatActivity  {
     private String pack;
 
     Toolbar unittool;
-    Boolean hideIcon=true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,12 +105,6 @@ public class unit extends AppCompatActivity  {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater=getMenuInflater();
         inflater.inflate(R.menu.del_menu, menu);
-        if(hideIcon){
-            menu.findItem(R.id.delete).setVisible(false);
-        }
-        else{
-            menu.findItem(R.id.delete).setVisible(true);
-        }
         return true;
     }
 
@@ -119,14 +112,39 @@ public class unit extends AppCompatActivity  {
     public boolean onOptionsItemSelected(MenuItem menuitem) {
         switch(menuitem.getItemId()){
             case R.id.delete:
-                delete();
+                confirmdialog();
                 break;
     }
         return super.onOptionsItemSelected(menuitem);
     }
-
-    public void delete(){
+    public void confirmdialog(){
+        AlertDialog.Builder builder=new AlertDialog.Builder(unit.this);
+        View mview=getLayoutInflater().inflate(R.layout.confirm_dialogbox,null);
+        TextView mess = mview.findViewById(R.id.conf_text);
+        mess.setText("DELETE ALL ITEMS");
+        builder.setTitle("CONFIRM");
+        builder.setView(mview);
+        builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                deleteAll();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog=builder.create();
+        dialog.show();
     }
+
+    private void deleteAll() {
+        goodsViewModel.deleteAll();
+    }
+
+
     public void inputDialog(){
         final EditText item_edit,cost_edit,pack_edit;
         AlertDialog.Builder builder = new AlertDialog.Builder(unit.this);
@@ -165,7 +183,7 @@ public class unit extends AppCompatActivity  {
         pack_edit = mview.findViewById(R.id.packtxt);
         item_edit.setText(it);
         pack_edit.setText(pa);
-        cost_edit.setText(co);
+        cost_edit.setText(String.valueOf(co));
         builder.setView(mview);
         builder.setTitle("Edit");
         builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {

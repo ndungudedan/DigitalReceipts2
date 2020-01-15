@@ -29,4 +29,11 @@ public class MonthSalesViewModel extends AndroidViewModel {
     public LiveData<List<MonthSalesEntity>> getMonthSales(){
             return AllMonthSales;
     }
+
+    public MonthSalesEntity getSale(String time){
+            return monthSalesRepo.getTotalSale(time);
+    }
+    public void deleteAll(){
+        monthSalesRepo.deleteAll();
+    }
 }

@@ -22,4 +22,7 @@ public interface CustomerDao {
 
     @Query("select * from Customers order by first_name desc")
     LiveData<List<CustomerEntity>> getAllCustomers();
+
+    @Query("delete from Customers")
+    void deleteAll();
 }

@@ -3,6 +3,8 @@ package com.example.dedan.digitalreceipts;
 import android.app.Application;
 import android.os.AsyncTask;
 
+import com.example.dedan.digitalreceipts.Database.AppDatabase;
+
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
@@ -12,7 +14,7 @@ public class WeekSalesRepo {
     LiveData<List<WeekSalesEntity>> allWeekSales;
 
     public WeekSalesRepo(Application application) {
-        AppDatabase appDatabase=AppDatabase.getInstance(application);
+        AppDatabase appDatabase= AppDatabase.getInstance(application);
         weekSalesDao=appDatabase.weekSalesDao();
         allWeekSales=weekSalesDao.getWeekSales();
     }

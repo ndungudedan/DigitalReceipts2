@@ -2,7 +2,6 @@ package com.example.dedan.digitalreceipts;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -32,11 +31,46 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.dedan.digitalreceipts.Month_Database.April.AprEntity;
-import com.example.dedan.digitalreceipts.Month_Database.December.DecEntity;
-import com.example.dedan.digitalreceipts.Month_Database.December.DecViewModel;
-import com.example.dedan.digitalreceipts.Month_Database.January.JanEntity;
-import com.example.dedan.digitalreceipts.Month_Database.January.JanViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.April.AprEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.April.AprViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.August.AugEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.August.AugViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.December.DecEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.December.DecViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.February.FebEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.February.FebViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.January.JanEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.January.JanViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.July.JulEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.July.JulViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.June.JunEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.June.JunViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.March.MarEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.March.MarViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.May.MayEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.May.MayViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.November.NovEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.November.NovViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.October.OctEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.October.OctViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.September.SepEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.September.SepViewModel;
+import com.example.dedan.digitalreceipts.Database.Today_Database.TodayEntity;
+import com.example.dedan.digitalreceipts.Database.Today_Database.TodayViewModel;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Friday.FriEntity;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Friday.FriViewModel;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Monday.MonEntity;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Monday.MonViewModel;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Saturday.SatEntity;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Saturday.SatViewModel;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Sunday.SunEntity;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Sunday.SunViewModel;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Thursday.ThurEntity;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Thursday.ThurViewModel;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Tuesday.TueEntity;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Tuesday.TueViewModel;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Wednesday.WedEntity;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Wednesday.WedViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
@@ -70,8 +104,13 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
     MonthSalesViewModel monthSalesViewModel;
     WeekSalesViewModel weekSalesViewModel;
     UserStatsViewModel userStatsViewModel;
-    JanViewModel janViewModel;
-    DecViewModel decViewModel;
+    JanViewModel janViewModel;FebViewModel febViewModel;MarViewModel marViewModel;
+    AprViewModel aprViewModel;MayViewModel mayViewModel;JunViewModel junViewModel;
+    JulViewModel julViewModel;AugViewModel augViewModel;SepViewModel sepViewModel;
+    OctViewModel octViewModel;NovViewModel novViewModel;DecViewModel decViewModel;
+    MonViewModel monViewModel;TueViewModel tueViewModel;WedViewModel wedViewModel;ThurViewModel thurViewModel;
+    FriViewModel friViewModel;SatViewModel satViewModel;SunViewModel sunViewModel;
+    TodayViewModel todayViewModel;
     List<PickedGoodEntity> pickedGoods;
 
     TextView totalView;
@@ -120,8 +159,19 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         weekSalesViewModel=ViewModelProviders.of(this).get(WeekSalesViewModel.class);
         monthSalesViewModel=ViewModelProviders.of(this).get(MonthSalesViewModel.class);
         userStatsViewModel=ViewModelProviders.of(this).get(UserStatsViewModel.class);
-        janViewModel=ViewModelProviders.of(this).get(JanViewModel.class);
-        decViewModel=ViewModelProviders.of(this).get(DecViewModel.class);
+        janViewModel=ViewModelProviders.of(this).get(JanViewModel.class);febViewModel=ViewModelProviders.of(this).get(FebViewModel.class);
+        marViewModel=ViewModelProviders.of(this).get(MarViewModel.class);aprViewModel=ViewModelProviders.of(this).get(AprViewModel.class);
+        mayViewModel=ViewModelProviders.of(this).get(MayViewModel.class);junViewModel=ViewModelProviders.of(this).get(JunViewModel.class);
+        julViewModel=ViewModelProviders.of(this).get(JulViewModel.class);augViewModel=ViewModelProviders.of(this).get(AugViewModel.class);
+        sepViewModel=ViewModelProviders.of(this).get(SepViewModel.class);octViewModel=ViewModelProviders.of(this).get(OctViewModel.class);
+        novViewModel=ViewModelProviders.of(this).get(NovViewModel.class);decViewModel=ViewModelProviders.of(this).get(DecViewModel.class);
+        monViewModel=ViewModelProviders.of(this).get(MonViewModel.class);tueViewModel=ViewModelProviders.of(this).get(TueViewModel.class);
+        wedViewModel=ViewModelProviders.of(this).get(WedViewModel.class);thurViewModel=ViewModelProviders.of(this).get(ThurViewModel.class);
+        friViewModel=ViewModelProviders.of(this).get(FriViewModel.class);satViewModel=ViewModelProviders.of(this).get(SatViewModel.class);
+        sunViewModel=ViewModelProviders.of(this).get(SunViewModel.class);
+        todayViewModel=ViewModelProviders.of(this).get(TodayViewModel.class);
+
+
 
 
         //pickedGoods=pickedGoodViewModel.getAllPickedGoodsList();
@@ -149,7 +199,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 // do update, if item does not exist on picked table then insert
                 //pickedGoods=pickedGoodViewModel.getAllPickedGoodsList();
 
-                int res = 0;//no of rows updated
+                int res=0;
                 quan=1;
                 int picked_id=goodsEntity.getKEY_GOODS_ID();
                 pack=goodsEntity.getKEY_PACK();
@@ -165,17 +215,18 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                             int total=cost*quan;
                             PickedGoodEntity pickedGoodEntity=new PickedGoodEntity(quan,pack,item,cost,total,picked_id);
                             pickedGoodEntity.setKEY_ID(id);
-                            res = pickedGoodViewModel.update(pickedGoodEntity);
+                            pickedGoodViewModel.update(pickedGoodEntity);
+                            res++;
                             break;
                         }
-
+                    }
+                    if(res==0) {
+                        int total=cost*quan;
+                        PickedGoodEntity pickedGoodEntity=new PickedGoodEntity(quan,pack,item,cost,total,picked_id);
+                        pickedGoodViewModel.insert(pickedGoodEntity);
                     }
                 }
-                if (res == 0) {
-                    int total=cost*quan;
-                    PickedGoodEntity pickedGoodEntity=new PickedGoodEntity(quan,pack,item,cost,total,picked_id);
-                    pickedGoodViewModel.insert(pickedGoodEntity);
-                }
+
             }
         });
 
@@ -272,6 +323,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
             case R.id.save:
                 if(pickedGoods.isEmpty()){
                     Toast.makeText(getApplicationContext(),"Cannot save empty receipt",Toast.LENGTH_SHORT).show();
+                    break;
                 }
                 if(name.isEmpty()){
                     getClient();
@@ -306,6 +358,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                getClient();
                 break;
             case R.id.newPdf:
+                confirmdialog();
                 refresh();
 
                 break;
@@ -323,51 +376,241 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         f.putExtra("GetCustomer","From_homeActivity");
         startActivityForResult(f,GET_CUSTOMER_REQUEST);
     }
+    public void companyTotals(String time){
+        MonthSalesEntity mTot=monthSalesViewModel.getSale(time);
+        if(mTot!=null){
+            MonthSalesEntity monthSalesEntity=new MonthSalesEntity(time,mTot.getKEY_total()+total);
+            monthSalesEntity.setKEY_ID(mTot.getKEY_ID());
+            monthSalesViewModel.update(monthSalesEntity);
+        }else{
+            MonthSalesEntity monthSalesEntity=new MonthSalesEntity(time,total);
+            monthSalesViewModel.insert(monthSalesEntity);
+        }
+    }
     public void userSalesInsert(){
         Date da=new Date();
-        String monthformat="MMM";
-        SimpleDateFormat sdf=new SimpleDateFormat(monthformat);
+        SimpleDateFormat sdf=new SimpleDateFormat("MMM");
         sdf.format(da);
         date=da.toString();
-        String currentMonth=da.toString();
-        currentMonth="Jan";
-        userTodaySales=userTodaySales+total;
-        userWeeksales=userWeeksales+total;
+        String userdb="user";
 
-        AprEntity aprEntity=new AprEntity(total,1,LoggeduserId,"user");
-
-        if(currentMonth.contains("Jan")){
-            JanEntity janEntity=new JanEntity(total,1,LoggeduserId,"user");
-            janViewModel.insert(janEntity);
-        }
-        else if(currentMonth.contains("Dec")){
-            LiveData<DecEntity> decEntity=decViewModel.getUserMonthsales(Integer.parseInt(LoggeduserId));
-            /*if(decEntity==null){
-                decEntity=new DecEntity(total,1,LoggeduserId,"user");
-                decViewModel.insert(decEntity);
+            TodayEntity today=todayViewModel.getUserTodaySales(LoggeduserId);
+            if(today!=null){
+                TodayEntity todayEntity=new TodayEntity(today.getKEY_SALES()+total,today.getKEY_NO_OF_CLIENTS()+1,LoggeduserId,userdb,date);
+                todayEntity.setKEY_ID(today.getKEY_ID());
+                todayViewModel.update(todayEntity);
+            }else{
+                TodayEntity todayEntity=new TodayEntity(total,1,LoggeduserId,userdb,date);
+                todayViewModel.insert(todayEntity);
             }
-            else{
-                userMonthsales=total+decEntity.getKEY_SALES();
-                int clientsServed=decEntity.getKEY_NO_OF_CLIENTS()+1;
-                decEntity=new DecEntity(userMonthsales,clientsServed,LoggeduserId,"user");
-                decViewModel.update(decEntity);
-            }*/
+
+        date="Jan";
+        if(date.contains("Jan")){
+            JanEntity jan=janViewModel.getUserMonthsales(LoggeduserId);
+            if(jan!=null){
+                JanEntity janEntity = new JanEntity(jan.getKEY_SALES()+total, jan.getKEY_NO_OF_CLIENTS()+1, LoggeduserId, userdb);
+                janEntity.setKEY_ID(jan.getKEY_ID());
+                janViewModel.update(janEntity);
+            }else {
+                JanEntity janEntity = new JanEntity(total, 1, LoggeduserId, userdb);
+                janViewModel.insert(janEntity);
+            }
+            companyTotals("Jan");
+            date="Feb";
         }
+         if(date.contains("Feb")){
+            FebEntity feb=febViewModel.getUserMonthSales(LoggeduserId);
+            if(feb!=null){
+                FebEntity febEntity=new FebEntity(feb.getKEY_SALES()+total,feb.getKEY_NO_OF_CLIENTS()+1,LoggeduserId,userdb);
+                febEntity.setKEY_ID(feb.getKEY_ID());
+                febViewModel.update(febEntity);
+            }else{
+            FebEntity febEntity=new FebEntity(total,1,LoggeduserId,userdb);
+            febViewModel.insert(febEntity);
+            }
+            companyTotals("Feb");date="Mar";
+            }
+         if(date.contains("Mar")){
+            MarEntity mar=marViewModel.getUserMonthSales(LoggeduserId);
+            if(mar!=null){
+                MarEntity marEntity=new MarEntity(mar.getKEY_SALES()+total,mar.getKEY_NO_OF_CLIENTS()+1,LoggeduserId,userdb);
+                marEntity.setKEY_ID(mar.getKEY_ID());
+                marViewModel.update(marEntity);
+            }else{
+                MarEntity marEntity=new MarEntity(total,1,LoggeduserId,userdb);
+                marViewModel.insert(marEntity);
+            }
+            companyTotals("Mar");date="Apr";
+        }
+         if(date.contains("Apr")){//change boolean value
+             AprEntity apr=aprViewModel.getUserMonthSales(LoggeduserId);
+             if(apr!=null){
+                 AprEntity aprEntity=new AprEntity(apr.getKEY_SALES()+total,apr.getKEY_NO_OF_CLIENTS()+1,LoggeduserId,userdb);
+                 aprEntity.setKEY_ID(apr.getKEY_ID());
+                 aprViewModel.update(aprEntity);
+             }
+             else{AprEntity aprEntity=new AprEntity(total,1,LoggeduserId,userdb);
+                 aprViewModel.insert(aprEntity);}
+            companyTotals("Apr");date="May";
+        }
+         if(date.contains("May")){
+             MayEntity may=mayViewModel.getUserMonthSales(LoggeduserId);
+             if(may!=null){
+                 MayEntity mayEntity=new MayEntity(may.getKEY_SALES()+total,may.getKEY_NO_OF_CLIENTS()+1,LoggeduserId,userdb);
+                 mayEntity.setKEY_ID(may.getKEY_ID());
+                 mayViewModel.update(mayEntity);
+             }
+             else{MayEntity mayEntity=new MayEntity(total,1,LoggeduserId,userdb);
+                 mayViewModel.insert(mayEntity);}
+            companyTotals("May");date="Jun";
+        }
+         if(date.contains("Jun")){
+             JunEntity jun=junViewModel.getUserMonthSales(LoggeduserId);
+             if(jun!=null){
+                 JunEntity junEntity=new JunEntity(jun.getKEY_SALES()+total,jun.getKEY_NO_OF_CLIENTS()+1,LoggeduserId,userdb);
+                 junEntity.setKEY_ID(jun.getKEY_ID());
+                 junViewModel.update(junEntity);
+             }else{JunEntity junEntity=new JunEntity(total,1,LoggeduserId,userdb);
+                 junViewModel.insert(junEntity);}
+            companyTotals("Jun");date="Jul";
+        }
+         if(date.contains("Jul")){
+             JulEntity jul=julViewModel.getUserMonthSales(LoggeduserId);
+             if(jul!=null){
+                 JulEntity julEntity=new JulEntity(jul.getKEY_SALES()+total,jul.getKEY_NO_OF_CLIENTS()+1,LoggeduserId,userdb);
+                 julEntity.setKEY_ID(jul.getKEY_ID());
+                 julViewModel.update(julEntity);
+             }else{JulEntity julEntity=new JulEntity(total,1,LoggeduserId,userdb);
+                 julViewModel.insert(julEntity);}
+            companyTotals("Jul");date="Aug";
+        }
+         if(date.contains("Aug")){
+             AugEntity aug=augViewModel.getUserMonthSales(LoggeduserId);
+             if(aug!=null){
+                 AugEntity augEntity=new AugEntity(aug.getKEY_SALES()+total,aug.getKEY_NO_OF_CLIENTS()+1,LoggeduserId,userdb);
+                 augEntity.setKEY_ID(aug.getKEY_ID());
+                 augViewModel.update(augEntity);
+             }else{  AugEntity augEntity=new AugEntity(total,1,LoggeduserId,userdb);
+                 augViewModel.insert(augEntity);}
+            companyTotals("Aug");date="Sep";
+        }
+         if(date.contains("Sep")){
+             SepEntity sep=sepViewModel.getUserMonthSales(LoggeduserId);
+             if(sep!=null){
+                 SepEntity sepEntity=new SepEntity(sep.getKEY_SALES()+total,sep.getKEY_NO_OF_CLIENTS()+1,LoggeduserId,userdb);
+                 sepEntity.setKEY_ID(sep.getKEY_ID());
+                 sepViewModel.update(sepEntity);
+             }else{SepEntity sepEntity=new SepEntity(total,1,LoggeduserId,userdb);
+                 sepViewModel.insert(sepEntity);}
+            companyTotals("Sep");date="Oct";
+        }
+         if(date.contains("Oct")){
+             OctEntity oct=octViewModel.getUserMonthSales(LoggeduserId);
+             if(oct!=null){
+                 OctEntity octEntity=new OctEntity(oct.getKEY_SALES()+total,oct.getKEY_NO_OF_CLIENTS()+1,LoggeduserId,userdb);
+                 octEntity.setKEY_ID(oct.getKEY_ID());
+                 octViewModel.update(octEntity);
+             }else{OctEntity octEntity=new OctEntity(total,1,LoggeduserId,userdb);
+                 octViewModel.insert(octEntity);}
+            companyTotals("Oct");date="Nov";
+        }
+         if(date.contains("Nov")){
+             NovEntity nov=novViewModel.getUserMonthSales(LoggeduserId);
+             if(nov!=null){
+                 NovEntity novEntity=new NovEntity(nov.getKEY_SALES()+total,nov.getKEY_NO_OF_CLIENTS()+1,LoggeduserId,userdb);
+                 novEntity.setKEY_ID(nov.getKEY_ID());
+                 novViewModel.update(novEntity);
+             }else{NovEntity novEntity=new NovEntity(total,1,LoggeduserId,userdb);
+                 novViewModel.insert(novEntity);}
+            companyTotals("Nov");date="Dec";
+        }
+         if(date.contains("Dec")){
+             DecEntity dec=decViewModel.getUserMonthsales(LoggeduserId);
+             if(dec!=null){
+                 DecEntity decEntity=new DecEntity(dec.getKEY_SALES()+total,dec.getKEY_NO_OF_CLIENTS()+1,LoggeduserId,userdb);
+                 decEntity.setKEY_ID(dec.getKEY_ID());
+                 decViewModel.update(decEntity);
+             }else{
+            DecEntity decEntity=new DecEntity(total,1,LoggeduserId,userdb);
+            decViewModel.insert(decEntity);
+             }
+            companyTotals("Dec");}
 
+        date="Mon";
+        if(date.contains("Mon")){
+             MonEntity mon=monViewModel.getUserDaySales(LoggeduserId);
+             if(mon!=null){
+                 MonEntity monEntity=new MonEntity(mon.getKEY_SALES()+total,mon.getKEY_NO_OF_CLIENTS()+1,LoggeduserId,userdb);
+                 monEntity.setKEY_ID(mon.getKEY_ID());
+                 monViewModel.update(monEntity);
+             }else{MonEntity monEntity=new MonEntity(total,1,LoggeduserId,userdb);
+                 monViewModel.insert(monEntity);}
+            companyTotals("Mon");
+            date="Tue";
+         }
+          if(date.contains("Tue")){
+            TueEntity tue=tueViewModel.getUserDaySales(LoggeduserId);
+            if(tue!=null){
+                TueEntity tueEntity=new TueEntity(tue.getKEY_SALES()+total,tue.getKEY_NO_OF_CLIENTS()+1,LoggeduserId,userdb);
+                tueEntity.setKEY_ID(tue.getKEY_ID());
+                tueViewModel.update(tueEntity);
+            }else{TueEntity tueEntity=new TueEntity(total,1,LoggeduserId,userdb);
+                tueViewModel.insert(tueEntity);}
+            companyTotals("Tue");date="Wed";
+         }
+          if(date.contains("Wed")){
+             WedEntity wed=wedViewModel.getUserDaySales(LoggeduserId);
+            if(wed!=null){
+                WedEntity wedEntity=new WedEntity(wed.getKEY_SALES()+total,wed.getKEY_NO_OF_CLIENTS()+1,LoggeduserId,userdb);
+                wedEntity.setKEY_ID(wed.getKEY_ID());
+                wedViewModel.update(wedEntity);
+            }else{WedEntity wedEntity=new WedEntity(total,1,LoggeduserId,userdb);
+                wedViewModel.insert(wedEntity);}
+            companyTotals("Wed");date="Thur";
+         }
+          if(date.contains("Thur")){
+             ThurEntity thur=thurViewModel.getUserDaySales(LoggeduserId);
+             if(thur!=null){
+                 ThurEntity thurEntity=new ThurEntity(thur.getKEY_SALES()+total,thur.getKEY_NO_OF_CLIENTS()+1,LoggeduserId,userdb);
+                 thurEntity.setKEY_ID(thur.getKEY_ID());
+                 thurViewModel.update(thurEntity);
+             }else{ThurEntity thurEntity=new ThurEntity(total,1,LoggeduserId,userdb);
+                 thurViewModel.insert(thurEntity);}
+            companyTotals("Thur");date="Fri";
+         }
+          if(date.contains("Fri")){
+            FriEntity fri=friViewModel.getUserDaySales(LoggeduserId);
+            if(fri!=null){
+                FriEntity friEntity=new FriEntity(fri.getKEY_SALES()+total,fri.getKEY_NO_OF_CLIENTS()+1,LoggeduserId,userdb);
+                friEntity.setKEY_ID(fri.getKEY_ID());
+                friViewModel.update(friEntity);
+            }else{FriEntity friEntity=new FriEntity(total,1,LoggeduserId,userdb);
+                friViewModel.insert(friEntity);}
+            companyTotals("Fri");date="Sat";
+         }
+          if(date.contains("Sat")){
+            SatEntity sat=satViewModel.getUserDaySales(LoggeduserId);
+            if(sat!=null){
+                SatEntity satEntity=new SatEntity(sat.getKEY_SALES()+total,sat.getKEY_NO_OF_CLIENTS()+1,LoggeduserId,userdb);
+                satEntity.setKEY_ID(sat.getKEY_ID());
+                satViewModel.update(satEntity);
+            }else{SatEntity satEntity=new SatEntity(total,1,LoggeduserId,userdb);
+                satViewModel.insert(satEntity);}
+            companyTotals("Sat");date="Sun";
+         }
+          if(date.contains("Sun")){
+             SunEntity sun=sunViewModel.getUserDaySales(LoggeduserId);
+             if(sun!=null){
+                 SunEntity sunEntity=new SunEntity(sun.getKEY_SALES()+total,sun.getKEY_NO_OF_CLIENTS()+1,LoggeduserId,userdb);
+                 sunEntity.setKEY_ID(sun.getKEY_ID());
+                 sunViewModel.update(sunEntity);
+             }else{
+                 SunEntity sunEntity=new SunEntity(total,1,LoggeduserId,userdb);
+                 sunViewModel.insert(sunEntity);
+             }
+            companyTotals("Sun");}
 
-    }
-
-    public void salesInsert(){
-        Date date=new Date();
-        String format="hh:mm:ss a dd-MMM-yyyy";
-        String monthformat="yyyy";
-        SimpleDateFormat sdf=new SimpleDateFormat(monthformat);
-        sdf.format(date);
-        MonthSalesEntity monthSalesEntity=new MonthSalesEntity(0,0,0,0,0,0,0,0,
-                0,0,0,0,date.toString(),0);
-        monthSalesViewModel.insert(monthSalesEntity);
-    }
-
+        }
     public int totalCount(){
         total=0;
         for(PickedGoodEntity good:pickedGoods){
@@ -559,9 +802,9 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         lipa=mview.findViewById(R.id.clCash);
         TextView bal = mview.findViewById(R.id.bal_display);
 
-
-        builder.setView(mview);
         bal.setText(String.valueOf(invCash));
+        builder.setMessage(String.valueOf(invCash));
+        builder.setView(mview);
         builder.setTitle("Cash Tendered");
         builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
             @Override
@@ -636,4 +879,40 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         dialog.show();
     }
 
+    public void confirmdialog(){
+        AlertDialog.Builder builder=new AlertDialog.Builder(homeActivity.this);
+        View mview=getLayoutInflater().inflate(R.layout.confirm_dialogbox,null);
+        TextView mess = mview.findViewById(R.id.conf_text);
+        mess.setText("CLEAR ALL SELECTED ITEMS");
+        builder.setTitle("CONFIRM");
+        builder.setView(mview);
+        builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                clearpickeditems();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog=builder.create();
+        dialog.show();
+    }
+
+    private void clearpickeditems() {
+        pickedGoodViewModel.deleteAll();
+    }
+
+    public void deleteAll(){
+        janViewModel.deleteAll();febViewModel.deleteAll();marViewModel.deleteAll();
+        aprViewModel.deleteAll();mayViewModel.deleteAll();junViewModel.deleteAll();
+        julViewModel.deleteAll();augViewModel.deleteAll();sepViewModel.deleteAll();
+        octViewModel.deleteAll();novViewModel.deleteAll();decViewModel.deleteAll();
+        monViewModel.deleteAll();tueViewModel.deleteAll();wedViewModel.deleteAll();
+        thurViewModel.deleteAll();friViewModel.deleteAll();satViewModel.deleteAll();
+        sunViewModel.deleteAll();
+    }
 }

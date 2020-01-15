@@ -4,12 +4,14 @@ import android.Manifest;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -20,6 +22,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
+
+import com.example.dedan.digitalreceipts.Database.Today_Database.TodayEntity;
+import com.example.dedan.digitalreceipts.Database.Today_Database.TodayViewModel;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -33,14 +39,7 @@ public class MainActivity extends AppCompatActivity {
     ReceiptViewModel receiptViewModel;
     MonthSalesViewModel monthSalesViewModel;
     WeekSalesViewModel weekSalesViewModel;
-
-    private String loggedIn_user;
-    private String loggedIn_username;
-    private int loggedIn_baseId;
-    private long loggedIn_empNo;
-    private Cursor mcursor;
-    private String dataToday;
-
+    TodayViewModel todayViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,85 +56,23 @@ public class MainActivity extends AppCompatActivity {
         receiptViewModel = ViewModelProviders.of(this).get(ReceiptViewModel.class);
         weekSalesViewModel=ViewModelProviders.of(this).get(WeekSalesViewModel.class);
         monthSalesViewModel=ViewModelProviders.of(this).get(MonthSalesViewModel.class);
+        todayViewModel=ViewModelProviders.of(this).get(TodayViewModel.class);
 
-
-        try{
-            loggedIn_user = getIntent().getExtras().getString("loggedIn_user");
-            loggedIn_username=getIntent().getExtras().getString("loggedIn_username");
-            loggedIn_baseId=getIntent().getExtras().getInt("loggedIn_baseId");
-            loggedIn_empNo=getIntent().getExtras().getLong("loggedIn_empNo");
-
-        }catch (NullPointerException e){
-            e.printStackTrace();
+        TodayEntity todayEntity=todayViewModel.getUserTodaySales(sharedPreferences.getString("current_userId","0"));
+        if(todayEntity!=null){
+            Date date=new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yy");
+            String timeStamp= sdf.format(date);
+            if(!timeStamp.contains(todayEntity.getKEY_DAY())){
+                todayViewModel.deleteAll();
+            }
         }
-
-        if(loggedIn_user !=null){
-            editor.putInt("current_user",0);
-            editor.putInt("current_user_no.of_sales",0);
-            editor.putLong("current_empNo",loggedIn_empNo);
-            editor.putString("current_user",loggedIn_user);
-            editor.putString("current_username",loggedIn_username);
-            editor.putInt("current_userId",loggedIn_baseId);
-            editor.apply();
-        }
-
-        Date date=new Date();
-        String savedToday = new SimpleDateFormat("dd/MM/yyyy").format(date);
-        String savedmonth=new SimpleDateFormat("MM/yyyy").format(date);
-        String savedyear=new SimpleDateFormat("yyyy").format(date);
 
         if(!sharedPreferences.getBoolean("firstTime", false)) {
-            Calendar cal=Calendar.getInstance();
-
-            Date Mdate=new Date();Date Wdate=new Date();Date Tdate=new Date();
-            String monthformat="yyyy";String weekformat="w";
-            SimpleDateFormat Msdf=new SimpleDateFormat(monthformat);Msdf.format(Mdate);
-            SimpleDateFormat Wsdf=new SimpleDateFormat(weekformat);Wsdf.format(Wdate);
-            MonthSalesEntity monthSalesEntity=new MonthSalesEntity(0,0,0,0,0,0,0,0,
-                    0,0,0,0,Mdate.toString(),0);
-            monthSalesViewModel.insert(monthSalesEntity);
-            WeekSalesEntity weekSalesEntity=new WeekSalesEntity(0,0,0,0,0,0,0,
-                    Wdate.toString(),0);
-            weekSalesViewModel.insert(weekSalesEntity);
-
-
-            editor.putString("todays_date",savedToday);
-            editor.putString("currentMonth",savedmonth);
-            editor.putString("currentYear",savedyear);
-            // run your one time code
-            editor.putInt("today",0);
-            editor.putInt("yesterday",0);
-            editor.putInt("thisWeek",0);
-            editor.putInt("thisMonth",0);
-
             editor.putBoolean("firstTime", true);
             editor.apply();
 
-            //today
-            todayAlarm();
-            //week
-            weeklyAlarm();
-            //Monthly
-            monthlyAlarm();
         }
-        Log.i("mesooi", " main called");
-
-        String checkDate=sharedPreferences.getString("todays_date","");
-        String checkMonth=sharedPreferences.getString("currentMonth","");
-        String checkYear=sharedPreferences.getString("currentYear","");
-        if(!checkDate.equals(savedToday)){
-
-            editor.putString("todays_date",checkDate);
-        }
-        if(!checkMonth.equals(savedmonth)){
-
-            editor.putString("currentMonth",checkMonth);
-        }
-        if(!checkYear.equals(savedyear)){
-            editor.putString("currentYear",checkYear);
-        }
-        Calendar c=Calendar.getInstance();
-        String time= String.valueOf(c.getTime());
 
         permissions();
     }
@@ -156,12 +93,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.logout:
-                finish();
-                loggedIn_user=null;
-                loggedIn_username=null;
-                loggedIn_baseId= 0;
-                Intent logout=new Intent(this,logIn.class);
-                startActivity(logout);
+                confirmdialog();
                 break;
             case R.id.secmenu:
                 Intent sec=new Intent(this,CompanyStats.class);
@@ -169,51 +101,6 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void weeklyAlarm() {
-        Intent weekIntent=new Intent(this,weekReceiver.class);
-        PendingIntent weekpendingIntent=PendingIntent.getBroadcast(this,0,weekIntent,0);
-        AlarmManager weekalarmManager=(AlarmManager)getSystemService(ALARM_SERVICE);
-
-        Calendar weekcalendar = Calendar.getInstance();
-        weekcalendar.setTimeInMillis(System.currentTimeMillis());
-        weekcalendar.set(Calendar.DAY_OF_WEEK, 1);
-        weekcalendar.set(Calendar.HOUR_OF_DAY, 0);
-        long timeWeek=weekcalendar.getTimeInMillis();
-
-        if (weekalarmManager != null) {
-            weekalarmManager.setRepeating(AlarmManager.RTC_WAKEUP,timeWeek,AlarmManager.INTERVAL_DAY*7, weekpendingIntent);
-        }
-    }
-    private void monthlyAlarm() {
-        Intent monthIntent=new Intent(this,monthReceiver.class);
-        PendingIntent monthpendingIntent=PendingIntent.getBroadcast(this,0,monthIntent,0);
-        AlarmManager monthalarmManager=(AlarmManager)getSystemService(ALARM_SERVICE);
-
-        Calendar monthcalendar = Calendar.getInstance();
-        monthcalendar.setTimeInMillis(System.currentTimeMillis());
-        monthcalendar.set(Calendar.WEEK_OF_MONTH, 1);
-        monthcalendar.set(Calendar.DAY_OF_WEEK, 1);
-        monthcalendar.set(Calendar.HOUR_OF_DAY,0);
-        long timeMonth=monthcalendar.getTimeInMillis();
-
-        if (monthalarmManager != null) {
-            monthalarmManager.set(AlarmManager.RTC_WAKEUP,timeMonth,monthpendingIntent);
-        }
-    }
-    private void todayAlarm(){
-        AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 11);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.AM_PM, Calendar.PM);
-        Intent myIntent = new Intent(this, receiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, myIntent,0);
-        if (alarmManager != null) {
-            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                    AlarmManager.INTERVAL_DAY, pendingIntent);
-        }
     }
 
     public void open(View view) {
@@ -243,6 +130,35 @@ public class MainActivity extends AppCompatActivity {
     public void stat(View view){
         Intent j=new Intent(this,security.class);
         startActivity(j);
+    }
+
+    public void confirmdialog(){
+        AlertDialog.Builder builder=new AlertDialog.Builder(MainActivity.this);
+        View mview=getLayoutInflater().inflate(R.layout.confirm_dialogbox,null);
+        TextView mess = mview.findViewById(R.id.conf_text);
+        mess.setText("YOU ARE LOGGING OUT");
+        builder.setTitle("CONFIRM");
+        builder.setView(mview);
+        builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                logout();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog=builder.create();
+        dialog.show();
+    }
+
+    private void logout() {
+        finish();
+        Intent logout=new Intent(this,logIn.class);
+        startActivity(logout);
     }
 
     public void permissions(){

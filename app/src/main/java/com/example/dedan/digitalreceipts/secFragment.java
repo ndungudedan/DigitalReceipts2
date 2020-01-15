@@ -122,9 +122,9 @@ public class secFragment extends Fragment implements View.OnClickListener {
         adapter.setOnItemClickListener(new CompanyStatsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(UserEntity userEntity) {
-                /*Intent intent=new Intent();
-                intent.putExtra("userid",LoggedUserId);
-                startActivity(intent);*/
+                Intent intent=new Intent(getActivity(),security.class);
+                intent.putExtra("userid",userEntity.getKEY_USER_ID());
+                startActivity(intent);
             }
         });
     }
@@ -151,61 +151,5 @@ public class secFragment extends Fragment implements View.OnClickListener {
 
         }
     }
-    public void update(){
-        if(internetIsConnected()){
-            FirebaseUser fireuser = FirebaseAuth.getInstance().getCurrentUser();
-            String newPassword =txt_pass.getText().toString().trim();
-            fireuser.updatePassword(newPassword)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Toast.makeText(getActivity(), "password updated",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(getActivity(), ""+e.getLocalizedMessage(),
-                            Toast.LENGTH_SHORT).show();
-                }
-            });
-            fireuser.updateEmail(user_email.getText().toString().trim())
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Toast.makeText(getActivity(), "email updated",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(getActivity(), ""+e.getLocalizedMessage(),
-                            Toast.LENGTH_SHORT).show();
-                }
-            });
 
-           //update local database
-        }
-        else{
-            Toast.makeText(getActivity(), "failed!!!No network access",
-                    Toast.LENGTH_SHORT).show();
-        }
-
-    }
-
-    public boolean internetIsConnected() {
-        try {
-            String command = "ping -c 1 google.com";
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                return (Runtime.getRuntime().exec(command).waitFor(5, TimeUnit.SECONDS));
-            }
-            return (Runtime.getRuntime().exec(command).waitFor()==0);
-        } catch (Exception e) {
-            return false;
-        }
-    }
 }

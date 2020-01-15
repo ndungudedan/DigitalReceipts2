@@ -9,7 +9,7 @@ public class ReceiptEntity {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "ID")
     private int KEY_ID;
-    @ColumnInfo(name = "date")
+    @ColumnInfo(name = "time")
     private String KEY_date;
     @ColumnInfo(name = "reference")
     private String KEY_rcpt_ref;

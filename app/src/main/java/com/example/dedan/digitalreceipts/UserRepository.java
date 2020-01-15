@@ -1,10 +1,12 @@
 package com.example.dedan.digitalreceipts;
 
 import android.app.Application;
-import android.content.AsyncQueryHandler;
 import android.os.AsyncTask;
 
+import com.example.dedan.digitalreceipts.Database.AppDatabase;
+
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import androidx.lifecycle.LiveData;
 
@@ -14,7 +16,7 @@ public class UserRepository {
     public UserEntity getUser;
 
     public UserRepository(Application application){
-        AppDatabase database=AppDatabase.getInstance(application);
+        AppDatabase database= AppDatabase.getInstance(application);
         userDao=database.userDao();
         allUsers=userDao.getAllUsers();
     }
@@ -34,7 +36,13 @@ public class UserRepository {
     public UserEntity getSingleUser(String user,String pass){
         getSingleUserAsyncTask task= new getSingleUserAsyncTask(userDao,pass,user);
         task.repo=this;
-        task.execute();
+        try {
+            getUser=task.execute().get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return getUser;
     }
     private static class getSingleUserAsyncTask extends AsyncTask<Void,Void,UserEntity> {

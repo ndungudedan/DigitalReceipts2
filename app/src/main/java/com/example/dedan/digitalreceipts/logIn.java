@@ -1,7 +1,7 @@
 package com.example.dedan.digitalreceipts;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import androidx.annotation.NonNull;
@@ -9,7 +9,6 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -22,36 +21,35 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class logIn extends AppCompatActivity {
     UserViewModel userViewModel;
-    private List<UserEntity> allUsers;
-
+    SharedPreferences sharedPreferences;
     private ProgressBar progressBar;
     TextView stat_view;
     private FirebaseAuth mAuth;
-    private static int loggedIn_baseId=1;//to be removeed
-    private static long loggedIn_empNO;
-    EditText emailtxt;
+    EditText usernametxt;
     TextInputEditText pass;
 
-    private static String loggedIn_user;
-    private static String loggedIn_username;
     private TextInputLayout inputLayoutEmail, inputLayoutPassword;
+    private UserEntity user;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         userViewModel= ViewModelProviders.of(this).get(UserViewModel.class);
+        sharedPreferences=getSharedPreferences("Data",MODE_PRIVATE);
 
         setContentView(R.layout.activity_log_in);
         pass=findViewById(R.id.password_edit);
-        emailtxt=findViewById(R.id.email_edit);
+        usernametxt =findViewById(R.id.user_edit);
         inputLayoutPassword = findViewById(R.id.input_layout_password);
         //inputLayoutEmail=findViewById(R.id.input_layout_useremail);
         progressBar = findViewById(R.id.progressBar);
@@ -60,25 +58,8 @@ public class logIn extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
     }
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-      //  alreadySignedIn(currentUser);
-    }
-    public void alreadySignedIn(FirebaseUser currentUser){
-        if(currentUser!=null){
-            Intent main=new Intent(this,MainActivity.class);
-            main.putExtra("loggedIn_user",loggedIn_user);
-            main.putExtra("loggedIn_username",loggedIn_username);
-            main.putExtra("loggedIn_baseId",loggedIn_baseId);
-            main.putExtra("loggedIn_empNo",loggedIn_empNO);
-            startActivity(main);
-        }
-    }
     public void login(View view) {
-        String userEmail=emailtxt.getText().toString();
+        String username= usernametxt.getText().toString();
         String password=pass.getText().toString();
         if (!validateCredentials()) {
             return;
@@ -86,7 +67,7 @@ public class logIn extends AppCompatActivity {
         stat_view.setText("Please Wait....");
         stat_view.setTextColor(Color.CYAN);
             // login user
-            int x= checkLogin(userEmail, password);
+            int x= checkLogin(username, password);
             x=1;
             if(x==3){
                 Toast.makeText(logIn.this, "  No such user exists",
@@ -95,14 +76,11 @@ public class logIn extends AppCompatActivity {
         if(x==1 & !internetIsConnected()){
             housekeeping();
             Intent main=new Intent(logIn.this,MainActivity.class);
-            main.putExtra("loggedIn_user",loggedIn_user);
-            main.putExtra("loggedIn_username",loggedIn_username);
-            main.putExtra("loggedIn_baseId",loggedIn_baseId);
-            main.putExtra("loggedIn_empNo",loggedIn_empNO);
+            loggedUser();
             startActivity(main);
         }
             if(x == 1 & internetIsConnected()){
-                mAuth.signInWithEmailAndPassword(emailtxt.getText().toString().trim(), pass.getText().toString().trim())
+                mAuth.signInWithEmailAndPassword(user.getKEY_EMAIL(), pass.getText().toString().trim())
                         .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -110,11 +88,8 @@ public class logIn extends AppCompatActivity {
                                     // Sign in success, update UI with the signed-in user's information
                                     if(mAuth.getCurrentUser().isEmailVerified()){
                                         housekeeping();
+                                        loggedUser();
                                         Intent main=new Intent(logIn.this,MainActivity.class);
-                                        main.putExtra("loggedIn_user",loggedIn_user);
-                                        main.putExtra("loggedIn_username",loggedIn_username);
-                                        main.putExtra("loggedIn_baseId",loggedIn_baseId);
-                                        main.putExtra("loggedIn_empNo",loggedIn_empNO);
                                         startActivity(main);
                                     }
                                     else{
@@ -141,25 +116,22 @@ public class logIn extends AppCompatActivity {
                         .show();
             }
     }
-    public int checkLogin( String name, String password) {              //0=default value                       //name refers to email
+    public int checkLogin( String name, String password) {              //0=default value
         int x = 0;                                                      //99=credentials empty unlikely scenario
-        UserEntity user=userViewModel.getSingleUser(name,password);            //2=access denied
-        if(user!=null){                                                   //1=login good
-            String n = user.getKEY_EMAIL();                                 //3=no such user exists
+        //2=accessbtn denied
+        user = userViewModel.getSingleUser(name,password);
+        if(user !=null){                                                   //1=login good
+            String n = user.getKEY_NAME();                                 //3=no such user exists
             String p = user.getKEY_PASS();
             String f = user.getKEY_FIRSTNAME();
             String a = user.getKEY_ACCESS();
-            long y=user.getKEY_empNO();
-            String h=user.getKEY_NAME();
+            long y= user.getKEY_empNO();
+            String h= user.getKEY_EMAIL();
             if (n.isEmpty() && p.isEmpty()) {
                 x = 99;
                 return x;
             }
             if (n.equals(name) && p.equals(password)) {
-                //loggedIn_baseId=cursor.getInt(IdPos);
-                loggedIn_username = h;
-                loggedIn_user = f;
-                loggedIn_empNO = y;
                 if(a.equals("ACCESS_DENIED")){
                     x = 2;
                     return x;
@@ -179,14 +151,14 @@ public class logIn extends AppCompatActivity {
         startActivity(intent);
     }
     public void Forgot_password(View view) {
-        String emailAddress = emailtxt.getText().toString().trim();
-        if (TextUtils.isEmpty(emailtxt.getText().toString().trim())) {
-            emailtxt.setError("Required.");
+        if (usernametxt.getText().toString().trim().isEmpty()) {
+            usernametxt.setError("Required.");
             return;
         } else {
-            emailtxt.setError(null);
+            usernametxt.setError(null);
         }
-            mAuth.sendPasswordResetEmail(emailAddress)
+        if(user!=null){
+            mAuth.sendPasswordResetEmail(user.getKEY_EMAIL())
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
@@ -206,19 +178,20 @@ public class logIn extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                 }
             });
+        }
+
 
     }
     public void admin_login(View view) {
-        String userEmail=emailtxt.getText().toString();
+        String username= usernametxt.getText().toString();
         String password=pass.getText().toString();
         if (!validateCredentials()) {
             return;
         }
         stat_view.setText("Please Wait.....");
 
-            // login user
-            int x=checkLogin(userEmail,password);
-            if(loggedIn_user.startsWith("ADMIN_")){
+         int x=checkLogin(username,password);
+            if(user!=null && user.getKEY_NAME().startsWith("ADMIN_")){
                 if(x==3){
                     Toast.makeText(logIn.this, "  No such user exists",
                             Toast.LENGTH_SHORT).show();
@@ -227,14 +200,11 @@ public class logIn extends AppCompatActivity {
                 if(x==1 & !internetIsConnected()){
                     housekeeping();
                     Intent main=new Intent(logIn.this,MainActivity.class);
-                    main.putExtra("loggedIn_user",loggedIn_user);
-                    main.putExtra("loggedIn_username",loggedIn_username);
-                    main.putExtra("loggedIn_baseId",loggedIn_baseId);
-                    main.putExtra("loggedIn_empNo",loggedIn_empNO);
+                    loggedUser();
                     startActivity(main);
                 }
                 if(x == 1 & internetIsConnected()){
-                    mAuth.signInWithEmailAndPassword(emailtxt.getText().toString().trim(), pass.getText().toString().trim())
+                    mAuth.signInWithEmailAndPassword(user.getKEY_EMAIL(), pass.getText().toString().trim())
                             .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
@@ -242,11 +212,8 @@ public class logIn extends AppCompatActivity {
                                         // Sign in success, update UI with the signed-in user's information
                                         if(mAuth.getCurrentUser().isEmailVerified()){
                                             housekeeping();
+                                            loggedUser();
                                             Intent main=new Intent(logIn.this,MainActivity.class);
-                                            main.putExtra("loggedIn_user",loggedIn_user);
-                                            main.putExtra("loggedIn_username",loggedIn_username);
-                                            main.putExtra("loggedIn_baseId",loggedIn_baseId);
-                                            main.putExtra("loggedIn_empNo",loggedIn_empNO);
                                             startActivity(main);
                                         }
                                         else{
@@ -274,15 +241,15 @@ public class logIn extends AppCompatActivity {
 
         }
     public void housekeeping(){
-        emailtxt.getText().clear();
+        usernametxt.getText().clear();
         pass.getText().clear();
     }
     private boolean validateCredentials() {
-        if (internetIsConnected() & TextUtils.isEmpty(emailtxt.getText().toString().trim())) {
-            emailtxt.setError("Required.");
+        if (usernametxt.getText().toString().trim().isEmpty()) {
+            usernametxt.setError("Required.");
             return false;
         } else {
-            emailtxt.setError(null);
+            usernametxt.setError(null);
         }
         if(pass.getText().toString().trim().isEmpty()){
             inputLayoutPassword.setError("invalid password");
@@ -292,10 +259,6 @@ public class logIn extends AppCompatActivity {
         }
         return true;
     }
-    private void requestFocus(View view) {
-        if (view.requestFocus()) {
-            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        } }
     public boolean internetIsConnected() {
         try {
             String command = "ping -c 1 google.com";
@@ -305,6 +268,21 @@ public class logIn extends AppCompatActivity {
             return (Runtime.getRuntime().exec(command).waitFor()==0);
         } catch (Exception e) {
             return false;
+        }
+    }
+    public void loggedUser(){
+        if(user!=null){
+            Date date=new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yy");
+            String timeStamp= sdf.format(date);
+
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("login_time",timeStamp);
+            editor.putInt("current_user",0);
+            editor.putString("current_user",user.getKEY_FIRSTNAME());
+            editor.putString("current_username",user.getKEY_NAME());
+            editor.putString("current_userId", String.valueOf(user.getKEY_USER_ID()));
+            editor.apply();
         }
     }
 }

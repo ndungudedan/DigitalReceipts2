@@ -3,47 +3,22 @@ package com.example.dedan.digitalreceipts;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.viewpager.widget.PagerTabStrip;
-import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.example.dedan.digitalreceipts.Month_Database.December.DecEntity;
-import com.example.dedan.digitalreceipts.Month_Database.December.DecViewModel;
-import com.example.dedan.digitalreceipts.Month_Database.January.JanEntity;
-import com.example.dedan.digitalreceipts.Month_Database.January.JanViewModel;
-
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 public class security extends AppCompatActivity implements User_StatsFragment2.OnFragmentInteractionListener {
-    List<UserEntity> userList;
-    ArrayAdapter<UserEntity> useradapter;
     private Fragment statFrag;
     private Fragment statFrag2;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +28,7 @@ public class security extends AppCompatActivity implements User_StatsFragment2.O
             statFrag = User_StatsFragment.newInstance();
             statFrag2 = User_StatsFragment2.newInstance();
         }
+
         dispstatfrag2();
 
         }
@@ -61,7 +37,7 @@ public class security extends AppCompatActivity implements User_StatsFragment2.O
         if (statFrag.isAdded()) {
             ft.show(statFrag);
         } else {
-            ft.add(R.id.userStatsFrame, statFrag, "A");
+            ft.add(R.id.userStatsFrame, statFrag, "A").addToBackStack("A");
         }
         if (statFrag2.isAdded()) { ft.hide(statFrag2); }
 

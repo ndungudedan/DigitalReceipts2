@@ -19,4 +19,7 @@ public interface UserStatsDao {
     @Query("select * from UserStatistics")
     LiveData<List<UserStatsEntity>> getAllUsersStats();
 
+    @Query("delete from UserStatistics")
+    void deleteAll();
+
 }
