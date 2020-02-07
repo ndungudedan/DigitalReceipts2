@@ -33,7 +33,6 @@ import java.util.Objects;
 public class rcptList extends AppCompatActivity {
     ReceiptViewModel receiptViewModel;
     Toolbar Rtool;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

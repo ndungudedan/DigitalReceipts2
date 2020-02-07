@@ -6,15 +6,20 @@ import android.os.AsyncTask;
 import com.example.dedan.digitalreceipts.Database.AppDatabase;
 import com.example.dedan.digitalreceipts.PickedGoodDao;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import androidx.lifecycle.LiveData;
 
 public class MayRepo {
     private final MayDao mayDao;
     private MayEntity monthsale;
+    private LiveData<List<MayEntity>> allEvents;
 
     public MayRepo(Application application) {
         AppDatabase appDatabase=AppDatabase.getInstance(application);
         mayDao =appDatabase.mayDao();
+        allEvents=mayDao.AllMayEvents();
     }
     public void insert(MayEntity mayEntity){
         new insertAsyncTask(mayDao).execute(mayEntity);
@@ -34,10 +39,13 @@ public class MayRepo {
         }
         return monthsale;
     }
-
+    public LiveData<List<MayEntity>> AllMayEvents(){
+        return allEvents;
+    }
     public void deleteAll(){
         new deleteAllAsync(mayDao).execute();
     }
+
     private static class deleteAllAsync extends AsyncTask<Void,Void,Void>{
         private MayDao dao;
         public deleteAllAsync(MayDao dao) {

@@ -1,61 +1,69 @@
-package com.example.dedan.digitalreceipts;
+package com.example.dedan.digitalreceipts.Database.Today_Database;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.dedan.digitalreceipts.R;
+import com.example.dedan.digitalreceipts.UserStatsAdapter;
+import com.example.dedan.digitalreceipts.UserStatsEntity;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class UserStatsAdapter extends ListAdapter<UserStatsEntity,UserStatsAdapter.userStatsHolder> {
+public class UserStatsMonthAdapter extends ListAdapter<UserStatsMonthEntity, UserStatsMonthAdapter.userStatsHolder> {
     private OnItemClickListener listener;
 
-    protected UserStatsAdapter() {
+    public UserStatsMonthAdapter() {
         super(diff_Callback);
     }
 
     @NonNull
     @Override
     public userStatsHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view=LayoutInflater.from(parent.getContext())
+        View view= LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.user_stats_recycler,parent,false);
         return new userStatsHolder(view);
     }
-
     @Override
     public void onBindViewHolder(@NonNull userStatsHolder holder, int position) {
-
+        UserStatsMonthEntity userStatsMonthEntity=getUserStatAt(position);
+        holder.txtdate.setText(userStatsMonthEntity.getKEY_MONTH());
+        holder.txtsale.setText(String.valueOf(userStatsMonthEntity.getKEY_MONTH_SALES()));
+        holder.txtclient.setText(String.valueOf(userStatsMonthEntity.getKEY_M_CLIENTS_SERVED()));
     }
 
-    public static final DiffUtil.ItemCallback<UserStatsEntity> diff_Callback=new
-            DiffUtil.ItemCallback<UserStatsEntity>() {
+    public static final DiffUtil.ItemCallback<UserStatsMonthEntity> diff_Callback=new
+            DiffUtil.ItemCallback<UserStatsMonthEntity>() {
 
                 @Override
-                public boolean areItemsTheSame(@NonNull UserStatsEntity oldItem, @NonNull UserStatsEntity newItem) {
+                public boolean areItemsTheSame(@NonNull UserStatsMonthEntity oldItem, @NonNull UserStatsMonthEntity newItem) {
                     return false;
                 }
 
                 @Override
-                public boolean areContentsTheSame(@NonNull UserStatsEntity oldItem, @NonNull UserStatsEntity newItem) {
+                public boolean areContentsTheSame(@NonNull UserStatsMonthEntity oldItem, @NonNull UserStatsMonthEntity newItem) {
                     return false;
                 }
             };
 
-    public UserStatsEntity getUserStatAt(int position){
+    public UserStatsMonthEntity getUserStatAt(int position){
         return getItem(position);
     }
 
     class userStatsHolder extends RecyclerView.ViewHolder {
-        private TextView txtfna;
-        private TextView txtsurna;
+        private TextView txtdate;
+        private TextView txtsale;
+        private TextView txtclient;
 
         public userStatsHolder(@NonNull View itemView) {
             super(itemView);
-            txtfna=itemView.findViewById(R.id.fna);
-            txtsurna=itemView.findViewById(R.id.surna);
+            txtdate=itemView.findViewById(R.id.date);
+            txtclient=itemView.findViewById(R.id.client_served);
+            txtsale=itemView.findViewById(R.id.sales);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -69,9 +77,10 @@ public class UserStatsAdapter extends ListAdapter<UserStatsEntity,UserStatsAdapt
         }
     }
     public interface OnItemClickListener{
-        void onItemClick(UserStatsEntity userStatsEntity);
+        void onItemClick(UserStatsMonthEntity userStatsMonthEntity);
     }
     public void setOnItemClickListener(OnItemClickListener listener){
         this.listener=listener;
     }
 }
+

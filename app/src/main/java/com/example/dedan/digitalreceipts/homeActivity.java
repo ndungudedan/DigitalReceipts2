@@ -55,8 +55,7 @@ import com.example.dedan.digitalreceipts.Database.Month_Database.October.OctEnti
 import com.example.dedan.digitalreceipts.Database.Month_Database.October.OctViewModel;
 import com.example.dedan.digitalreceipts.Database.Month_Database.September.SepEntity;
 import com.example.dedan.digitalreceipts.Database.Month_Database.September.SepViewModel;
-import com.example.dedan.digitalreceipts.Database.Today_Database.TodayEntity;
-import com.example.dedan.digitalreceipts.Database.Today_Database.TodayViewModel;
+import com.example.dedan.digitalreceipts.Database.Today_Database.UserStatsMonthViewModel;
 import com.example.dedan.digitalreceipts.Database.Week_Database.Friday.FriEntity;
 import com.example.dedan.digitalreceipts.Database.Week_Database.Friday.FriViewModel;
 import com.example.dedan.digitalreceipts.Database.Week_Database.Monday.MonEntity;
@@ -93,7 +92,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -110,10 +111,11 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
     OctViewModel octViewModel;NovViewModel novViewModel;DecViewModel decViewModel;
     MonViewModel monViewModel;TueViewModel tueViewModel;WedViewModel wedViewModel;ThurViewModel thurViewModel;
     FriViewModel friViewModel;SatViewModel satViewModel;SunViewModel sunViewModel;
-    TodayViewModel todayViewModel;
+    UserStatsMonthViewModel userStatsMonthViewModel;
     List<PickedGoodEntity> pickedGoods;
 
     TextView totalView;
+    TextView nulltxt;
     public static final int GET_CUSTOMER_REQUEST=3;
     private static final int EDIT_CHECK_DIALOG=1;
     private static final int ADD_CHECK_DIALOG=2;
@@ -152,6 +154,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         totalView=findViewById(R.id.totaltxt);
+        nulltxt=findViewById(R.id.empty_pro);
 
         goodsViewModel= ViewModelProviders.of(this).get(GoodsViewModel.class);
         pickedGoodViewModel=ViewModelProviders.of(this).get(PickedGoodViewModel.class);
@@ -169,7 +172,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         wedViewModel=ViewModelProviders.of(this).get(WedViewModel.class);thurViewModel=ViewModelProviders.of(this).get(ThurViewModel.class);
         friViewModel=ViewModelProviders.of(this).get(FriViewModel.class);satViewModel=ViewModelProviders.of(this).get(SatViewModel.class);
         sunViewModel=ViewModelProviders.of(this).get(SunViewModel.class);
-        todayViewModel=ViewModelProviders.of(this).get(TodayViewModel.class);
+        userStatsMonthViewModel =ViewModelProviders.of(this).get(UserStatsMonthViewModel.class);
 
 
 
@@ -190,6 +193,10 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onChanged(List<GoodsEntity> goodsEntities) {
                 adapter.submitList(goodsEntities);
+                if(goodsEntities.isEmpty()){
+                    nulltxt.setVisibility(View.VISIBLE);
+                    nulltxt.setText("Nothing to display");
+                }
             }
         });
 
@@ -332,19 +339,8 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                     inputDialog(total);
                 }
                     else{
-                        pdfCount++;
-                        if(pdfCount==1){
-                            userSalesInsert();
-                            pdf();
-                            ReceiptEntity receiptEntity=new ReceiptEntity(date,file.getAbsolutePath(),user,file.getName());
-                            receiptViewModel.insert(receiptEntity);
-                            Toast.makeText(getApplicationContext(),"SAVED",Toast.LENGTH_SHORT).show();
-                            }
-                            else{
-                            Toast.makeText(getApplicationContext(),"Pdf Already saved\nPlease Refresh",Toast.LENGTH_SHORT).show();
-                        }
+                        operationcomplete();
                 }
-
                 //Toast.makeText(getApplicationContext(),"Empty PDF",Toast.LENGTH_SHORT).show();
 
                 break;
@@ -366,6 +362,21 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
 
         return super.onOptionsItemSelected(item);
     }
+
+    private void operationcomplete() {
+        pdfCount++;
+        if(pdfCount==1){
+            userSalesInsert();
+            pdf();
+            ReceiptEntity receiptEntity=new ReceiptEntity(date,file.getAbsolutePath(),user,file.getName());
+            receiptViewModel.insert(receiptEntity);
+            Toast.makeText(getApplicationContext(),"SAVED",Toast.LENGTH_SHORT).show();
+        }
+        else{
+            Toast.makeText(getApplicationContext(),"Pdf Already saved\nPlease Refresh",Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public void refresh(){
         startActivity(getIntent());
         finish();
@@ -376,33 +387,21 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         f.putExtra("GetCustomer","From_homeActivity");
         startActivityForResult(f,GET_CUSTOMER_REQUEST);
     }
-    public void companyTotals(String time){
+    public void companyTotals(String time,String session){
         MonthSalesEntity mTot=monthSalesViewModel.getSale(time);
         if(mTot!=null){
-            MonthSalesEntity monthSalesEntity=new MonthSalesEntity(time,mTot.getKEY_total()+total);
+            MonthSalesEntity monthSalesEntity=new MonthSalesEntity(time,session,mTot.getKEY_total()+total);
             monthSalesEntity.setKEY_ID(mTot.getKEY_ID());
             monthSalesViewModel.update(monthSalesEntity);
         }else{
-            MonthSalesEntity monthSalesEntity=new MonthSalesEntity(time,total);
+            MonthSalesEntity monthSalesEntity=new MonthSalesEntity(time,session,total);
             monthSalesViewModel.insert(monthSalesEntity);
         }
     }
     public void userSalesInsert(){
-        Date da=new Date();
-        SimpleDateFormat sdf=new SimpleDateFormat("MMM");
-        sdf.format(da);
-        date=da.toString();
+        Calendar calendar=Calendar.getInstance();
+        date= DateFormat.getDateInstance(DateFormat.FULL).format(calendar.getTime());
         String userdb="user";
-
-            TodayEntity today=todayViewModel.getUserTodaySales(LoggeduserId);
-            if(today!=null){
-                TodayEntity todayEntity=new TodayEntity(today.getKEY_SALES()+total,today.getKEY_NO_OF_CLIENTS()+1,LoggeduserId,userdb,date);
-                todayEntity.setKEY_ID(today.getKEY_ID());
-                todayViewModel.update(todayEntity);
-            }else{
-                TodayEntity todayEntity=new TodayEntity(total,1,LoggeduserId,userdb,date);
-                todayViewModel.insert(todayEntity);
-            }
 
         date="Jan";
         if(date.contains("Jan")){
@@ -415,7 +414,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 JanEntity janEntity = new JanEntity(total, 1, LoggeduserId, userdb);
                 janViewModel.insert(janEntity);
             }
-            companyTotals("Jan");
+            companyTotals("Jan","Month");
             date="Feb";
         }
          if(date.contains("Feb")){
@@ -428,7 +427,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
             FebEntity febEntity=new FebEntity(total,1,LoggeduserId,userdb);
             febViewModel.insert(febEntity);
             }
-            companyTotals("Feb");date="Mar";
+            companyTotals("Feb","Month");date="Mar";
             }
          if(date.contains("Mar")){
             MarEntity mar=marViewModel.getUserMonthSales(LoggeduserId);
@@ -440,7 +439,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 MarEntity marEntity=new MarEntity(total,1,LoggeduserId,userdb);
                 marViewModel.insert(marEntity);
             }
-            companyTotals("Mar");date="Apr";
+            companyTotals("Mar","Month");date="Apr";
         }
          if(date.contains("Apr")){//change boolean value
              AprEntity apr=aprViewModel.getUserMonthSales(LoggeduserId);
@@ -451,7 +450,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
              }
              else{AprEntity aprEntity=new AprEntity(total,1,LoggeduserId,userdb);
                  aprViewModel.insert(aprEntity);}
-            companyTotals("Apr");date="May";
+            companyTotals("Apr","Month");date="May";
         }
          if(date.contains("May")){
              MayEntity may=mayViewModel.getUserMonthSales(LoggeduserId);
@@ -462,7 +461,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
              }
              else{MayEntity mayEntity=new MayEntity(total,1,LoggeduserId,userdb);
                  mayViewModel.insert(mayEntity);}
-            companyTotals("May");date="Jun";
+            companyTotals("May","Month");date="Jun";
         }
          if(date.contains("Jun")){
              JunEntity jun=junViewModel.getUserMonthSales(LoggeduserId);
@@ -472,7 +471,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                  junViewModel.update(junEntity);
              }else{JunEntity junEntity=new JunEntity(total,1,LoggeduserId,userdb);
                  junViewModel.insert(junEntity);}
-            companyTotals("Jun");date="Jul";
+            companyTotals("Jun","Month");date="Jul";
         }
          if(date.contains("Jul")){
              JulEntity jul=julViewModel.getUserMonthSales(LoggeduserId);
@@ -482,7 +481,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                  julViewModel.update(julEntity);
              }else{JulEntity julEntity=new JulEntity(total,1,LoggeduserId,userdb);
                  julViewModel.insert(julEntity);}
-            companyTotals("Jul");date="Aug";
+            companyTotals("Jul","Month");date="Aug";
         }
          if(date.contains("Aug")){
              AugEntity aug=augViewModel.getUserMonthSales(LoggeduserId);
@@ -492,7 +491,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                  augViewModel.update(augEntity);
              }else{  AugEntity augEntity=new AugEntity(total,1,LoggeduserId,userdb);
                  augViewModel.insert(augEntity);}
-            companyTotals("Aug");date="Sep";
+            companyTotals("Aug","Month");date="Sep";
         }
          if(date.contains("Sep")){
              SepEntity sep=sepViewModel.getUserMonthSales(LoggeduserId);
@@ -502,7 +501,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                  sepViewModel.update(sepEntity);
              }else{SepEntity sepEntity=new SepEntity(total,1,LoggeduserId,userdb);
                  sepViewModel.insert(sepEntity);}
-            companyTotals("Sep");date="Oct";
+            companyTotals("Sep","Month");date="Oct";
         }
          if(date.contains("Oct")){
              OctEntity oct=octViewModel.getUserMonthSales(LoggeduserId);
@@ -512,7 +511,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                  octViewModel.update(octEntity);
              }else{OctEntity octEntity=new OctEntity(total,1,LoggeduserId,userdb);
                  octViewModel.insert(octEntity);}
-            companyTotals("Oct");date="Nov";
+            companyTotals("Oct","Month");date="Nov";
         }
          if(date.contains("Nov")){
              NovEntity nov=novViewModel.getUserMonthSales(LoggeduserId);
@@ -522,7 +521,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                  novViewModel.update(novEntity);
              }else{NovEntity novEntity=new NovEntity(total,1,LoggeduserId,userdb);
                  novViewModel.insert(novEntity);}
-            companyTotals("Nov");date="Dec";
+            companyTotals("Nov","Month");date="Dec";
         }
          if(date.contains("Dec")){
              DecEntity dec=decViewModel.getUserMonthsales(LoggeduserId);
@@ -534,7 +533,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
             DecEntity decEntity=new DecEntity(total,1,LoggeduserId,userdb);
             decViewModel.insert(decEntity);
              }
-            companyTotals("Dec");}
+            companyTotals("Dec","Month");}
 
         date="Mon";
         if(date.contains("Mon")){
@@ -545,7 +544,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                  monViewModel.update(monEntity);
              }else{MonEntity monEntity=new MonEntity(total,1,LoggeduserId,userdb);
                  monViewModel.insert(monEntity);}
-            companyTotals("Mon");
+            companyTotals("Mon","Week");
             date="Tue";
          }
           if(date.contains("Tue")){
@@ -556,7 +555,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 tueViewModel.update(tueEntity);
             }else{TueEntity tueEntity=new TueEntity(total,1,LoggeduserId,userdb);
                 tueViewModel.insert(tueEntity);}
-            companyTotals("Tue");date="Wed";
+            companyTotals("Tue","Week");date="Wed";
          }
           if(date.contains("Wed")){
              WedEntity wed=wedViewModel.getUserDaySales(LoggeduserId);
@@ -566,7 +565,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 wedViewModel.update(wedEntity);
             }else{WedEntity wedEntity=new WedEntity(total,1,LoggeduserId,userdb);
                 wedViewModel.insert(wedEntity);}
-            companyTotals("Wed");date="Thur";
+            companyTotals("Wed","Week");date="Thur";
          }
           if(date.contains("Thur")){
              ThurEntity thur=thurViewModel.getUserDaySales(LoggeduserId);
@@ -576,7 +575,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                  thurViewModel.update(thurEntity);
              }else{ThurEntity thurEntity=new ThurEntity(total,1,LoggeduserId,userdb);
                  thurViewModel.insert(thurEntity);}
-            companyTotals("Thur");date="Fri";
+            companyTotals("Thur","Week");date="Fri";
          }
           if(date.contains("Fri")){
             FriEntity fri=friViewModel.getUserDaySales(LoggeduserId);
@@ -586,7 +585,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 friViewModel.update(friEntity);
             }else{FriEntity friEntity=new FriEntity(total,1,LoggeduserId,userdb);
                 friViewModel.insert(friEntity);}
-            companyTotals("Fri");date="Sat";
+            companyTotals("Fri","Week");date="Sat";
          }
           if(date.contains("Sat")){
             SatEntity sat=satViewModel.getUserDaySales(LoggeduserId);
@@ -596,7 +595,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 satViewModel.update(satEntity);
             }else{SatEntity satEntity=new SatEntity(total,1,LoggeduserId,userdb);
                 satViewModel.insert(satEntity);}
-            companyTotals("Sat");date="Sun";
+            companyTotals("Sat","Week");date="Sun";
          }
           if(date.contains("Sun")){
              SunEntity sun=sunViewModel.getUserDaySales(LoggeduserId);
@@ -608,7 +607,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                  SunEntity sunEntity=new SunEntity(total,1,LoggeduserId,userdb);
                  sunViewModel.insert(sunEntity);
              }
-            companyTotals("Sun");}
+            companyTotals("Sun","Week");}
 
         }
     public int totalCount(){
@@ -645,7 +644,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
             SimpleDateFormat currentDate = new SimpleDateFormat("ddMMyyyy_HHmmss");
             timeStamp= currentDate.format(date);
 
-             file=new File(dir,name+"_"+timeStamp+".pdf");
+             file=new File(dir,name+".pdf");
             try {
 //creates pdf,saves and writes to it.
                 FileOutputStream fileOutputStream=new FileOutputStream(file);
@@ -810,12 +809,9 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(DialogInterface dialog, int id) {
                  pay=lipa.getText().toString();
-
-                if (lipa.getText().toString().isEmpty()){
-                    lipa.setError("Name is empty");
-                    lipa.requestFocus();
-                    return;
-                }
+                 if(!pay.isEmpty()){
+                     operationcomplete();
+                 }
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

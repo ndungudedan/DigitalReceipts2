@@ -6,21 +6,29 @@ import android.os.AsyncTask;
 import com.example.dedan.digitalreceipts.Database.AppDatabase;
 import com.example.dedan.digitalreceipts.PickedGoodDao;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import androidx.lifecycle.LiveData;
 
 public class JunRepo {
     private JunDao junDao;
     private JunEntity monthsale;
+    private LiveData<List<JunEntity>> allEvents;
 
     public JunRepo(Application application) {
         AppDatabase appDatabase=AppDatabase.getInstance(application);
         junDao=appDatabase.junDao();
+        allEvents=junDao.AllJunEvents();
     }
     public void insert(JunEntity junEntity){
         new insertAsyncTask(junDao).execute(junEntity);
     }
     public void update(JunEntity junEntity){
         new updateAsyncTask(junDao).execute(junEntity);
+    }
+    public LiveData<List<JunEntity>> AllJunEvents(){
+        return allEvents;
     }
     public JunEntity getMonthUserSales(String userid){
         MonthUserSalesAsync task=new MonthUserSalesAsync(junDao);
@@ -34,6 +42,7 @@ public class JunRepo {
         }
         return monthsale;
     }
+
     public void deleteAll(){
         new deleteAllAsync(junDao).execute();
     }

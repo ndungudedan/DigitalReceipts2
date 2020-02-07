@@ -6,14 +6,19 @@ import android.os.AsyncTask;
 import com.example.dedan.digitalreceipts.Database.AppDatabase;
 import com.example.dedan.digitalreceipts.PickedGoodDao;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import androidx.lifecycle.LiveData;
 
 public class DecRepo {
     private DecDao decDao;
     private DecEntity monthsale;
+    private LiveData<List<DecEntity>> allEvents;
     public DecRepo(Application application) {
         AppDatabase appDatabase=AppDatabase.getInstance(application);
         decDao=appDatabase.decDao();
+        allEvents=decDao.AllDecEvents();
     }
     public void insert(DecEntity decEntity){
         new insertasyncTask(decDao).execute(decEntity);
@@ -21,7 +26,6 @@ public class DecRepo {
     public void update(DecEntity decEntity){
         new updateasyncTask(decDao).execute(decEntity);
     }
-
     public DecEntity getMonthUserSales(String userid){
         MonthUserSalesAsync task=new MonthUserSalesAsync(decDao);
         task.Repo=this;
@@ -34,9 +38,13 @@ public class DecRepo {
         }
         return monthsale;
     }
+    public LiveData<List<DecEntity>> AllDecEvents(){
+        return allEvents;
+    }
     public void deleteAll(){
         new deleteAllAsync(decDao).execute();
     }
+
     private static class deleteAllAsync extends AsyncTask<Void,Void,Void>{
         private DecDao dao;
         public deleteAllAsync(DecDao dao) {

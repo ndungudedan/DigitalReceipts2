@@ -6,21 +6,29 @@ import android.os.AsyncTask;
 import com.example.dedan.digitalreceipts.Database.AppDatabase;
 import com.example.dedan.digitalreceipts.PickedGoodDao;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import androidx.lifecycle.LiveData;
 
 public class SepRepo {
     private SepDao sepDao;
     private SepEntity monthsale;
+    private LiveData<List<SepEntity>> allEvents;
 
     public SepRepo(Application application) {
         AppDatabase appDatabase=AppDatabase.getInstance(application);
         sepDao=appDatabase.sepDao();
+        allEvents=sepDao.AllSepEvents();
     }
     public void insert(SepEntity sepEntity){
         new insertAsyncTask(sepDao).execute(sepEntity);
     }
     public void update(SepEntity sepEntity){
         new updateAsyncTask(sepDao).execute(sepEntity);
+    }
+    public LiveData<List<SepEntity>> AllSepEvents(){
+        return allEvents;
     }
     public SepEntity getMonthUserSales(String userid){
         MonthUserSalesAsync task=new MonthUserSalesAsync(sepDao);
@@ -34,6 +42,7 @@ public class SepRepo {
         }
         return monthsale;
     }
+
     public void deleteAll(){
         new deleteAllAsync(sepDao).execute();
     }

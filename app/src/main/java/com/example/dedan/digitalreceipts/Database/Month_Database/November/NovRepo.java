@@ -6,22 +6,29 @@ import android.os.AsyncTask;
 import com.example.dedan.digitalreceipts.Database.AppDatabase;
 import com.example.dedan.digitalreceipts.PickedGoodDao;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class NovRepo {
+import androidx.lifecycle.LiveData;
 
+public class NovRepo {
+    private LiveData<List<NovEntity>> allEvents;
     private NovDao novDao;
     private NovEntity monthsale;
 
     public NovRepo(Application application) {
         AppDatabase appDatabase=AppDatabase.getInstance(application);
         novDao =appDatabase.novDao();
+        allEvents=novDao.AllNovEvents();
     }
     public void insert(NovEntity novEntity){
         new insertAsyncTask(novDao).execute(novEntity);
     }
     public void update(NovEntity novEntity){
         new updateAsyncTask(novDao).execute(novEntity);
+    }
+    public LiveData<List<NovEntity>> AllNovEvents(){
+        return allEvents;
     }
     public NovEntity getMonthUserSales(String userid){
         MonthUserSalesAsync task=new MonthUserSalesAsync(novDao);
@@ -35,6 +42,7 @@ public class NovRepo {
         }
         return monthsale;
     }
+
     public void deleteAll(){
         new deleteAllAsync(novDao).execute();
     }

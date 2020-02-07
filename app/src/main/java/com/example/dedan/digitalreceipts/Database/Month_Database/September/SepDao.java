@@ -2,6 +2,9 @@ package com.example.dedan.digitalreceipts.Database.Month_Database.September;
 
 import com.example.dedan.digitalreceipts.Database.Month_Database.BaseDao;
 
+import java.util.List;
+
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Query;
 
@@ -12,4 +15,7 @@ public interface SepDao extends BaseDao<SepEntity> {
 
     @Query("delete from September")
     void deleteAll();
+
+    @Query("select * from September")
+    LiveData<List<SepEntity>> AllSepEvents();
 }

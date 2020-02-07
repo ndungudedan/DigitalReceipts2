@@ -40,6 +40,7 @@ public class unit extends AppCompatActivity  {
     private String item;
     private int cost;
     private String pack;
+    TextView nulltxt;
 
     Toolbar unittool;
 
@@ -51,6 +52,7 @@ public class unit extends AppCompatActivity  {
         setSupportActionBar(unittool);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
+        nulltxt=findViewById(R.id.empty_unit);
         FloatingActionButton floatingActionButton=findViewById(R.id.floating_unit_btn);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,6 +74,10 @@ public class unit extends AppCompatActivity  {
             @Override
             public void onChanged(@Nullable List<GoodsEntity> goodsEntities) {
                 adapter.submitList(goodsEntities);
+                if(goodsEntities==null){
+                    nulltxt.setVisibility(View.VISIBLE);
+                    nulltxt.setText("Nothing to display");
+                }
             }
         });
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,

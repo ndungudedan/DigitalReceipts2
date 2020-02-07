@@ -11,10 +11,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout2"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_height="303dp"
         android:layout_marginTop="75dp"
-        android:layout_marginBottom="206dp"
-        app:layout_constraintBottom_toTopOf="@+id/reg_btn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -22,9 +20,8 @@
             android:id="@+id/first_name_inputlayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toStartOf="@+id/sec_name_inputLayout"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintStart_toStartOf="@id/guideline"
+            app:layout_constraintTop_toTopOf="@+id/sec_name_inputLayout">
 
             <EditText
                 android:id="@+id/first_name"
@@ -39,10 +36,8 @@
             android:id="@+id/residence_inputLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
-            app:layout_constraintEnd_toStartOf="@+id/tel_no_inputLayout"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/id_no_inputLayout">
+            app:layout_constraintStart_toStartOf="@id/guideline"
+            app:layout_constraintTop_toTopOf="@+id/tel_no_inputLayout">
 
             <EditText
                 android:id="@+id/residence"
@@ -57,8 +52,8 @@
             android:id="@+id/sec_name_inputLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintStart_toStartOf="@id/barrier"
+            app:layout_constraintTop_toTopOf="@+id/first_name_inputlayout">
 
             <EditText
                 android:id="@+id/sec_name"
@@ -73,9 +68,8 @@
             android:id="@+id/id_no_inputLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toStartOf="@+id/dob_inputLayout"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/first_name_inputlayout">
+            app:layout_constraintStart_toStartOf="@id/guideline"
+            app:layout_constraintTop_toTopOf="@+id/dob_inputLayout">
 
             <EditText
                 android:id="@+id/id_no"
@@ -92,8 +86,7 @@
             android:layout_height="wrap_content"
             android:clickable="true"
             android:focusable="false"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/residence_inputLayout"
+            app:layout_constraintStart_toStartOf="@id/barrier"
             app:layout_constraintTop_toBottomOf="@+id/sec_name_inputLayout">
 
             <EditText
@@ -111,7 +104,7 @@
             android:id="@+id/tel_no_inputLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/barrier"
             app:layout_constraintTop_toBottomOf="@+id/dob_inputLayout">
 
             <EditText
@@ -128,7 +121,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/email_reg_inputLayout"
+            app:layout_constraintStart_toStartOf="@id/guideline"
             app:layout_constraintTop_toBottomOf="@+id/textView2">
 
             <EditText
@@ -148,7 +142,7 @@
             app:counterMaxLength="10"
             app:hintAnimationEnabled="true"
             app:hintEnabled="true"
-            app:layout_constraintStart_toEndOf="@+id/user_reg_inputLayout"
+            app:layout_constraintStart_toStartOf="@id/barrier"
             app:layout_constraintTop_toTopOf="@+id/user_reg_inputLayout"
             app:passwordToggleEnabled="true"
             app:passwordToggleTint="@android:color/holo_blue_dark">
@@ -167,7 +161,8 @@
             android:id="@+id/email_reg_inputLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@id/guideline"
             app:layout_constraintTop_toBottomOf="@+id/user_reg_inputLayout">
 
             <EditText
@@ -188,18 +183,36 @@
             android:paddingTop="5dp"
             android:text="credentials"
             android:textColor="@color/colorPrimary"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/guideline"
             app:layout_constraintTop_toBottomOf="@+id/residence_inputLayout" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="229dp"
+            android:layout_marginEnd="182dp"
+            app:barrierDirection="right"
+            app:constraint_referenced_ids="user_reg_inputLayout,id_no_inputLayout,first_name_inputlayout,email_reg_inputLayout,residence_inputLayout,textView2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.49"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="16dp" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button
         android:id="@+id/reg_btn"
-        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="51dp"
         android:onClick="register"
         android:text="register"
         app:layout_constraintBottom_toTopOf="@+id/login_link_btn"
@@ -209,7 +222,6 @@
 
     <Button
         android:id="@+id/login_link_btn"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="login_link"
@@ -218,5 +230,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/reg_btn" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Please input detais:"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

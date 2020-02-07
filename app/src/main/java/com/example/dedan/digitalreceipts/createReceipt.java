@@ -12,9 +12,12 @@ import android.provider.MediaStore;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.io.File;
@@ -22,7 +25,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class createReceipt extends AppCompatActivity {
+public class createReceipt extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     EditText title,locat,box;
     EditText mail;
@@ -33,6 +36,9 @@ public class createReceipt extends AppCompatActivity {
     Uri uri;
     File file;
     Bitmap bitmap;
+    Spinner spin;
+    String[] spinList ;
+    ArrayAdapter<String> spinAdapt;
 
     SharedPreferences sharedpreferences;
 
@@ -40,6 +46,16 @@ public class createReceipt extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_receipt);
+
+        sharedpreferences=getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        spin= findViewById(R.id.month_spinner);
+        spinList= new String[]{"January","February","March","April","May","June","July","August",
+                "September","October","November","December"};
+        spinAdapt=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,spinList);
+        spinAdapt.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spin.setAdapter(spinAdapt);
+        spin.setSelection(sharedpreferences.getInt("startMonthPos",0));
+        spin.setOnItemSelectedListener(this);
 
         title= findViewById(R.id.title);
         mail= findViewById(R.id.email);
@@ -161,10 +177,23 @@ public class createReceipt extends AppCompatActivity {
         }
     }
 
-
     public void dropLIST(View view) {
         Intent dropOpen=new Intent(this,security.class);
         startActivity(dropOpen);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        sharedpreferences=getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.putString("startMonth",view.toString());
+        editor.putInt("startMonthPos",position);
+        editor.apply();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }
 

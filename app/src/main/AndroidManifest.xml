@@ -16,7 +16,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light">
-        <activity android:name=".CompanyStats"></activity>
+        <activity android:name=".Company"></activity>
         <activity
             android:name=".CustomerAddEdit"
             android:parentActivityName=".MainActivity"

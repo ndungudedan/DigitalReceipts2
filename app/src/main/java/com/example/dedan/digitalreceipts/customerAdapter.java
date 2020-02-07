@@ -27,13 +27,13 @@ private OnItemClickListener listener;
                 @Override
                 public boolean areContentsTheSame(@NonNull CustomerEntity oldItem, @NonNull CustomerEntity newItem) {
                     return oldItem.getKEY_id()==newItem.getKEY_id()&&
-                            oldItem.getKEY_address()==newItem.getKEY_address()&&
+                            oldItem.getKEY_address().equals(newItem.getKEY_address()) &&
                             oldItem.getKEY_email().equals(newItem.getKEY_email())&&
                             oldItem.getKEY_first_name().equals(newItem.getKEY_first_name())&&
                             oldItem.getKEY_sec_name().equals(newItem.getKEY_sec_name())&&
                             oldItem.getKEY_location().equals(newItem.getKEY_location())&&
-                            oldItem.getKEY_phone()==newItem.getKEY_phone()&&
-                            oldItem.getKEY_po_box()==newItem.getKEY_po_box();
+                            oldItem.getKEY_phone().equals(newItem.getKEY_phone()) &&
+                            oldItem.getKEY_po_box().equals(newItem.getKEY_po_box());
                 }
             };
 

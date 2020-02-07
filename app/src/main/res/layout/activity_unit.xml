@@ -15,6 +15,13 @@
         android:background="@color/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         app:titleTextColor="@android:color/white"/>
+    <TextView
+        android:id="@+id/empty_unit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"

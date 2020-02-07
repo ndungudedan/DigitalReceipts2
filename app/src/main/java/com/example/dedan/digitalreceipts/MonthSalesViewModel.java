@@ -33,6 +33,13 @@ public class MonthSalesViewModel extends AndroidViewModel {
     public MonthSalesEntity getSale(String time){
             return monthSalesRepo.getTotalSale(time);
     }
+    public LiveData<List<MonthSalesEntity>> getWeekSale(String ssn){
+        return monthSalesRepo.getWeekSale(ssn);
+    }
+    public LiveData<List<MonthSalesEntity>> getMonthSale(String ssn){
+        return monthSalesRepo.getMonthSale(ssn);
+    }
+
     public void deleteAll(){
         monthSalesRepo.deleteAll();
     }

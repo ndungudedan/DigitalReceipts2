@@ -26,19 +26,34 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ref"
-            android:layout_marginTop="10dp"
             android:layout_toEndOf="@id/imageView3"
-            android:layout_below="@id/txt_rcpt_date"
+            android:layout_alignTop="@id/imageView3"
             />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/txt_rcpt_date"
-            android:layout_alignParentEnd="true"
             android:text="Date"
-
+            android:layout_alignParentEnd="true"
+            android:layout_alignBottom="@id/imageView3"
             />
+
+        <TextView
+            android:id="@+id/txt_user"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Served by:"
+            android:layout_below="@id/txt_rcpt_ref"
+            android:layout_toEndOf="@id/imageView3"/>
+        <TextView
+            android:id="@+id/txt_rcpt_user"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txt_rcpt_ref"
+            android:layout_toEndOf="@id/txt_user"
+            />
+
 
     </RelativeLayout>
 

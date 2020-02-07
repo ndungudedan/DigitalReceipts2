@@ -2,8 +2,11 @@ package com.example.dedan.digitalreceipts.Database.Month_Database.November;
 
 import android.app.Application;
 
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 
 public class NovViewModel extends AndroidViewModel {
     private NovRepo novRepo;
@@ -19,6 +22,9 @@ public class NovViewModel extends AndroidViewModel {
     }
     public NovEntity getUserMonthSales(String userId){
         return novRepo.getMonthUserSales(userId);
+    }
+    public LiveData<List<NovEntity>> AllNovEvents() {
+        return novRepo.AllNovEvents();
     }
     public void deleteAll(){
         novRepo.deleteAll();

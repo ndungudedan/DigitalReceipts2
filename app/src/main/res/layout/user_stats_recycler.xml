@@ -1,51 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-    <androidx.cardview.widget.CardView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/MonthsCard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        >
+<androidx.cardview.widget.CardView
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+    android:id="@+id/currentWeekCard"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/yearSummaryCard"
+    android:layout_margin="20dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Week"
+            android:layout_centerHorizontal="true"
+            />
+        <TextView
+            android:id="@+id/cur_Wsa"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sales:"
+            android:layout_below="@id/date"
+            />
+        <TextView
+            android:id="@+id/sales"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/date"
+            android:layout_toEndOf="@id/cur_Wsa"/>
+        <TextView
+            android:id="@+id/curr_Wcli"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Clients:"
+            android:layout_below="@id/cur_Wsa"/>
+        <TextView
+            android:id="@+id/client_served"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/cur_Wsa"
+            android:layout_toEndOf="@id/curr_Wcli"/>
 
-            <TextView
-                android:id="@+id/date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:text="Date" />
-
-            <TextView
-                android:id="@+id/Msa"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/date"
-                android:text="Sales:" />
-
-            <TextView
-                android:id="@+id/Msales"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/date"
-                android:layout_toEndOf="@id/Msa" />
-
-            <TextView
-                android:id="@+id/Mcli"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/Msa"
-                android:text="Clients served:" />
-
-            <TextView
-                android:id="@+id/Mclient_served"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/Msa"
-                android:layout_toEndOf="@id/Mcli" />
-
-        </RelativeLayout>
+    </RelativeLayout>
     </androidx.cardview.widget.CardView>

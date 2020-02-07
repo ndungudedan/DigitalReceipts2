@@ -33,10 +33,14 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:layout_alignParentStart="true">
-
+        <TextView
+            android:id="@+id/empty_pro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"/>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/homeGoodsrecycler"
-            android:layout_width="211dp"
+            android:layout_width="150dp"
             android:layout_height="match_parent"
             tools:listitem="@layout/unit_recycler" />
     </FrameLayout>
@@ -47,32 +51,45 @@
         >
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:padding="8dp">
         <TableRow
             android:id="@+id/tablerow"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignStart="@id/pickedGoodsRecycler"
+            android:layout_marginStart="20dp"
             >
             <TextView
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:text="Quantity"
+                android:text="qty"
+                android:paddingEnd="5dp"
                 />
             <TextView
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:text="pack"
+                android:paddingEnd="5dp"
+
+                />
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="Item"
+                android:paddingEnd="5dp"
                 />
             <TextView
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:text="Each"
+                android:paddingEnd="5dp"
+
                 />
             <TextView
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:text="cost"
+                android:text="Amount"
+                android:paddingEnd="5dp"
                 />
 
         </TableRow>
@@ -80,9 +97,10 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:layout_below="@id/tablerow"
                 android:id="@+id/pickedGoodsRecycler"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                tools:listitem="@layout/picked_good_recycler" />
+                tools:listitem="@layout/picked_good_recycler"
+                />
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/pickedfloatingBtn"

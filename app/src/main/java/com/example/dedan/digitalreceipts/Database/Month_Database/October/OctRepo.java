@@ -6,15 +6,20 @@ import android.os.AsyncTask;
 import com.example.dedan.digitalreceipts.Database.AppDatabase;
 import com.example.dedan.digitalreceipts.PickedGoodDao;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import androidx.lifecycle.LiveData;
 
 public class OctRepo {
     private OctDao octDao;
     private OctEntity monthsale;
+    private LiveData<List<OctEntity>> allEvents;
 
     public OctRepo(Application application) {
         AppDatabase appDatabase=AppDatabase.getInstance(application);
         octDao=appDatabase.octDao();
+        allEvents=octDao.AllOctEvents();
     }
     public void insert(OctEntity octEntity){
         new insertAsyncTask(octDao).execute(octEntity);
@@ -34,9 +39,13 @@ public class OctRepo {
         }
         return monthsale;
     }
+    public LiveData<List<OctEntity>> AllOctEvents(){
+        return allEvents;
+    }
     public void deleteAll(){
         new deleteAllAsync(octDao).execute();
     }
+
     private static class deleteAllAsync extends AsyncTask<Void,Void,Void>{
         private OctDao dao;
         public deleteAllAsync(OctDao dao) {

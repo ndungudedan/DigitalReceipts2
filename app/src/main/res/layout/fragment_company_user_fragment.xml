@@ -3,12 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".User_StatsFragment">
-
-
+    tools:context=".company_user_fragment">
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/userStatsRecycler"
+        android:id="@+id/userRecycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@layout/user_stats_recycler" />
+        tools:listitem="@layout/user_recycler"/>
+
 </FrameLayout>

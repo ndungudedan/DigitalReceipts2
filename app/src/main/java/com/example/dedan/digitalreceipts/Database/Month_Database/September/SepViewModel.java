@@ -2,8 +2,11 @@ package com.example.dedan.digitalreceipts.Database.Month_Database.September;
 
 import android.app.Application;
 
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 
 public class SepViewModel extends AndroidViewModel {
     private SepRepo sepRepo;
@@ -20,7 +23,10 @@ public class SepViewModel extends AndroidViewModel {
     public SepEntity getUserMonthSales(String userId){
         return sepRepo.getMonthUserSales(userId);
     }
-    public void deleteAll(){
+    public LiveData<List<SepEntity>> AllSepEvents() {
+        return sepRepo.AllSepEvents();
+    }
+        public void deleteAll(){
         sepRepo.deleteAll();
     }
 }

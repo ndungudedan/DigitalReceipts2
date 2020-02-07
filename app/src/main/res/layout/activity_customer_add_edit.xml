@@ -46,6 +46,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/phoneInputLayout"
         android:layout_below="@+id/snameInputLayout">
+
         <EditText
             android:id="@+id/phonetxt"
             android:layout_width="wrap_content"
@@ -53,7 +54,7 @@
             android:layout_alignParentStart="true"
             android:ems="10"
             android:hint="phoneNo"
-            android:inputType="number" />
+            android:inputType="number|text" />
     </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="wrap_content"
@@ -85,7 +86,7 @@
             android:layout_alignParentStart="true"
             android:ems="10"
             android:hint="po_box"
-            android:inputType="number" />
+            android:inputType="number|text" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -94,6 +95,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/addressInputLayout"
         android:layout_below="@+id/poboxInputLayout">
+
         <EditText
             android:id="@+id/addresstxt"
             android:layout_width="wrap_content"
@@ -101,7 +103,7 @@
             android:layout_alignParentStart="true"
             android:ems="10"
             android:hint="address"
-            android:inputType="number" />
+            android:inputType="number|text" />
     </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="wrap_content"
@@ -121,13 +123,13 @@
 
     <Button
         android:id="@+id/button"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/locationInputLayout"
-        android:text="SAVE"
-        android:layout_marginTop="20dp"
         android:layout_centerHorizontal="true"
-        />
+        android:layout_marginTop="20dp"
+        android:text="SAVE" />
 
 </RelativeLayout>
 

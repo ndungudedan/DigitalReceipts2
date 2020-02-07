@@ -5,8 +5,8 @@ import android.os.AsyncTask;
 
 import com.example.dedan.digitalreceipts.CustomerDao;
 import com.example.dedan.digitalreceipts.CustomerEntity;
-import com.example.dedan.digitalreceipts.Database.Today_Database.TodayDao;
-import com.example.dedan.digitalreceipts.Database.Today_Database.TodayEntity;
+import com.example.dedan.digitalreceipts.Database.Today_Database.UserStatsMonthDao;
+import com.example.dedan.digitalreceipts.Database.Today_Database.UserStatsMonthEntity;
 import com.example.dedan.digitalreceipts.GoodsDao;
 import com.example.dedan.digitalreceipts.GoodsEntity;
 import com.example.dedan.digitalreceipts.MonthSalesDao;
@@ -69,7 +69,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 @Database(entities = {UserEntity.class, GoodsEntity.class, PickedGoodEntity.class, MonthSalesEntity.class, WeekSalesEntity.class, ReceiptEntity.class,
         CustomerEntity.class, UserStatsEntity.class, JanEntity.class, FebEntity.class, MarEntity.class, AprEntity.class, MayEntity.class, JunEntity.class,
         JulEntity.class, AugEntity.class, SepEntity.class, OctEntity.class, NovEntity.class, DecEntity.class, MonEntity.class,
-        TueEntity.class, WedEntity.class, ThurEntity.class, FriEntity.class, SatEntity.class, SunEntity.class, TodayEntity.class},version = 5)
+        TueEntity.class, WedEntity.class, ThurEntity.class, FriEntity.class, SatEntity.class, SunEntity.class, UserStatsMonthEntity.class},version = 8)
 public abstract class AppDatabase extends RoomDatabase {
     private static AppDatabase dbInstance;
     public abstract UserDao userDao();
@@ -86,7 +86,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract OctDao octDao();public abstract NovDao novDao();public abstract DecDao decDao();
     public abstract MonDao monDao();public abstract TueDao tueDao();public abstract WedDao wedDao();
     public abstract ThurDao thurDao();public abstract FriDao friDao();public abstract SatDao satDao();public abstract SunDao sunDao();
-    public abstract TodayDao todayDao();
+    public abstract UserStatsMonthDao todayDao();
     public static synchronized AppDatabase getInstance(Context context) {
         if (dbInstance == null) {
             dbInstance = Room.databaseBuilder(context.getApplicationContext(),
@@ -100,8 +100,8 @@ public abstract class AppDatabase extends RoomDatabase {
     private static RoomDatabase.Callback roomCallback=new RoomDatabase.Callback(){
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
-            super.onCreate(db);
             new insertasync(dbInstance).execute();
+            super.onCreate(db);
         }
     };
     private static class insertasync extends AsyncTask<Void,Void,Void> {
@@ -113,8 +113,8 @@ public abstract class AppDatabase extends RoomDatabase {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            customerDao.insert(new CustomerEntity("NAME","SURNAME",07,
-                    "N/A",0,0,"N/A"));
+            customerDao.insert(new CustomerEntity("NAME","SURNAME","N/A",
+                    "N/A","N/A","N/A","N/A"));
             return null;
         }
     }

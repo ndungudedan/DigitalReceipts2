@@ -16,33 +16,45 @@
             android:layout_height="wrap_content"
             >
             <TextView
+                android:paddingEnd="5dp"
                 android:id="@+id/quant"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="qty" />
 
             <TextView
                 android:id="@+id/packing"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text="pack"
                 android:layout_toEndOf="@+id/quant"
+                android:paddingEnd="5dp"
                 />
 
             <TextView
                 android:id="@+id/good"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView"
+                android:text="item"
                 android:layout_toEndOf="@+id/packing"
+                android:paddingEnd="5dp"
+                />
+            <TextView
+                android:id="@+id/per"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Each"
+                android:layout_toEndOf="@+id/good"
+                android:paddingEnd="5dp"
                 />
 
             <TextView
                 android:id="@+id/price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TextView"
-                android:layout_toEndOf="@+id/good"
+                android:text="amount"
+                android:layout_toEndOf="@+id/per"
+                android:paddingEnd="5dp"
                 />
         </TableRow>
 

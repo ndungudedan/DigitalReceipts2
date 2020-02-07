@@ -1,45 +1,109 @@
 package com.example.dedan.digitalreceipts;
 
 import android.Manifest;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
-import android.util.Log;
+import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.dedan.digitalreceipts.Database.Today_Database.TodayEntity;
-import com.example.dedan.digitalreceipts.Database.Today_Database.TodayViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.April.AprEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.April.AprViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.August.AugEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.August.AugViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.December.DecEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.December.DecViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.February.FebEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.February.FebViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.January.JanEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.January.JanViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.July.JulEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.July.JulViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.June.JunEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.June.JunViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.March.MarEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.March.MarViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.May.MayEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.May.MayViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.November.NovEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.November.NovViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.October.OctEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.October.OctViewModel;
+import com.example.dedan.digitalreceipts.Database.Month_Database.September.SepEntity;
+import com.example.dedan.digitalreceipts.Database.Month_Database.September.SepViewModel;
+import com.example.dedan.digitalreceipts.Database.Today_Database.UserStatsMonthEntity;
+import com.example.dedan.digitalreceipts.Database.Today_Database.UserStatsMonthViewModel;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Friday.FriViewModel;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Monday.MonViewModel;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Saturday.SatViewModel;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Sunday.SunViewModel;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Thursday.ThurViewModel;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Tuesday.TueViewModel;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Wednesday.WedViewModel;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.draw.DottedLineSeparator;
+import com.itextpdf.text.pdf.draw.LineSeparator;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     Toolbar maintool;
     SharedPreferences sharedPreferences;
-
+    UserViewModel userViewModel;
+    JanViewModel janViewModel;FebViewModel febViewModel;MarViewModel marViewModel;
+    AprViewModel aprViewModel;MayViewModel mayViewModel;JunViewModel junViewModel;
+    JulViewModel julViewModel;AugViewModel augViewModel;SepViewModel sepViewModel;
+    OctViewModel octViewModel;NovViewModel novViewModel;DecViewModel decViewModel;
+    MonViewModel monViewModel;TueViewModel tueViewModel;WedViewModel wedViewModel;ThurViewModel thurViewModel;
+    FriViewModel friViewModel;SatViewModel satViewModel;SunViewModel sunViewModel;
     ReceiptViewModel receiptViewModel;
     MonthSalesViewModel monthSalesViewModel;
     WeekSalesViewModel weekSalesViewModel;
-    TodayViewModel todayViewModel;
+    UserStatsMonthViewModel userStatsMonthViewModel;
+    private Document doc;
+    private FileOutputStream fileOutputStream;
+    private PdfPTable table;
+    private String username="";
+    private File file;
+    private Date date;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,25 +117,26 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences=getSharedPreferences("Data",MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
+        userViewModel=ViewModelProviders.of(this).get(UserViewModel.class);
+        janViewModel=ViewModelProviders.of(this).get(JanViewModel.class);febViewModel=ViewModelProviders.of(this).get(FebViewModel.class);
+        marViewModel=ViewModelProviders.of(this).get(MarViewModel.class);aprViewModel=ViewModelProviders.of(this).get(AprViewModel.class);
+        mayViewModel=ViewModelProviders.of(this).get(MayViewModel.class);junViewModel=ViewModelProviders.of(this).get(JunViewModel.class);
+        julViewModel=ViewModelProviders.of(this).get(JulViewModel.class);augViewModel=ViewModelProviders.of(this).get(AugViewModel.class);
+        sepViewModel=ViewModelProviders.of(this).get(SepViewModel.class);octViewModel=ViewModelProviders.of(this).get(OctViewModel.class);
+        novViewModel=ViewModelProviders.of(this).get(NovViewModel.class);decViewModel=ViewModelProviders.of(this).get(DecViewModel.class);
+        monViewModel=ViewModelProviders.of(this).get(MonViewModel.class);tueViewModel=ViewModelProviders.of(this).get(TueViewModel.class);
+        wedViewModel=ViewModelProviders.of(this).get(WedViewModel.class);thurViewModel=ViewModelProviders.of(this).get(ThurViewModel.class);
+        friViewModel=ViewModelProviders.of(this).get(FriViewModel.class);satViewModel=ViewModelProviders.of(this).get(SatViewModel.class);
+        sunViewModel=ViewModelProviders.of(this).get(SunViewModel.class);
+
         receiptViewModel = ViewModelProviders.of(this).get(ReceiptViewModel.class);
         weekSalesViewModel=ViewModelProviders.of(this).get(WeekSalesViewModel.class);
         monthSalesViewModel=ViewModelProviders.of(this).get(MonthSalesViewModel.class);
-        todayViewModel=ViewModelProviders.of(this).get(TodayViewModel.class);
-
-        TodayEntity todayEntity=todayViewModel.getUserTodaySales(sharedPreferences.getString("current_userId","0"));
-        if(todayEntity!=null){
-            Date date=new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yy");
-            String timeStamp= sdf.format(date);
-            if(!timeStamp.contains(todayEntity.getKEY_DAY())){
-                todayViewModel.deleteAll();
-            }
-        }
+        userStatsMonthViewModel =ViewModelProviders.of(this).get(UserStatsMonthViewModel.class);
 
         if(!sharedPreferences.getBoolean("firstTime", false)) {
             editor.putBoolean("firstTime", true);
             editor.apply();
-
         }
 
         permissions();
@@ -90,13 +155,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        logout();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.logout:
                 confirmdialog();
                 break;
             case R.id.secmenu:
-                Intent sec=new Intent(this,CompanyStats.class);
+                Intent sec=new Intent(this,Company.class);
                 startActivity(sec);
                 break;
         }
@@ -156,6 +227,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void logout() {
+        reportPdf();
         finish();
         Intent logout=new Intent(this,logIn.class);
         startActivity(logout);
@@ -183,11 +255,9 @@ public class MainActivity extends AppCompatActivity {
                 if((grantResults.length>0&&grantResults[0]==PackageManager.PERMISSION_GRANTED)){
                    // Toast.makeText(getApplicationContext(),"welcome",Toast.LENGTH_SHORT).show();
 
-
                 }
                 else{
                    // Toast.makeText(getApplicationContext(),"Please allow permissions",Toast.LENGTH_SHORT).show();
-
                 }
                 break;
         }
@@ -199,5 +269,206 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
+    public String getUser(final String x){
+        userViewModel.getAllUsers().observe(this, new Observer<List<UserEntity>>() {
+            @Override
+            public void onChanged(List<UserEntity> userEntities) {
+                for(UserEntity user:userEntities){
+                    if(x.equals(String.valueOf(user.getKEY_USER_ID()))){
+                        username =user.getKEY_FIRSTNAME()+""+user.getKEY_SECNAME();
+                    }
+                }
+            }
+        });
+        return username;
+    }
+    public void report(){
+        janViewModel.getAllJanEvents().observe(this, new Observer<List<JanEntity>>() {
+            @Override
+            public void onChanged(List<JanEntity> janEntities) {
+                for(JanEntity jan:janEntities){
+                    table.addCell(getUser(jan.getKEY_FOREIGN_KEY()));
+                    table.addCell(String.valueOf(jan.getKEY_SALES()));
+                    table.addCell(String.valueOf(jan.getKEY_NO_OF_CLIENTS()));
+                    table.addCell("January");
+                }
+            }
+        });
+        febViewModel.AllFebEvents().observe(this, new Observer<List<FebEntity>>() {
+            @Override
+            public void onChanged(List<FebEntity> febEntities) {
+                for (FebEntity feb:febEntities){
+                    table.addCell(getUser(feb.getKEY_FOREIGN_KEY()));
+                    table.addCell(String.valueOf(feb.getKEY_SALES()));
+                    table.addCell(String.valueOf(feb.getKEY_NO_OF_CLIENTS()));
+                    table.addCell("February");
+                }
+            }
+        });
+        marViewModel.allMarEvents().observe(this, new Observer<List<MarEntity>>() {
+            @Override
+            public void onChanged(List<MarEntity> marEntities) {
 
+            }
+        });
+        aprViewModel.AllAprEvents().observe(this, new Observer<List<AprEntity>>() {
+            @Override
+            public void onChanged(List<AprEntity> aprEntities) {
+
+            }
+        });
+        mayViewModel.AllMayEvents().observe(this, new Observer<List<MayEntity>>() {
+            @Override
+            public void onChanged(List<MayEntity> mayEntities) {
+
+            }
+        });
+        junViewModel.AllJunEvents().observe(this, new Observer<List<JunEntity>>() {
+            @Override
+            public void onChanged(List<JunEntity> junEntities) {
+
+            }
+        });
+        julViewModel.AllJulEvents().observe(this, new Observer<List<JulEntity>>() {
+            @Override
+            public void onChanged(List<JulEntity> julEntities) {
+
+            }
+        });
+        augViewModel.AllAugEvents().observe(this, new Observer<List<AugEntity>>() {
+            @Override
+            public void onChanged(List<AugEntity> augEntities) {
+
+            }
+        });
+        sepViewModel.AllSepEvents().observe(this, new Observer<List<SepEntity>>() {
+            @Override
+            public void onChanged(List<SepEntity> sepEntities) {
+
+            }
+        });
+        octViewModel.AllOctEvents().observe(this, new Observer<List<OctEntity>>() {
+            @Override
+            public void onChanged(List<OctEntity> octEntities) {
+
+            }
+        });
+        novViewModel.AllNovEvents().observe(this, new Observer<List<NovEntity>>() {
+            @Override
+            public void onChanged(List<NovEntity> novEntities) {
+
+            }
+        });
+        decViewModel.AllDecEvents().observe(this, new Observer<List<DecEntity>>() {
+            @Override
+            public void onChanged(List<DecEntity> decEntities) {
+
+            }
+        });
+        try {
+            doc.add(table);
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+        doc.close();
+        try {
+            fileOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void reportPdf(){
+        String state= Environment.getExternalStorageState();
+        if(Environment.MEDIA_MOUNTED.equals(state)){
+            File route=Environment.getExternalStorageDirectory();
+            File dir=new File(route.getAbsolutePath()+"/DIGITALRECEIPTS","Reports");
+
+            if(!dir.exists()){
+                dir.mkdirs();
+            }
+            date = new Date();
+            SimpleDateFormat currentDate = new SimpleDateFormat("ddMMyyyy_HHmmss");
+            String timeStamp= currentDate.format(date);
+
+            file = new File(dir,"Annual Report"+".pdf");
+            try {
+//creates pdf,saves and writes to it.
+                fileOutputStream = new FileOutputStream(file);
+                doc = new Document();
+                PdfWriter.getInstance(doc, fileOutputStream);
+                doc.open();
+                sharedPreferences=getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+
+                File d = new File(route.getAbsolutePath() + "/DIGITALRECEIPTS","Logo");
+                File g=new File(d,"/Logo.jpg");
+
+                PdfPTable company=new PdfPTable(2);
+                company.setWidthPercentage(60);
+                PdfPCell logoCell=new PdfPCell();
+                logoCell.setBorder(Rectangle.NO_BORDER);
+
+                if(g.exists()){
+                    try (FileInputStream stream = new FileInputStream(g)) {
+                        Bitmap bit= BitmapFactory.decodeStream(stream);
+                        ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
+                        bit.compress(Bitmap.CompressFormat.PNG,100,byteArrayOutputStream);
+                        Image image=Image.getInstance(byteArrayOutputStream.toByteArray());
+                        //image.setAlignment(Image.ALIGN_LEFT);
+                        //doc.add(image);
+                        logoCell.addElement(image);
+                        company.addCell(logoCell);
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                Paragraph Na=new Paragraph(sharedPreferences.getString("nameKey","")+"\n"+sharedPreferences.getString("emailKey","")+"\n"+"P.O. BOX"+
+                        sharedPreferences.getString("boxKey","")+ "\n"+sharedPreferences.getString("locationKey","")+"\n"+
+                        sharedPreferences.getString("contactKey",""), FontFactory.getFont(FontFactory.TIMES_ROMAN,18, Font.NORMAL));
+                Paragraph Em=new Paragraph(sharedPreferences.getString("emailKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL, BaseColor.MAGENTA));
+                Paragraph Bo=new Paragraph("P.O. BOX"+sharedPreferences.getString("boxKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL,BaseColor.MAGENTA));
+                Paragraph Lo=new Paragraph(sharedPreferences.getString("locationKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL,BaseColor.MAGENTA));
+                Paragraph Co=new Paragraph(sharedPreferences.getString("contactKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL,BaseColor.MAGENTA));
+
+                Na.setAlignment(Element.ALIGN_RIGHT);
+                Em.setAlignment(Element.ALIGN_RIGHT);
+                Bo.setAlignment(Element.ALIGN_RIGHT);
+                Lo.setAlignment(Element.ALIGN_RIGHT);
+                Co.setAlignment(Element.ALIGN_RIGHT);
+                doc.add(Na);
+                doc.add(Em);
+                doc.add(Bo);
+                doc.add(Lo);
+                doc.add(Co);
+                doc.add(new Paragraph(new Date().toString()));
+
+
+                PdfPCell Cell=new PdfPCell(new Paragraph(Na));
+                company.addCell(Cell);
+                doc.add(company);
+
+                doc.add(new Paragraph("January Summary"));
+                doc.add(new DottedLineSeparator());
+
+                table = new PdfPTable(4);
+                table.addCell("User");
+                table.addCell("Sales");
+                table.addCell("Clients");
+                table.addCell("Month");
+
+                report();
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(),"Please save logo first",Toast.LENGTH_SHORT).show();
+            } catch (DocumentException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            Toast.makeText(getApplicationContext(),"sdCard not mounted",Toast.LENGTH_SHORT).show();
+        }
+        ReceiptEntity receiptEntity=new ReceiptEntity("N/A",file.getAbsolutePath(),"Report",file.getName());
+        receiptViewModel.insert(receiptEntity);
+    }
 }

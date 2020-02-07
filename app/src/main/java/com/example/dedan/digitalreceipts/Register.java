@@ -195,6 +195,9 @@ public class Register extends AppCompatActivity {
             editor.apply();
     }
     public void login_link(View view) {
+        UserEntity userEntity=new UserEntity("dedan","dedan",0,"dedan","dedan","dedan",
+                "dedan","dedan","dedan","dedan","Welcome","dedan","");
+        userViewModel.insert(userEntity);
         Intent intent=new Intent(this,logIn.class);
         startActivity(intent);
     }

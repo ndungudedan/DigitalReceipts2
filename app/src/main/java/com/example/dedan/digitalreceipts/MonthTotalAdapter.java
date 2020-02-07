@@ -38,7 +38,8 @@ public class MonthTotalAdapter extends ListAdapter<MonthSalesEntity,MonthTotalAd
     @Override
     public void onBindViewHolder(@NonNull MonthStatsHolder holder, int position) {
         MonthSalesEntity monthSalesEntity=getItem(position);
-        holder.txtCash.setText(monthSalesEntity.getKEY_total());
+        holder.txtCash.setText(String.valueOf(monthSalesEntity.getKEY_total()));
+        holder.txtColumn.setText(monthSalesEntity.getKEY_time());
     }
 
     class MonthStatsHolder extends RecyclerView.ViewHolder{
@@ -47,7 +48,7 @@ public class MonthTotalAdapter extends ListAdapter<MonthSalesEntity,MonthTotalAd
         public MonthStatsHolder(@NonNull View itemView) {
             super(itemView);
             txtCash=itemView.findViewById(R.id.info);
-            //txtColumn=itemView.findViewById(R.id.column);
+            txtColumn=itemView.findViewById(R.id.time);
 
         }
     }

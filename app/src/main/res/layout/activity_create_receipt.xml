@@ -14,11 +14,20 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_gravity="center_horizontal"
         android:layout_weight="1"
         app:srcCompat="@mipmap/launch_foreground" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="please pick a start month"/>
 
+    <Spinner
+        android:id="@+id/month_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
     <EditText
         android:id="@+id/title"
         style="@style/Widget.AppCompat.EditText"

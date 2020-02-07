@@ -35,6 +35,7 @@ public class ReceiptAdapter extends ListAdapter<ReceiptEntity, ReceiptAdapter.Re
         ReceiptEntity rcptEntity=getItem(position);
         holder.txtRef.setText(rcptEntity.getKEY_customer());
         holder.txtdate.setText(rcptEntity.getKEY_date());
+        holder.txtuser.setText(rcptEntity.getKEY_servedby());
     }
 
     private static final DiffUtil.ItemCallback<ReceiptEntity> diff_Callback=new
@@ -59,10 +60,12 @@ public class ReceiptAdapter extends ListAdapter<ReceiptEntity, ReceiptAdapter.Re
     class ReceiptHolder extends RecyclerView.ViewHolder{
         private TextView txtRef;
         private TextView txtdate;
+        private TextView txtuser;
         public ReceiptHolder(@NonNull View itemView) {
             super(itemView);
             txtRef=itemView.findViewById(R.id.txt_rcpt_ref);
             txtdate=itemView.findViewById(R.id.txt_rcpt_date);
+            txtuser=itemView.findViewById(R.id.txt_rcpt_user);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

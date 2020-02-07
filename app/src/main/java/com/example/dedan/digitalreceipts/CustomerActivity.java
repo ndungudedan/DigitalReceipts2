@@ -134,11 +134,11 @@ public class CustomerActivity extends AppCompatActivity {
         if(requestCode==ADD_CUSTOMER_REQUEST && resultCode==RESULT_OK){
             String fname=data.getStringExtra(CustomerAddEdit.EXTRA_FNAME);
             String sname=data.getStringExtra(CustomerAddEdit.EXTRA_SNAME);
-            int pobox= Integer.parseInt(data.getStringExtra(CustomerAddEdit.EXTRA_POBOX));
-            int address= Integer.parseInt(data.getStringExtra(CustomerAddEdit.EXTRA_ADDRESS));
+            String pobox= data.getStringExtra(CustomerAddEdit.EXTRA_POBOX);
+            String address=data.getStringExtra(CustomerAddEdit.EXTRA_ADDRESS);
             String location=data.getStringExtra(CustomerAddEdit.EXTRA_LOCATION);
             String email=data.getStringExtra(CustomerAddEdit.EXTRA_EMAIL);
-            int phone= Integer.parseInt(data.getStringExtra(CustomerAddEdit.EXTRA_PHONE));
+            String phone=data.getStringExtra(CustomerAddEdit.EXTRA_PHONE);
 
             CustomerEntity customerEntity=new CustomerEntity(fname,sname,phone,location,address,pobox,email);
             customerViewModel.insert(customerEntity);
@@ -151,11 +151,11 @@ public class CustomerActivity extends AppCompatActivity {
             }
             String fname=data.getStringExtra(CustomerAddEdit.EXTRA_FNAME);
             String sname=data.getStringExtra(CustomerAddEdit.EXTRA_SNAME);
-            int pobox= Integer.parseInt(data.getStringExtra(CustomerAddEdit.EXTRA_POBOX));
-            int address= Integer.parseInt(data.getStringExtra(CustomerAddEdit.EXTRA_ADDRESS));
+            String pobox=data.getStringExtra(CustomerAddEdit.EXTRA_POBOX);
+            String address=data.getStringExtra(CustomerAddEdit.EXTRA_ADDRESS);
             String location=data.getStringExtra(CustomerAddEdit.EXTRA_LOCATION);
             String email=data.getStringExtra(CustomerAddEdit.EXTRA_EMAIL);
-            int phone= Integer.parseInt(data.getStringExtra(CustomerAddEdit.EXTRA_PHONE));
+            String phone=data.getStringExtra(CustomerAddEdit.EXTRA_PHONE);
 
             CustomerEntity customerEntity=new CustomerEntity(fname,sname,phone,location,address,pobox,email);
             customerEntity.setKEY_id(id);

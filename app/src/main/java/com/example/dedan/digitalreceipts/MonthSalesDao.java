@@ -26,6 +26,12 @@ public interface MonthSalesDao {
     @Query("select * from MonthSalesEntity where Time= :time")
     MonthSalesEntity getSale(String time);
 
+    @Query("select * from MonthSalesEntity where session= :ssn")
+    LiveData<List<MonthSalesEntity>> getWeekSales(String ssn);
+
+    @Query("select * from MonthSalesEntity where session= :ssn")
+    LiveData<List<MonthSalesEntity>> getMonthSales(String ssn);
+
     @Query("delete from MonthSalesEntity")
     void deleteAll();
 

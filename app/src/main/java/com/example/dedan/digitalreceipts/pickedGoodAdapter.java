@@ -31,6 +31,7 @@ public class pickedGoodAdapter extends ListAdapter<PickedGoodEntity, pickedGoodA
         PickedGoodEntity currentEntity=getItem(position);
         holder.txtQuan.setText(String.valueOf(currentEntity.getKEY_Quantity()));
         holder.txtPack.setText(currentEntity.getKEY_Pack());
+        holder.txtPer.setText(String.valueOf(currentEntity.getKEY_Cost()));
         holder.txtCost.setText(String.valueOf(currentEntity.getKEY_total()));
         holder.txtItem.setText(currentEntity.getKEY_Item());
     }
@@ -55,6 +56,7 @@ public class pickedGoodAdapter extends ListAdapter<PickedGoodEntity, pickedGoodA
         private TextView txtPack;
         private TextView txtCost;
         private TextView txtQuan;
+        private TextView txtPer;
 
         public pickedUnitHolder(@NonNull View itemView) {
             super(itemView);
@@ -62,6 +64,7 @@ public class pickedGoodAdapter extends ListAdapter<PickedGoodEntity, pickedGoodA
             txtCost=itemView.findViewById(R.id.price);
             txtPack=itemView.findViewById(R.id.packing);
             txtQuan=itemView.findViewById(R.id.quant);
+            txtPer=itemView.findViewById(R.id.per);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
