@@ -13,13 +13,24 @@ public class MonthSalesEntity {
     private String KEY_time;
     @ColumnInfo(name = "session")
     private String KEY_session;
+    @ColumnInfo(name = "clients")
+    private int KEY_clients;
     @ColumnInfo(name = "total")
     private int KEY_total;
 
-    public MonthSalesEntity(String KEY_time, String KEY_session, int KEY_total) {
+    public MonthSalesEntity(String KEY_time, String KEY_session, int KEY_clients, int KEY_total) {
         this.KEY_time = KEY_time;
         this.KEY_session = KEY_session;
+        this.KEY_clients = KEY_clients;
         this.KEY_total = KEY_total;
+    }
+
+    public int getKEY_clients() {
+        return KEY_clients;
+    }
+
+    public void setKEY_clients(int KEY_clients) {
+        this.KEY_clients = KEY_clients;
     }
 
     public String getKEY_session() {

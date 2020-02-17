@@ -14,11 +14,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.List;
 
 public class company_stat_fragment extends Fragment {
     MonthSalesViewModel monthSalesViewModel;
+    private TextView txtTotal,txtClients;
+    private int total_sales,total_clients;
     public company_stat_fragment() {
         // Required empty public constructor
     }
@@ -44,30 +47,37 @@ public class company_stat_fragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_company_stat_fragment, container, false);
+
         RecyclerView recyclerMT=view.findViewById(R.id.comp_month_recycler);
-        recyclerMT.setLayoutManager(new GridLayoutManager(getActivity(),4));
-        final MonthTotalAdapter monthTotalAdapter=new MonthTotalAdapter();
-        recyclerMT.setAdapter(monthTotalAdapter);
-        monthSalesViewModel.getWeekSale("Month").observe(this, new Observer<List<MonthSalesEntity>>() {
+        recyclerMT.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
+        final MonthTotalAdapter weekTotalAdapter=new MonthTotalAdapter();
+        recyclerMT.setAdapter(weekTotalAdapter);
+        monthSalesViewModel.getWeekSale("Week").observe(this, new Observer<List<MonthSalesEntity>>() {
             @Override
             public void onChanged(List<MonthSalesEntity> monthSalesEntities) {
-                monthTotalAdapter.submitList(monthSalesEntities);
+                weekTotalAdapter.submitList(monthSalesEntities);
             }
         });
 
-        RecyclerView recyclerMT1=view.findViewById(R.id.comp_week_recycler);
-        recyclerMT1.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
-        final MonthTotalAdapter monthTotalAdapter1=new MonthTotalAdapter();
-        recyclerMT1.setAdapter(monthTotalAdapter1);
+        RecyclerView mnthrecycler=view.findViewById(R.id.comp_week_recycler);
+        mnthrecycler.setLayoutManager(new GridLayoutManager(getActivity(),4));
+        final comp_month_adapter monthTotalAdapter=new comp_month_adapter();
+        mnthrecycler.setAdapter(monthTotalAdapter);
 
-        monthSalesViewModel.getMonthSale("Week").observe(this, new Observer<List<MonthSalesEntity>>() {
+        monthSalesViewModel.getMonthSale("Month").observe(this, new Observer<List<MonthSalesEntity>>() {
             @Override
             public void onChanged(List<MonthSalesEntity> monthSalesEntities) {
+                for(MonthSalesEntity entity:monthSalesEntities){
+                    total_sales=total_sales+entity.getKEY_total();
+                    total_clients=total_clients+entity.getKEY_clients();
+                }
                 monthTotalAdapter.submitList(monthSalesEntities);
             }
         });
-
-
+        txtClients=view.findViewById(R.id.client_served);
+        txtTotal=view.findViewById(R.id.comp_sales);
+        txtClients.setText(String.valueOf(total_clients));
+        txtTotal.setText(String.valueOf(total_sales));
         return view;
     }
 
@@ -91,7 +101,6 @@ public class company_stat_fragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        monthSalesViewModel.deleteAll();
     }
 
     public interface OnFragmentInteractionListener {

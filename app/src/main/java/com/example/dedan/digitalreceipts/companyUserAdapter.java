@@ -40,18 +40,20 @@ public class companyUserAdapter extends ListAdapter<UserEntity, companyUserAdapt
         UserEntity userEntity=getItem(position);
         holder.txtfname.setText(userEntity.getKEY_FIRSTNAME());
         holder.txtsecname.setText(userEntity.getKEY_SECNAME());
+        holder.txtaccess.setText(userEntity.getKEY_ACCESS());
     }
     public UserEntity getUserAt(int position){
         return getItem(position);
     }
 
     class userHolder extends RecyclerView.ViewHolder {
-        private TextView txtfname;private TextView txtsecname;
+        private TextView txtfname;private TextView txtsecname;private TextView txtaccess;
 
         public userHolder(@NonNull View itemView) {
             super(itemView);
             txtfname=itemView.findViewById(R.id.fna);
             txtsecname=itemView.findViewById(R.id.surna);
+            txtaccess=itemView.findViewById(R.id.access);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

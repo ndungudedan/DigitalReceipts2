@@ -114,6 +114,14 @@ public class MainActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
 
 
+        sharedPreferences=getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        date = new Date();
+        SimpleDateFormat currentDate = new SimpleDateFormat("ddMMyyyy_HHmmss");
+        String timeStamp= currentDate.format(date);
+        if (timeStamp.contains(sharedPreferences.getString("startMonth","January"))){
+            endYeardialog();
+        }
+
         sharedPreferences=getSharedPreferences("Data",MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
@@ -225,6 +233,22 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog dialog=builder.create();
         dialog.show();
     }
+    public void endYeardialog(){
+        AlertDialog.Builder builder=new AlertDialog.Builder(MainActivity.this);
+        View mview=getLayoutInflater().inflate(R.layout.confirm_dialogbox,null);
+        TextView mess = mview.findViewById(R.id.conf_text);
+        mess.setText("END OF FINANCIAL YEAR:");
+        builder.setTitle("GENERATE ANNUAL REPORT");
+        builder.setView(mview);
+        builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                reportPdf();
+            }
+        });
+        AlertDialog dialog=builder.create();
+        dialog.show();
+    }
 
     private void logout() {
         reportPdf();
@@ -308,61 +332,111 @@ public class MainActivity extends AppCompatActivity {
         marViewModel.allMarEvents().observe(this, new Observer<List<MarEntity>>() {
             @Override
             public void onChanged(List<MarEntity> marEntities) {
-
+                for(MarEntity val:marEntities){
+                    table.addCell(getUser(val.getKEY_FOREIGN_KEY()));
+                    table.addCell(String.valueOf(val.getKEY_SALES()));
+                    table.addCell(String.valueOf(val.getKEY_NO_OF_CLIENTS()));
+                    table.addCell("January");
+                }
             }
         });
         aprViewModel.AllAprEvents().observe(this, new Observer<List<AprEntity>>() {
             @Override
             public void onChanged(List<AprEntity> aprEntities) {
-
+                for(AprEntity val:aprEntities){
+                    table.addCell(getUser(val.getKEY_FOREIGN_KEY()));
+                    table.addCell(String.valueOf(val.getKEY_SALES()));
+                    table.addCell(String.valueOf(val.getKEY_NO_OF_CLIENTS()));
+                    table.addCell("January");
+                }
             }
         });
         mayViewModel.AllMayEvents().observe(this, new Observer<List<MayEntity>>() {
             @Override
             public void onChanged(List<MayEntity> mayEntities) {
-
+                for(MayEntity val:mayEntities){
+                    table.addCell(getUser(val.getKEY_FOREIGN_KEY()));
+                    table.addCell(String.valueOf(val.getKEY_SALES()));
+                    table.addCell(String.valueOf(val.getKEY_NO_OF_CLIENTS()));
+                    table.addCell("January");
+                }
             }
         });
         junViewModel.AllJunEvents().observe(this, new Observer<List<JunEntity>>() {
             @Override
             public void onChanged(List<JunEntity> junEntities) {
-
+                for(JunEntity val:junEntities){
+                    table.addCell(getUser(val.getKEY_FOREIGN_KEY()));
+                    table.addCell(String.valueOf(val.getKEY_SALES()));
+                    table.addCell(String.valueOf(val.getKEY_NO_OF_CLIENTS()));
+                    table.addCell("January");
+                }
             }
         });
         julViewModel.AllJulEvents().observe(this, new Observer<List<JulEntity>>() {
             @Override
             public void onChanged(List<JulEntity> julEntities) {
-
+                for(JulEntity val:julEntities){
+                    table.addCell(getUser(val.getKEY_FOREIGN_KEY()));
+                    table.addCell(String.valueOf(val.getKEY_SALES()));
+                    table.addCell(String.valueOf(val.getKEY_NO_OF_CLIENTS()));
+                    table.addCell("January");
+                }
             }
         });
         augViewModel.AllAugEvents().observe(this, new Observer<List<AugEntity>>() {
             @Override
             public void onChanged(List<AugEntity> augEntities) {
-
+                for(AugEntity val:augEntities){
+                    table.addCell(getUser(val.getKEY_FOREIGN_KEY()));
+                    table.addCell(String.valueOf(val.getKEY_SALES()));
+                    table.addCell(String.valueOf(val.getKEY_NO_OF_CLIENTS()));
+                    table.addCell("January");
+                }
             }
         });
         sepViewModel.AllSepEvents().observe(this, new Observer<List<SepEntity>>() {
             @Override
             public void onChanged(List<SepEntity> sepEntities) {
-
+                for(SepEntity val:sepEntities){
+                    table.addCell(getUser(val.getKEY_FOREIGN_KEY()));
+                    table.addCell(String.valueOf(val.getKEY_SALES()));
+                    table.addCell(String.valueOf(val.getKEY_NO_OF_CLIENTS()));
+                    table.addCell("January");
+                }
             }
         });
         octViewModel.AllOctEvents().observe(this, new Observer<List<OctEntity>>() {
             @Override
             public void onChanged(List<OctEntity> octEntities) {
-
+                for(OctEntity val:octEntities){
+                    table.addCell(getUser(val.getKEY_FOREIGN_KEY()));
+                    table.addCell(String.valueOf(val.getKEY_SALES()));
+                    table.addCell(String.valueOf(val.getKEY_NO_OF_CLIENTS()));
+                    table.addCell("January");
+                }
             }
         });
         novViewModel.AllNovEvents().observe(this, new Observer<List<NovEntity>>() {
             @Override
             public void onChanged(List<NovEntity> novEntities) {
-
+                for(NovEntity val:novEntities){
+                    table.addCell(getUser(val.getKEY_FOREIGN_KEY()));
+                    table.addCell(String.valueOf(val.getKEY_SALES()));
+                    table.addCell(String.valueOf(val.getKEY_NO_OF_CLIENTS()));
+                    table.addCell("January");
+                }
             }
         });
         decViewModel.AllDecEvents().observe(this, new Observer<List<DecEntity>>() {
             @Override
             public void onChanged(List<DecEntity> decEntities) {
-
+                for(DecEntity val:decEntities){
+                    table.addCell(getUser(val.getKEY_FOREIGN_KEY()));
+                    table.addCell(String.valueOf(val.getKEY_SALES()));
+                    table.addCell(String.valueOf(val.getKEY_NO_OF_CLIENTS()));
+                    table.addCell("January");
+                }
             }
         });
         try {

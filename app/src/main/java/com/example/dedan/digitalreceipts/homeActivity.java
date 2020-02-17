@@ -127,7 +127,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
 
     int itemlistCount=0;
     int count=0,initCount;
-    int total=0,initTotal;
+    private int total=0,clients=0;
     int receiptCount;
 
     Toolbar tool;
@@ -355,6 +355,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 break;
             case R.id.newPdf:
                 confirmdialog();
+                clearpickeditems();
                 refresh();
 
                 break;
@@ -390,11 +391,11 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
     public void companyTotals(String time,String session){
         MonthSalesEntity mTot=monthSalesViewModel.getSale(time);
         if(mTot!=null){
-            MonthSalesEntity monthSalesEntity=new MonthSalesEntity(time,session,mTot.getKEY_total()+total);
+            MonthSalesEntity monthSalesEntity=new MonthSalesEntity(time,session,mTot.getKEY_clients()+1,mTot.getKEY_total()+total);
             monthSalesEntity.setKEY_ID(mTot.getKEY_ID());
             monthSalesViewModel.update(monthSalesEntity);
         }else{
-            MonthSalesEntity monthSalesEntity=new MonthSalesEntity(time,session,total);
+            MonthSalesEntity monthSalesEntity=new MonthSalesEntity(time,session,1,total);
             monthSalesViewModel.insert(monthSalesEntity);
         }
     }

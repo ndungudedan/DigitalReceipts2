@@ -27,7 +27,10 @@ public class UserStatsAdapter extends ListAdapter<UserStatsEntity,UserStatsAdapt
 
     @Override
     public void onBindViewHolder(@NonNull userStatsHolder holder, int position) {
-
+        UserStatsEntity userStatsEntity=getUserStatAt(position);
+        holder.txtdate.setText(userStatsEntity.getKEY_WEEK());
+        holder.txtsale.setText(String.valueOf(userStatsEntity.getKEY_WEEK_SALES()));
+        holder.txtclient.setText(String.valueOf(userStatsEntity.getKEY_W_CLIENTS_SERVED()));
     }
 
     public static final DiffUtil.ItemCallback<UserStatsEntity> diff_Callback=new
@@ -49,13 +52,15 @@ public class UserStatsAdapter extends ListAdapter<UserStatsEntity,UserStatsAdapt
     }
 
     class userStatsHolder extends RecyclerView.ViewHolder {
-        private TextView txtfna;
-        private TextView txtsurna;
+        private TextView txtdate;
+        private TextView txtsale;
+        private TextView txtclient;
 
         public userStatsHolder(@NonNull View itemView) {
             super(itemView);
-            txtfna=itemView.findViewById(R.id.fna);
-            txtsurna=itemView.findViewById(R.id.surna);
+            txtdate=itemView.findViewById(R.id.date);
+            txtclient=itemView.findViewById(R.id.client_served);
+            txtsale=itemView.findViewById(R.id.sales);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -10,49 +10,48 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class MonthTotalAdapter extends ListAdapter<MonthSalesEntity,MonthTotalAdapter.MonthStatsHolder> {
-    public MonthTotalAdapter(){
-        super(diff_Callback);
+public class comp_month_adapter extends ListAdapter<MonthSalesEntity, comp_month_adapter.saleholder> {
+
+    public comp_month_adapter() {
+        super(diffCallback);
     }
-    private static final DiffUtil.ItemCallback<MonthSalesEntity> diff_Callback=new DiffUtil.ItemCallback<MonthSalesEntity>() {
+
+    private static final DiffUtil.ItemCallback<MonthSalesEntity> diffCallback=new DiffUtil.ItemCallback<MonthSalesEntity>() {
         @Override
         public boolean areItemsTheSame(@NonNull MonthSalesEntity oldItem, @NonNull MonthSalesEntity newItem) {
-            return oldItem.getKEY_total()==newItem.getKEY_total();
+            return false;
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull MonthSalesEntity oldItem, @NonNull MonthSalesEntity newItem) {
-            return oldItem.getKEY_total()==newItem.getKEY_total()&&
-                    oldItem.getKEY_time().equals(newItem.getKEY_time());
+            return false;
         }
     };
-
     @NonNull
     @Override
-    public MonthStatsHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView= LayoutInflater.from(parent.getContext())
+    public saleholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view= LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.month_total_recycler,parent,false);
-        return new MonthStatsHolder(itemView);
+        return new saleholder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MonthStatsHolder holder, int position) {
+    public void onBindViewHolder(@NonNull saleholder holder, int position) {
         MonthSalesEntity monthSalesEntity=getItem(position);
         holder.txtCash.setText(String.valueOf(monthSalesEntity.getKEY_total()));
         holder.txtColumn.setText(monthSalesEntity.getKEY_time());
         holder.txtClient.setText(String.valueOf(monthSalesEntity.getKEY_clients()));
     }
 
-    class MonthStatsHolder extends RecyclerView.ViewHolder{
+    class saleholder extends RecyclerView.ViewHolder {
         private TextView txtCash;
-        private TextView txtColumn;
         private TextView txtClient;
-        public MonthStatsHolder(@NonNull View itemView) {
+        private TextView txtColumn;
+        public saleholder(@NonNull View itemView) {
             super(itemView);
             txtCash=itemView.findViewById(R.id.info);
             txtColumn=itemView.findViewById(R.id.time);
             txtClient=itemView.findViewById(R.id.clientele);
-
         }
     }
 }

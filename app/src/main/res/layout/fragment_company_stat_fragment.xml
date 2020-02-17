@@ -28,7 +28,7 @@
                 android:layout_below="@id/year"
                 />
             <TextView
-                android:id="@+id/user_sales"
+                android:id="@+id/comp_sales"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/year"
