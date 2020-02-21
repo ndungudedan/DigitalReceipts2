@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -22,14 +24,19 @@ public class company_stat_fragment extends Fragment {
     MonthSalesViewModel monthSalesViewModel;
     private TextView txtTotal,txtClients;
     private int total_sales,total_clients;
+    private MonthTotalAdapter weekTotalAdapter;
+    private RecyclerView recyclerMT;
+    private RecyclerView mnthrecycler;
+    private comp_month_adapter monthTotalAdapter;
+
     public company_stat_fragment() {
         // Required empty public constructor
     }
 
-    public static company_stat_fragment newInstance(String param1, String param2) {
+    public static company_stat_fragment newInstance() {
         company_stat_fragment fragment = new company_stat_fragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
+        //Bundle args = new Bundle();
+        //fragment.setArguments(args);
         return fragment;
     }
 
@@ -39,7 +46,8 @@ public class company_stat_fragment extends Fragment {
         if (getArguments() != null) {
         }
         monthSalesViewModel= ViewModelProviders.of(this).get(MonthSalesViewModel.class);
-
+        weekTotalAdapter = new MonthTotalAdapter();
+        monthTotalAdapter = new comp_month_adapter();
     }
 
     @Override
@@ -48,22 +56,27 @@ public class company_stat_fragment extends Fragment {
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_company_stat_fragment, container, false);
 
-        RecyclerView recyclerMT=view.findViewById(R.id.comp_month_recycler);
+        recyclerMT = view.findViewById(R.id.comp_month_recycler);
         recyclerMT.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
-        final MonthTotalAdapter weekTotalAdapter=new MonthTotalAdapter();
-        recyclerMT.setAdapter(weekTotalAdapter);
+
+        mnthrecycler = view.findViewById(R.id.comp_week_recycler);
+        mnthrecycler.setLayoutManager(new GridLayoutManager(getActivity(),4));
+
+        txtClients=view.findViewById(R.id.client_served);
+        txtTotal=view.findViewById(R.id.comp_sales);
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         monthSalesViewModel.getWeekSale("Week").observe(this, new Observer<List<MonthSalesEntity>>() {
             @Override
             public void onChanged(List<MonthSalesEntity> monthSalesEntities) {
                 weekTotalAdapter.submitList(monthSalesEntities);
+                recyclerMT.setAdapter(weekTotalAdapter);
             }
         });
-
-        RecyclerView mnthrecycler=view.findViewById(R.id.comp_week_recycler);
-        mnthrecycler.setLayoutManager(new GridLayoutManager(getActivity(),4));
-        final comp_month_adapter monthTotalAdapter=new comp_month_adapter();
-        mnthrecycler.setAdapter(monthTotalAdapter);
-
         monthSalesViewModel.getMonthSale("Month").observe(this, new Observer<List<MonthSalesEntity>>() {
             @Override
             public void onChanged(List<MonthSalesEntity> monthSalesEntities) {
@@ -71,14 +84,18 @@ public class company_stat_fragment extends Fragment {
                     total_sales=total_sales+entity.getKEY_total();
                     total_clients=total_clients+entity.getKEY_clients();
                 }
+                txtClients.setText(String.valueOf(total_clients));
+                txtTotal.setText(String.valueOf(total_sales));
                 monthTotalAdapter.submitList(monthSalesEntities);
+                mnthrecycler.setAdapter(monthTotalAdapter);
             }
         });
-        txtClients=view.findViewById(R.id.client_served);
-        txtTotal=view.findViewById(R.id.comp_sales);
-        txtClients.setText(String.valueOf(total_clients));
-        txtTotal.setText(String.valueOf(total_sales));
-        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event

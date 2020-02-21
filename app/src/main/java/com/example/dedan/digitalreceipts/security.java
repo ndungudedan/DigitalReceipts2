@@ -45,6 +45,7 @@ import com.example.dedan.digitalreceipts.Database.Today_Database.UserStatsMonthA
 import com.example.dedan.digitalreceipts.Database.Today_Database.UserStatsMonthEntity;
 import com.example.dedan.digitalreceipts.Database.Today_Database.UserStatsMonthViewModel;
 import com.example.dedan.digitalreceipts.Database.Week_Database.Friday.FriViewModel;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Monday.MonEntity;
 import com.example.dedan.digitalreceipts.Database.Week_Database.Monday.MonViewModel;
 import com.example.dedan.digitalreceipts.Database.Week_Database.Saturday.SatViewModel;
 import com.example.dedan.digitalreceipts.Database.Week_Database.Sunday.SunViewModel;
@@ -294,97 +295,85 @@ public class security extends AppCompatActivity {
     }
     public void monthStatsPopul(){
         if(janViewModel.getUserMonthsales(LoggeduserId)!=null) {
-            UserStatsMonthEntity janStat = new UserStatsMonthEntity("sunday", 0, "week 27",
-                    0, "Jan", janViewModel.getUserMonthsales(LoggeduserId).getKEY_SALES(),
-                    janViewModel.getUserMonthsales(LoggeduserId).getKEY_NO_OF_CLIENTS(), 0, Integer.parseInt(LoggeduserId));
+            UserStatsMonthEntity janStat = new UserStatsMonthEntity("Jan", janViewModel.getUserMonthsales(LoggeduserId).getKEY_SALES(),
+                    janViewModel.getUserMonthsales(LoggeduserId).getKEY_NO_OF_CLIENTS(), Integer.parseInt(LoggeduserId));
             userStatsMonthViewModel.insert(janStat);
             total_sales=total_sales+janStat.getKEY_MONTH_SALES();
             total_clients=total_clients+janStat.getKEY_M_CLIENTS_SERVED();
         }
         if(febViewModel.getUserMonthSales(LoggeduserId)!=null) {
-            UserStatsMonthEntity febStat = new UserStatsMonthEntity("sunday", 0, "week 27",
-                    0, "Apr", febViewModel.getUserMonthSales(LoggeduserId).getKEY_SALES(),
-                    febViewModel.getUserMonthSales(LoggeduserId).getKEY_NO_OF_CLIENTS(), 0, Integer.parseInt(LoggeduserId));
+            UserStatsMonthEntity febStat = new UserStatsMonthEntity("Feb", febViewModel.getUserMonthSales(LoggeduserId).getKEY_SALES(),
+                    febViewModel.getUserMonthSales(LoggeduserId).getKEY_NO_OF_CLIENTS(), Integer.parseInt(LoggeduserId));
             userStatsMonthViewModel.insert(febStat);
             total_sales=total_sales+febStat.getKEY_MONTH_SALES();
             total_clients=total_clients+febStat.getKEY_M_CLIENTS_SERVED();
         }
         if(marViewModel.getUserMonthSales(LoggeduserId)!=null) {
-            UserStatsMonthEntity marStat = new UserStatsMonthEntity("sunday", 0, "week 27",
-                    0, "Apr", marViewModel.getUserMonthSales(LoggeduserId).getKEY_SALES(),
-                    marViewModel.getUserMonthSales(LoggeduserId).getKEY_NO_OF_CLIENTS(), 0, Integer.parseInt(LoggeduserId));
+            UserStatsMonthEntity marStat = new UserStatsMonthEntity("Mar", marViewModel.getUserMonthSales(LoggeduserId).getKEY_SALES(),
+                    marViewModel.getUserMonthSales(LoggeduserId).getKEY_NO_OF_CLIENTS(), Integer.parseInt(LoggeduserId));
             userStatsMonthViewModel.insert(marStat);
             total_sales=total_sales+marStat.getKEY_MONTH_SALES();
             total_clients=total_clients+marStat.getKEY_M_CLIENTS_SERVED();
         }
         if(aprViewModel.getUserMonthSales(LoggeduserId)!=null) {
-            UserStatsMonthEntity aprStat = new UserStatsMonthEntity("sunday", 0, "week 27",
-                    0, "Apr", aprViewModel.getUserMonthSales(LoggeduserId).getKEY_SALES(),
-                    aprViewModel.getUserMonthSales(LoggeduserId).getKEY_NO_OF_CLIENTS(), 0, Integer.parseInt(LoggeduserId));
+            UserStatsMonthEntity aprStat = new UserStatsMonthEntity("Apr", aprViewModel.getUserMonthSales(LoggeduserId).getKEY_SALES(),
+                    aprViewModel.getUserMonthSales(LoggeduserId).getKEY_NO_OF_CLIENTS(), Integer.parseInt(LoggeduserId));
             userStatsMonthViewModel.insert(aprStat);
             total_sales=total_sales+aprStat.getKEY_MONTH_SALES();
             total_clients=total_clients+aprStat.getKEY_M_CLIENTS_SERVED();
         }
         if(mayViewModel.getUserMonthSales(LoggeduserId)!=null) {
-            UserStatsMonthEntity mayStat = new UserStatsMonthEntity("sunday", 0, "week 27",
-                    0, "Apr", mayViewModel.getUserMonthSales(LoggeduserId).getKEY_SALES(),
-                    mayViewModel.getUserMonthSales(LoggeduserId).getKEY_NO_OF_CLIENTS(), 0, Integer.parseInt(LoggeduserId));
+            UserStatsMonthEntity mayStat = new UserStatsMonthEntity("May", mayViewModel.getUserMonthSales(LoggeduserId).getKEY_SALES(),
+                    mayViewModel.getUserMonthSales(LoggeduserId).getKEY_NO_OF_CLIENTS(), Integer.parseInt(LoggeduserId));
             userStatsMonthViewModel.insert(mayStat);
             total_sales=total_sales+mayStat.getKEY_MONTH_SALES();
             total_clients=total_clients+mayStat.getKEY_M_CLIENTS_SERVED();
         }
         if(junViewModel.getUserMonthSales(LoggeduserId)!=null) {
-            UserStatsMonthEntity junStat = new UserStatsMonthEntity("sunday", 0, "week 27",
-                    0, "Apr", junViewModel.getUserMonthSales(LoggeduserId).getKEY_SALES(),
-                    junViewModel.getUserMonthSales(LoggeduserId).getKEY_NO_OF_CLIENTS(), 0, Integer.parseInt(LoggeduserId));
+            UserStatsMonthEntity junStat = new UserStatsMonthEntity("Jun", junViewModel.getUserMonthSales(LoggeduserId).getKEY_SALES(),
+                    junViewModel.getUserMonthSales(LoggeduserId).getKEY_NO_OF_CLIENTS(), Integer.parseInt(LoggeduserId));
             userStatsMonthViewModel.insert(junStat);
             total_sales=total_sales+junStat.getKEY_MONTH_SALES();
             total_clients=total_clients+junStat.getKEY_M_CLIENTS_SERVED();
         }
         if(julViewModel.getUserMonthSales(LoggeduserId)!=null) {
-            UserStatsMonthEntity julStat = new UserStatsMonthEntity("sunday", 0, "week 27",
-                    0, "Apr", julViewModel.getUserMonthSales(LoggeduserId).getKEY_SALES(),
-                    julViewModel.getUserMonthSales(LoggeduserId).getKEY_NO_OF_CLIENTS(), 0, Integer.parseInt(LoggeduserId));
+            UserStatsMonthEntity julStat = new UserStatsMonthEntity("Jul", julViewModel.getUserMonthSales(LoggeduserId).getKEY_SALES(),
+                    julViewModel.getUserMonthSales(LoggeduserId).getKEY_NO_OF_CLIENTS(), Integer.parseInt(LoggeduserId));
             userStatsMonthViewModel.insert(julStat);
             total_sales=total_sales+julStat.getKEY_MONTH_SALES();
             total_clients=total_clients+julStat.getKEY_M_CLIENTS_SERVED();
         }
         if(augViewModel.getUserMonthSales(LoggeduserId)!=null) {
-            UserStatsMonthEntity augStat = new UserStatsMonthEntity("sunday", 0, "week 27",
-                    0, "Apr", augViewModel.getUserMonthSales(LoggeduserId).getKEY_SALES(),
-                    augViewModel.getUserMonthSales(LoggeduserId).getKEY_NO_OF_CLIENTS(), 0, Integer.parseInt(LoggeduserId));
+            UserStatsMonthEntity augStat = new UserStatsMonthEntity("Aug", augViewModel.getUserMonthSales(LoggeduserId).getKEY_SALES(),
+                    augViewModel.getUserMonthSales(LoggeduserId).getKEY_NO_OF_CLIENTS(), Integer.parseInt(LoggeduserId));
             userStatsMonthViewModel.insert(augStat);
             total_sales=total_sales+augStat.getKEY_MONTH_SALES();
             total_clients=total_clients+augStat.getKEY_M_CLIENTS_SERVED();
         }
         if(sepViewModel.getUserMonthSales(LoggeduserId)!=null) {
-            UserStatsMonthEntity sepStat = new UserStatsMonthEntity("sunday", 0, "week 27",
-                    0, "Apr", sepViewModel.getUserMonthSales(LoggeduserId).getKEY_SALES(),
-                    sepViewModel.getUserMonthSales(LoggeduserId).getKEY_NO_OF_CLIENTS(), 0, Integer.parseInt(LoggeduserId));
+            UserStatsMonthEntity sepStat = new UserStatsMonthEntity("Sep", sepViewModel.getUserMonthSales(LoggeduserId).getKEY_SALES(),
+                    sepViewModel.getUserMonthSales(LoggeduserId).getKEY_NO_OF_CLIENTS(), Integer.parseInt(LoggeduserId));
             userStatsMonthViewModel.insert(sepStat);
             total_sales=total_sales+sepStat.getKEY_MONTH_SALES();
             total_clients=total_clients+sepStat.getKEY_M_CLIENTS_SERVED();
         }
         if(octViewModel.getUserMonthSales(LoggeduserId)!=null) {
-            UserStatsMonthEntity octStat = new UserStatsMonthEntity("sunday", 0, "week 27",
-                    0, "Apr", octViewModel.getUserMonthSales(LoggeduserId).getKEY_SALES(),
-                    octViewModel.getUserMonthSales(LoggeduserId).getKEY_NO_OF_CLIENTS(), 0, Integer.parseInt(LoggeduserId));
+            UserStatsMonthEntity octStat = new UserStatsMonthEntity("Oct", octViewModel.getUserMonthSales(LoggeduserId).getKEY_SALES(),
+                    octViewModel.getUserMonthSales(LoggeduserId).getKEY_NO_OF_CLIENTS(), Integer.parseInt(LoggeduserId));
             userStatsMonthViewModel.insert(octStat);
             total_sales=total_sales+octStat.getKEY_MONTH_SALES();
             total_clients=total_clients+octStat.getKEY_M_CLIENTS_SERVED();
         }
         if(novViewModel.getUserMonthSales(LoggeduserId)!=null) {
-            UserStatsMonthEntity novStat = new UserStatsMonthEntity("sunday", 0, "week 27",
-                    0, "Apr", novViewModel.getUserMonthSales(LoggeduserId).getKEY_SALES(),
-                    novViewModel.getUserMonthSales(LoggeduserId).getKEY_NO_OF_CLIENTS(), 0, Integer.parseInt(LoggeduserId));
+            UserStatsMonthEntity novStat = new UserStatsMonthEntity("Nov", novViewModel.getUserMonthSales(LoggeduserId).getKEY_SALES(),
+                    novViewModel.getUserMonthSales(LoggeduserId).getKEY_NO_OF_CLIENTS(), Integer.parseInt(LoggeduserId));
             userStatsMonthViewModel.insert(novStat);
             total_sales=total_sales+novStat.getKEY_MONTH_SALES();
             total_clients=total_clients+novStat.getKEY_M_CLIENTS_SERVED();
         }
         if(decViewModel.getUserMonthsales(LoggeduserId)!=null) {
-            UserStatsMonthEntity decStat = new UserStatsMonthEntity("sunday", 0, "week 27",
-                    0, "Apr", decViewModel.getUserMonthsales(LoggeduserId).getKEY_SALES(),
-                    decViewModel.getUserMonthsales(LoggeduserId).getKEY_NO_OF_CLIENTS(), 0, Integer.parseInt(LoggeduserId));
+            UserStatsMonthEntity decStat = new UserStatsMonthEntity("Dec", decViewModel.getUserMonthsales(LoggeduserId).getKEY_SALES(),
+                    decViewModel.getUserMonthsales(LoggeduserId).getKEY_NO_OF_CLIENTS(), Integer.parseInt(LoggeduserId));
             userStatsMonthViewModel.insert(decStat);
             total_sales=total_sales+decStat.getKEY_MONTH_SALES();
             total_clients=total_clients+decStat.getKEY_M_CLIENTS_SERVED();
@@ -393,45 +382,38 @@ public class security extends AppCompatActivity {
     public void weekStatsPopul(){
         int x=monViewModel.getUserDaySales(LoggeduserId).getKEY_SALES();
         if(monViewModel.getUserDaySales(LoggeduserId)!=null){
-            UserStatsEntity monStat=new UserStatsEntity("sunday",0,"week 27",
-                    0,"Apr",monViewModel.getUserDaySales(LoggeduserId).getKEY_SALES(),
-                    monViewModel.getUserDaySales(LoggeduserId).getKEY_NO_OF_CLIENTS(),0,Integer.parseInt(LoggeduserId));
+            UserStatsEntity monStat=new UserStatsEntity("Monday","Week 27",monViewModel.getUserDaySales(LoggeduserId).getKEY_SALES(),
+                    monViewModel.getUserDaySales(LoggeduserId).getKEY_NO_OF_CLIENTS(),Integer.parseInt(LoggeduserId));
             userStatsViewModel.insert(monStat);
         }
         if(tueViewModel.getUserDaySales(LoggeduserId)!=null) {
-            UserStatsEntity tueStat = new UserStatsEntity("sunday", 0, "week 27",
-                    0, "Apr", tueViewModel.getUserDaySales(LoggeduserId).getKEY_SALES(),
-                    tueViewModel.getUserDaySales(LoggeduserId).getKEY_NO_OF_CLIENTS(), 0, Integer.parseInt(LoggeduserId));
+            UserStatsEntity tueStat = new UserStatsEntity("Tuesday", "week 27", tueViewModel.getUserDaySales(LoggeduserId).getKEY_SALES(),
+                    tueViewModel.getUserDaySales(LoggeduserId).getKEY_NO_OF_CLIENTS(),  Integer.parseInt(LoggeduserId));
             userStatsViewModel.insert(tueStat);
         }
         if(wedViewModel.getUserDaySales(LoggeduserId)!=null) {
-            UserStatsEntity wedStat = new UserStatsEntity("sunday", 0, "week 27",
-                    0, "Apr", wedViewModel.getUserDaySales(LoggeduserId).getKEY_SALES(),
-                    wedViewModel.getUserDaySales(LoggeduserId).getKEY_NO_OF_CLIENTS(), 0, Integer.parseInt(LoggeduserId));
+            UserStatsEntity wedStat = new UserStatsEntity("Wednesday", "week 27",wedViewModel.getUserDaySales(LoggeduserId).getKEY_SALES(),
+                    wedViewModel.getUserDaySales(LoggeduserId).getKEY_NO_OF_CLIENTS(), Integer.parseInt(LoggeduserId));
             userStatsViewModel.insert(wedStat);
         }
         if(thurViewModel.getUserDaySales(LoggeduserId)!=null) {
-            UserStatsEntity thurStat = new UserStatsEntity("sunday", 0, "week 27",
-                    0, "Apr", thurViewModel.getUserDaySales(LoggeduserId).getKEY_SALES(),
-                    thurViewModel.getUserDaySales(LoggeduserId).getKEY_NO_OF_CLIENTS(), 0, Integer.parseInt(LoggeduserId));
+            UserStatsEntity thurStat = new UserStatsEntity("Thursday","week 27",thurViewModel.getUserDaySales(LoggeduserId).getKEY_SALES(),
+                    thurViewModel.getUserDaySales(LoggeduserId).getKEY_NO_OF_CLIENTS(),Integer.parseInt(LoggeduserId));
             userStatsViewModel.insert(thurStat);
         }
         if(friViewModel.getUserDaySales(LoggeduserId)!=null) {
-            UserStatsEntity friStat = new UserStatsEntity("sunday", 0, "week 27",
-                    0, "Apr", friViewModel.getUserDaySales(LoggeduserId).getKEY_SALES(),
-                    friViewModel.getUserDaySales(LoggeduserId).getKEY_NO_OF_CLIENTS(), 0, Integer.parseInt(LoggeduserId));
+            UserStatsEntity friStat = new UserStatsEntity("Friday", "week 27",friViewModel.getUserDaySales(LoggeduserId).getKEY_SALES(),
+                    friViewModel.getUserDaySales(LoggeduserId).getKEY_NO_OF_CLIENTS(),Integer.parseInt(LoggeduserId));
             userStatsViewModel.insert(friStat);
         }
         if(satViewModel.getUserDaySales(LoggeduserId)!=null) {
-            UserStatsEntity satStat = new UserStatsEntity("sunday", 0, "week 27",
-                    0, "Apr", satViewModel.getUserDaySales(LoggeduserId).getKEY_SALES(),
-                    satViewModel.getUserDaySales(LoggeduserId).getKEY_NO_OF_CLIENTS(), 0, Integer.parseInt(LoggeduserId));
+            UserStatsEntity satStat = new UserStatsEntity("Saturday","week 27",satViewModel.getUserDaySales(LoggeduserId).getKEY_SALES(),
+                    satViewModel.getUserDaySales(LoggeduserId).getKEY_NO_OF_CLIENTS(),Integer.parseInt(LoggeduserId));
             userStatsViewModel.insert(satStat);
         }
         if(sunViewModel.getUserDaySales(LoggeduserId)!=null) {
-            UserStatsEntity sunStat = new UserStatsEntity("sunday", 0, "week 27",
-                    0, "Apr", sunViewModel.getUserDaySales(LoggeduserId).getKEY_SALES(),
-                    sunViewModel.getUserDaySales(LoggeduserId).getKEY_NO_OF_CLIENTS(), 0, Integer.parseInt(LoggeduserId));
+            UserStatsEntity sunStat = new UserStatsEntity("Sunday","week 27",sunViewModel.getUserDaySales(LoggeduserId).getKEY_SALES(),
+                    sunViewModel.getUserDaySales(LoggeduserId).getKEY_NO_OF_CLIENTS(),Integer.parseInt(LoggeduserId));
             userStatsViewModel.insert(sunStat);
         }
     }

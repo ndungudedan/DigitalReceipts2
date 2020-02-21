@@ -28,7 +28,7 @@ public class Company extends AppCompatActivity {
         ViewpagerAdapter adapter=new ViewpagerAdapter(getSupportFragmentManager());
 
         adapter.AddFragment(new company_user_fragment(),"Users");
-        adapter.AddFragment(new company_stat_fragment(),"Statistics");
+        adapter.AddFragment(company_stat_fragment.newInstance(),"Statistics");
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);

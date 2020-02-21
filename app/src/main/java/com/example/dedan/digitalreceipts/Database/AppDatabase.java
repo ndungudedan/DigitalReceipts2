@@ -69,7 +69,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 @Database(entities = {UserEntity.class, GoodsEntity.class, PickedGoodEntity.class, MonthSalesEntity.class, WeekSalesEntity.class, ReceiptEntity.class,
         CustomerEntity.class, UserStatsEntity.class, JanEntity.class, FebEntity.class, MarEntity.class, AprEntity.class, MayEntity.class, JunEntity.class,
         JulEntity.class, AugEntity.class, SepEntity.class, OctEntity.class, NovEntity.class, DecEntity.class, MonEntity.class,
-        TueEntity.class, WedEntity.class, ThurEntity.class, FriEntity.class, SatEntity.class, SunEntity.class, UserStatsMonthEntity.class},version = 10)
+        TueEntity.class, WedEntity.class, ThurEntity.class, FriEntity.class, SatEntity.class, SunEntity.class, UserStatsMonthEntity.class},version = 11)
 public abstract class AppDatabase extends RoomDatabase {
     private static AppDatabase dbInstance;
     public abstract UserDao userDao();
