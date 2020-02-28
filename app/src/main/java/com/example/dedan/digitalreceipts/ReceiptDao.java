@@ -22,4 +22,7 @@ public interface ReceiptDao {
 
     @Query("select * from Receipts order by ID asc ")
     LiveData<List<ReceiptEntity>> getAllReceipts();
+
+    @Query("select * from Receipts where time !=:h order by ID asc ")
+    LiveData<List<ReceiptEntity>> getTodayReceipts(String h);
 }

@@ -122,6 +122,7 @@ public class security extends AppCompatActivity {
         txtYrSales=findViewById(R.id.user_sales);
         nulltxt=findViewById(R.id.empty_txt);
 
+
         userStatsViewModel=ViewModelProviders.of(this).get(UserStatsViewModel.class);
         userStatsMonthViewModel=ViewModelProviders.of(this).get(UserStatsMonthViewModel.class);
         userViewModel= ViewModelProviders.of(this).get(UserViewModel.class);
@@ -223,6 +224,8 @@ public class security extends AppCompatActivity {
             @Override
             public void onChanged(List<UserStatsEntity> userStatsEntities) {
                 userStatsAdapter.submitList(userStatsEntities);
+                TextView txt=findViewById(R.id.wkno);
+                txt.setText(userStatsEntities.get(0).getKEY_WEEK());
                 if(userStatsEntities.isEmpty()){
                     nulltxt.setVisibility(View.VISIBLE);
                     nulltxt.setText("Nothing to display");

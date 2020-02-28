@@ -72,7 +72,6 @@ public class FriRepo {
         protected FriEntity doInBackground(String... strings) {
             return dao.getDayUserSales(strings[0]);
         }
-
     }
     private static class insertAsyncTask extends AsyncTask<FriEntity,Void,Void> {
         private FriDao dao;

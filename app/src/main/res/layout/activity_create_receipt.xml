@@ -28,6 +28,7 @@
         android:id="@+id/month_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
     <EditText
         android:id="@+id/title"
         style="@style/Widget.AppCompat.EditText"
@@ -35,12 +36,14 @@
         android:layout_height="match_parent"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="10dp"
+        android:enabled="false"
         android:hint="Title"
         android:inputType="textCapWords"
-        android:enabled="false"/>
+        android:textColorHint="#000009" />
 
     <EditText
         android:id="@+id/email"
+        android:textColorHint="#000009"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
@@ -50,6 +53,7 @@
         android:enabled="false"/>
     <EditText
         android:id="@+id/box"
+        android:textColorHint="#000009"
         style="@style/Widget.AppCompat.EditText"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -60,6 +64,7 @@
         android:enabled="false"/>
     <EditText
         android:id="@+id/location"
+        android:textColorHint="#000009"
         style="@style/Widget.AppCompat.EditText"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -71,6 +76,7 @@
 
     <EditText
         android:id="@+id/contact"
+        android:textColorHint="#000009"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
@@ -79,9 +85,10 @@
         android:inputType="textCapWords"
         android:enabled="false"/>
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
 
         <Button
             android:id="@+id/save"
@@ -89,8 +96,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10sp"
-            android:layout_toRightOf="@id/edit"
-            android:text="SAVE" />
+            android:text="SAVE"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintEnd_toStartOf="@+id/edit"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/edit"
@@ -99,7 +109,11 @@
             android:layout_height="wrap_content"
             android:layout_margin="10sp"
             android:onClick="edit"
-            android:text="EDIT" />
+            app:layout_constraintHorizontal_chainStyle="spread"
+            android:text="EDIT"
+            app:layout_constraintEnd_toStartOf="@+id/security"
+            app:layout_constraintStart_toEndOf="@+id/save"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/security"
@@ -107,14 +121,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10sp"
-            android:layout_toRightOf="@id/save"
             android:onClick="dropLIST"
-            android:text="Security" />
+            android:text="Security"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toEndOf="@+id/edit"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    </RelativeLayout>
-
-
-
-
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </android.widget.LinearLayout>
 </android.widget.ScrollView>

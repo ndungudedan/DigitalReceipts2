@@ -1,10 +1,17 @@
 package com.example.dedan.digitalreceipts;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
@@ -36,30 +43,34 @@ class UnitAdapter extends ListAdapter<GoodsEntity,UnitAdapter.UnitHolder> {
     @Override
     public UnitAdapter.UnitHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView= LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.unit_recycler,parent,false);
+                .inflate(R.layout.unit_recycler,parent,false); //home activity uses home_unit_recycler
         return new UnitHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull UnitAdapter.UnitHolder holder, int position) {
         GoodsEntity currentgoodsEntity=getItem(position);
+        holder.imageView.setImageBitmap(retreivePic(currentgoodsEntity.getKEY_PIC(),currentgoodsEntity.getKEY_ITEM()));
         holder.txtItem.setText(currentgoodsEntity.getKEY_ITEM());
         holder.txtCost.setText(String.valueOf(currentgoodsEntity.getKEY_COST()));
         holder.txtPack.setText(currentgoodsEntity.getKEY_PACK());
+        holder.txtCat.setText(currentgoodsEntity.getKEY_CATEGORY());
     }
     public GoodsEntity getGoodAt(int position){
         return getItem(position);
     }
 
     class UnitHolder extends RecyclerView.ViewHolder{
-        private TextView txtItem;
-        private TextView txtPack;
-        private TextView txtCost;
+        private TextView txtItem;private TextView txtCat;
+        private TextView txtPack;private TextView txtCost;
+        private ImageView imageView;
         public UnitHolder(@NonNull View itemView) {
             super(itemView);
             txtItem=itemView.findViewById(R.id.txt_item);
             txtCost=itemView.findViewById(R.id.txt_cost);
             txtPack=itemView.findViewById(R.id.txt_pack);
+            txtCat=itemView.findViewById(R.id.txt_cat);
+            imageView=itemView.findViewById(R.id.unit_recycler_image);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -79,5 +90,16 @@ class UnitAdapter extends ListAdapter<GoodsEntity,UnitAdapter.UnitHolder> {
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
+    }
+    private Bitmap retreivePic(String path,String item) {
+        Bitmap bit=null;
+        try{
+            File file=new File(path,item+"pic.jpg");
+            bit= BitmapFactory.decodeStream(new FileInputStream(file));
+        }
+        catch (FileNotFoundException e){
+            e.printStackTrace();
+        }
+        return bit;
     }
 }

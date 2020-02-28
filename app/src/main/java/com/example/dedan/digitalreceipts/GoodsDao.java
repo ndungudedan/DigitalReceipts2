@@ -24,6 +24,9 @@ public interface GoodsDao {
     @Query("select * from Goods order by Items desc")
     LiveData<List<GoodsEntity>> getAllGoods();
 
+    @Query("select * from Goods where Category =:cat order by Items desc")
+    LiveData<List<GoodsEntity>> getCategoryGoods(String cat);
+
     @Query("delete from Goods")
     void deleteAll();
 

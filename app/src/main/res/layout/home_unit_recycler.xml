@@ -2,23 +2,19 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginStart="8dp"
-    android:layout_marginTop="8dp"
-    android:layout_marginEnd="8dp">
+    android:layout_margin="4dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="8dp">
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/unit_recycler_image"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/icons8add96" />
@@ -29,21 +25,20 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
             android:text="Pack:"
             android:textColor="@color/colorAccent"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/textView10"
+            app:layout_constraintEnd_toStartOf="@+id/txt_pack"
             app:layout_constraintStart_toEndOf="@id/unit_recycler_image"
             app:layout_constraintTop_toBottomOf="@+id/txt_I" />
 
         <TextView
             android:id="@+id/txt_pack"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="24dp"
+            android:layout_height="13dp"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
             android:text="pack"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/txt_cost"
             app:layout_constraintStart_toEndOf="@+id/txt_p"
             app:layout_constraintTop_toBottomOf="@+id/txt_item" />
 
@@ -58,34 +53,36 @@
             app:layout_constraintBottom_toTopOf="@+id/txt_p"
             app:layout_constraintEnd_toStartOf="@+id/txt_item"
             app:layout_constraintStart_toEndOf="@id/unit_recycler_image"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/txt_cat" />
 
         <TextView
             android:id="@+id/txt_item"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:layout_toEndOf="@id/txt_I"
             android:text="item"
             app:layout_constraintBottom_toBottomOf="@+id/txt_I"
-            app:layout_constraintStart_toEndOf="@+id/txt_I" />
+            app:layout_constraintStart_toEndOf="@+id/txt_I"
+            app:layout_constraintTop_toBottomOf="@id/txt_cat" />
 
         <TextView
             android:id="@+id/txt_cost"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:text="0"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintStart_toEndOf="@+id/textView10"
+            app:layout_constraintTop_toBottomOf="@+id/txt_pack" />
 
         <TextView
             android:id="@+id/textView10"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:layout_toStartOf="@id/txt_cost"
@@ -93,17 +90,19 @@
             android:textColor="@color/colorAccent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/txt_cost"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintStart_toEndOf="@id/unit_recycler_image"
+            app:layout_constraintTop_toBottomOf="@+id/txt_p" />
 
         <TextView
             android:id="@+id/txt_cat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:text="Category"
-            android:textColor="#009688"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txt_cost" />
+            app:layout_constraintBottom_toTopOf="@+id/txt_I"
+            app:layout_constraintStart_toEndOf="@id/unit_recycler_image"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

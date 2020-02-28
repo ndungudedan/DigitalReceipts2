@@ -28,4 +28,13 @@
         android:inputType="number"
         android:textColor="@android:color/holo_blue_bright" />
 
+    <ProgressBar
+        android:id="@+id/savePdfBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:visibility="invisible"
+        />
+
 </android.widget.RelativeLayout>

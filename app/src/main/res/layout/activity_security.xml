@@ -1,211 +1,288 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relativeLayout3"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <androidx.cardview.widget.CardView
         android:id="@+id/userdetailsCard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/yearSummaryCard"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
             <ImageView
                 android:id="@+id/profilePic"
-                android:layout_width="150dp"
-                android:layout_height="175dp"
+                android:layout_width="323dp"
+                android:layout_height="312dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/icons8businessman80" />
-            <RelativeLayout
+
+            <TextView
+                android:id="@+id/na"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/profilePic">
-                <TextView
-                    android:id="@+id/na"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Name:"
-                    />
-                <TextView
-                    android:id="@+id/Name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toEndOf="@id/na"
-                    />
-                <TextView
-                    android:id="@+id/id"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Id.No:"
-                    android:layout_below="@id/na"
-                    />
-                <TextView
-                    android:id="@+id/idno"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toEndOf="@id/id"
-                    android:layout_below="@id/Name"/>
-                <TextView
-                    android:id="@+id/dobirth"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/id"
-                    android:text="DOB:"
-                    />
-                <TextView
-                    android:id="@+id/DOB"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/idno"
-                    android:layout_toEndOf="@id/dobirth"
-                    />
-                <TextView
-                    android:id="@+id/pho"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/dobirth"
-                    android:text="Phone:"
-                    />
-                <TextView
-                    android:id="@+id/mobile"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/DOB"
-                    android:layout_toEndOf="@id/pho"
-                    />
-                <TextView
-                    android:id="@+id/res"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/pho"
-                    android:text="Residence:"
-                    />
-                <TextView
-                    android:id="@+id/mresidence"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/mobile"
-                    android:layout_toEndOf="@id/res"
-                    />
-                <TextView
-                    android:id="@+id/ema"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/res"
-                    android:text="Email:"
-                    />
-                <TextView
-                    android:id="@+id/memail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/mresidence"
-                    android:layout_toEndOf="@id/ema"
-                    />
-                <TextView
-                    android:id="@+id/mstat"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/ema"
-                    android:text="Status:"
-                    />
-                <TextView
-                    android:id="@+id/mstatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/memail"
-                    android:layout_toEndOf="@id/mstat"
-                    />
+                android:text="Name:"
+                app:layout_constraintStart_toEndOf="@id/profilePic"
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <Button
-                    android:id="@+id/access_btn"
-                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
-                    android:layout_width="150dp"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/mstatus"
-                    android:layout_alignParentEnd="true"
-                    android:text="INVALIDATE"
-                    android:visibility="invisible"
-                    android:clickable="false"/>
-            </RelativeLayout>
+            <TextView
+                android:id="@+id/Name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/na"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        </RelativeLayout>
+            <TextView
+                android:id="@+id/id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Id.No:"
+                app:layout_constraintStart_toEndOf="@id/profilePic"
+                app:layout_constraintTop_toBottomOf="@id/na" />
 
+            <TextView
+                android:id="@+id/idno"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/id"
+                app:layout_constraintTop_toBottomOf="@id/Name" />
+
+            <TextView
+                android:id="@+id/dobirth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DOB:"
+                app:layout_constraintStart_toEndOf="@id/profilePic"
+                app:layout_constraintTop_toBottomOf="@id/id" />
+
+            <TextView
+                android:id="@+id/DOB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/dobirth"
+                app:layout_constraintTop_toBottomOf="@id/idno" />
+
+            <TextView
+                android:id="@+id/pho"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phone:"
+                app:layout_constraintStart_toEndOf="@id/profilePic"
+                app:layout_constraintTop_toBottomOf="@id/dobirth" />
+
+            <TextView
+                android:id="@+id/mobile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/pho"
+                app:layout_constraintTop_toBottomOf="@id/DOB" />
+
+            <TextView
+                android:id="@+id/res"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Residence:"
+                app:layout_constraintStart_toEndOf="@id/profilePic"
+                app:layout_constraintTop_toBottomOf="@id/pho" />
+
+            <TextView
+                android:id="@+id/mresidence"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/res"
+                app:layout_constraintTop_toBottomOf="@id/mobile" />
+
+            <TextView
+                android:id="@+id/ema"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Email:"
+                app:layout_constraintStart_toEndOf="@id/profilePic"
+                app:layout_constraintTop_toBottomOf="@id/res" />
+
+            <TextView
+                android:id="@+id/memail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/ema"
+                app:layout_constraintTop_toBottomOf="@id/mresidence" />
+
+            <TextView
+                android:id="@+id/mstat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Status:"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/profilePic"
+                app:layout_constraintTop_toBottomOf="@id/ema" />
+
+            <TextView
+                android:id="@+id/mstatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/mstat"
+                app:layout_constraintTop_toBottomOf="@id/memail" />
+
+            <Button
+                android:id="@+id/access_btn"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:text="INVALIDATE"
+                android:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/mstatus" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
+
     <androidx.cardview.widget.CardView
         android:id="@+id/yearSummaryCard"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_below="@id/userdetailsCard">
-        <RelativeLayout
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/comp_week_recycler"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/userdetailsCard">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary">
+
             <TextView
                 android:id="@+id/year"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="2019"
-                android:layout_centerHorizontal="true"
-                />
+                android:text="2020"
+                android:textColor="#F7FFFFFF"
+                android:textSize="50sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <TextView
                 android:id="@+id/sa"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sales:"
-                android:layout_below="@id/year"
-                />
+                android:text="KES:"
+                android:textColor="#F7FFFFFF"
+                android:textSize="25sp"
+                app:layout_constraintEnd_toStartOf="@id/year"
+                app:layout_constraintTop_toBottomOf="@id/year" />
+
             <TextView
                 android:id="@+id/user_sales"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/year"
-                android:layout_toEndOf="@id/sa"/>
+                android:text="00.00"
+                android:textColor="#F7FFFFFF"
+                android:textSize="25sp"
+                app:layout_constraintEnd_toEndOf="@+id/sa"
+                app:layout_constraintHorizontal_bias="0.996"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/sa" />
+
             <TextView
                 android:id="@+id/cli"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Clients:"
-                android:layout_below="@id/sa"/>
+                android:textColor="#F7FFFFFF"
+                android:textSize="25sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@id/year"
+                app:layout_constraintTop_toBottomOf="@id/year" />
+
             <TextView
                 android:id="@+id/client_served"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/sa"
-                android:layout_toEndOf="@id/cli"/>
+                android:text="00"
+                android:textColor="#F7FFFFFF"
+                android:textSize="25sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@id/cli"
+                app:layout_constraintTop_toBottomOf="@id/cli" />
 
-        </RelativeLayout>
+            <View
+                android:id="@+id/divider"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/year"
+                app:layout_constraintVertical_bias="1.0" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
-    <FrameLayout
-        android:id="@+id/week_frame"
+    <TextView
+        android:id="@+id/wkno"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/yearSummaryCard">
-        <TextView
-            android:id="@+id/empty_txt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="invisible"/>
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/comp_week_recycler"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:listitem="@layout/user_stats_recycler"
-            />
+        android:text="week 0-1"
+        app:layout_constraintBottom_toTopOf="@id/comp_week_recycler"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/yearSummaryCard" />
 
-    </FrameLayout>
-    <FrameLayout
-        android:id="@+id/month_frame"
+    <TextView
+        android:id="@+id/empty_txt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/week_frame">
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/comp_month_recycler"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:listitem="@layout/user_stats_recycler"
-            />
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/yearSummaryCard"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
 
-    </FrameLayout>
-</RelativeLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/comp_week_recycler"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/comp_month_recycler"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/yearSummaryCard"
+        tools:listitem="@layout/user_stats_recycler" />
+
+    <TextView
+        android:id="@+id/mnth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Financial Year"
+        app:layout_constraintTop_toBottomOf="@id/comp_week_recycler"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/comp_month_recycler"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/comp_month_recycler"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/comp_week_recycler"
+        tools:listitem="@layout/user_stats_recycler" />
+</androidx.constraintlayout.widget.ConstraintLayout>

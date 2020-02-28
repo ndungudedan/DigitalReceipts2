@@ -27,7 +27,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,6 +58,8 @@ import com.example.dedan.digitalreceipts.Database.Month_Database.October.OctEnti
 import com.example.dedan.digitalreceipts.Database.Month_Database.October.OctViewModel;
 import com.example.dedan.digitalreceipts.Database.Month_Database.September.SepEntity;
 import com.example.dedan.digitalreceipts.Database.Month_Database.September.SepViewModel;
+import com.example.dedan.digitalreceipts.Database.Store.CategoryEntity;
+import com.example.dedan.digitalreceipts.Database.Store.CategoryViewModel;
 import com.example.dedan.digitalreceipts.Database.Today_Database.UserStatsMonthViewModel;
 import com.example.dedan.digitalreceipts.Database.Week_Database.Friday.FriEntity;
 import com.example.dedan.digitalreceipts.Database.Week_Database.Friday.FriViewModel;
@@ -94,6 +99,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -113,6 +119,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
     FriViewModel friViewModel;SatViewModel satViewModel;SunViewModel sunViewModel;
     UserStatsMonthViewModel userStatsMonthViewModel;
     List<PickedGoodEntity> pickedGoods;
+    CategoryViewModel categoryViewModel;
 
     TextView totalView;
     TextView nulltxt;
@@ -143,6 +150,10 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
     private String date;
     private EditText lipa;
     private String LoggeduserId;
+    private Spinner spinner;
+    private UnitAdapter adapter;
+    private List<String> spinList=new ArrayList<>();
+    private ArrayAdapter<String> spinAdapt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,6 +166,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
 
         totalView=findViewById(R.id.totaltxt);
         nulltxt=findViewById(R.id.empty_pro);
+        spinner=findViewById(R.id.cat_spin);
 
         goodsViewModel= ViewModelProviders.of(this).get(GoodsViewModel.class);
         pickedGoodViewModel=ViewModelProviders.of(this).get(PickedGoodViewModel.class);
@@ -173,10 +185,18 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         friViewModel=ViewModelProviders.of(this).get(FriViewModel.class);satViewModel=ViewModelProviders.of(this).get(SatViewModel.class);
         sunViewModel=ViewModelProviders.of(this).get(SunViewModel.class);
         userStatsMonthViewModel =ViewModelProviders.of(this).get(UserStatsMonthViewModel.class);
+        categoryViewModel=ViewModelProviders.of(this).get(CategoryViewModel.class);
 
-
-
-
+        categoryViewModel.AllCategorys().observe(this, new Observer<List<CategoryEntity>>() {
+            @Override
+            public void onChanged(List<CategoryEntity> categoryEntities) {
+                for(CategoryEntity ent:categoryEntities){
+                    spinList.add(ent.getKEY_Category());
+                }
+                spinList.add(0,"ALL CATEGORY");
+                loadSpinner();
+            }
+        });
         //pickedGoods=pickedGoodViewModel.getAllPickedGoodsList();
 
         shp=getSharedPreferences("Data",Context.MODE_PRIVATE);
@@ -187,7 +207,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         RecyclerView GoodsrecyclerView=findViewById(R.id.homeGoodsrecycler);
         GoodsrecyclerView.setLayoutManager(new LinearLayoutManager(this));
         GoodsrecyclerView.setHasFixedSize(true);
-        final UnitAdapter adapter=new UnitAdapter();
+        adapter = new UnitAdapter();
         GoodsrecyclerView.setAdapter(adapter);
         goodsViewModel.getAllGoods().observe(this, new Observer<List<GoodsEntity>>() {
             @Override
@@ -310,7 +330,14 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
 
         }
     }
-
+    public void loadSpinner(){
+        if(!spinList.isEmpty()){
+            spinAdapt=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,spinList);
+            spinAdapt.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinner.setAdapter(spinAdapt);
+            spinner.setOnItemSelectedListener(this);
+        }
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -618,20 +645,6 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         return total;
     }
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        switch (adapterView.getId()){
-            case R.id.quanSpin:
-
-                break;
-            case R.id.spinner2:
-        }
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-    }
-
     public void pdf(){
         String state= Environment.getExternalStorageState();
         if(Environment.MEDIA_MOUNTED.equals(state)){
@@ -680,7 +693,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 Paragraph Na=new Paragraph(shp.getString("nameKey","")+"\n"+shp.getString("emailKey","")+"\n"+"P.O. BOX"+
                         shp.getString("boxKey","")+ "\n"+shp.getString("locationKey","")+"\n"+
                         shp.getString("contactKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,18,Font.NORMAL));
-   Paragraph Em=new Paragraph(shp.getString("emailKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL,BaseColor.MAGENTA));
+                /*Paragraph Em=new Paragraph(shp.getString("emailKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL,BaseColor.MAGENTA));
                 Paragraph Bo=new Paragraph("P.O. BOX"+shp.getString("boxKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL,BaseColor.MAGENTA));
                 Paragraph Lo=new Paragraph(shp.getString("locationKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL,BaseColor.MAGENTA));
                 Paragraph Co=new Paragraph(shp.getString("contactKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL,BaseColor.MAGENTA));
@@ -695,8 +708,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 doc.add(Bo);
                 doc.add(Lo);
                 doc.add(Co);
-                doc.add(new Paragraph(new Date().toString()));
-
+                doc.add(new Paragraph(new Date().toString()));*/
 
                 PdfPCell Cell=new PdfPCell(new Paragraph(Na));
                 company.addCell(Cell);
@@ -757,6 +769,11 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
                 catch (NumberFormatException e){
                     e.printStackTrace();
                 }
+                doc.add(new Paragraph("\n"));
+                Paragraph us=new Paragraph("You were served by: "+user+"\n"+"THANK YOU");
+                us.setAlignment(Element.ALIGN_CENTER);
+                doc.add(us);
+
                 doc.close();
                 fileOutputStream.close();
                 receiptcount();
@@ -801,6 +818,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         View mview=getLayoutInflater().inflate(R.layout.activity_client_dialog,null);
         lipa=mview.findViewById(R.id.clCash);
         TextView bal = mview.findViewById(R.id.bal_display);
+        final ProgressBar pbar=mview.findViewById(R.id.savePdfBar);
 
         bal.setText(String.valueOf(invCash));
         builder.setMessage(String.valueOf(invCash));
@@ -811,6 +829,7 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
             public void onClick(DialogInterface dialog, int id) {
                  pay=lipa.getText().toString();
                  if(!pay.isEmpty()){
+                     pbar.setVisibility(View.VISIBLE);
                      operationcomplete();
                  }
             }
@@ -877,24 +896,25 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void confirmdialog(){
-        AlertDialog.Builder builder=new AlertDialog.Builder(homeActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(homeActivity.this);
         View mview=getLayoutInflater().inflate(R.layout.confirm_dialogbox,null);
         TextView mess = mview.findViewById(R.id.conf_text);
+
         mess.setText("CLEAR ALL SELECTED ITEMS");
-        builder.setTitle("CONFIRM");
         builder.setView(mview);
+        builder.setTitle("CONFIRM");
         builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int id) {
                 clearpickeditems();
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
             }
         });
+
         AlertDialog dialog=builder.create();
         dialog.show();
     }
@@ -911,5 +931,37 @@ public class homeActivity extends AppCompatActivity implements AdapterView.OnIte
         monViewModel.deleteAll();tueViewModel.deleteAll();wedViewModel.deleteAll();
         thurViewModel.deleteAll();friViewModel.deleteAll();satViewModel.deleteAll();
         sunViewModel.deleteAll();
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        if(spinList.get(position).equals("ALL CATEGORY")){
+            goodsViewModel.getAllGoods().observe(this, new Observer<List<GoodsEntity>>() {
+                @Override
+                public void onChanged(List<GoodsEntity> goodsEntities) {
+                    adapter.submitList(goodsEntities);
+                    if(goodsEntities.isEmpty()){
+                        nulltxt.setVisibility(View.VISIBLE);
+                        nulltxt.setText("Nothing to display");
+                    }
+                }
+            });
+        }
+        else{
+        goodsViewModel.getAllCategoryGoods(spinList.get(position)).observe(this, new Observer<List<GoodsEntity>>() {
+            @Override
+            public void onChanged(List<GoodsEntity> goodsEntities) {
+                adapter.submitList(goodsEntities);
+                if(goodsEntities.isEmpty()){
+                    nulltxt.setVisibility(View.VISIBLE);
+                    nulltxt.setText("Nothing to display");
+                }
+            }
+        }); }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }

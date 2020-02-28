@@ -87,13 +87,11 @@
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="5dp"
-        android:layout_marginRight="5dp"
         android:layout_marginBottom="14dp"
         android:onClick="Reg_link"
         android:text="Not registered"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/forgot_btn"
+        app:layout_constraintEnd_toStartOf="@+id/login_btn"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
@@ -102,13 +100,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="12dp"
-        android:layout_marginRight="12dp"
         android:layout_marginBottom="14dp"
         android:onClick="Forgot_password"
         android:text="forgot_password"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/reg_link_btn" />
+        app:layout_constraintStart_toEndOf="@+id/admin_login" />
 
     <ProgressBar
         android:id="@+id/progressBar"

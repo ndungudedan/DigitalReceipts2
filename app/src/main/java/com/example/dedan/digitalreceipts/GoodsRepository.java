@@ -5,12 +5,17 @@ import androidx.lifecycle.LiveData;
 import android.os.AsyncTask;
 
 import com.example.dedan.digitalreceipts.Database.AppDatabase;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Friday.FriDao;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Friday.FriEntity;
+import com.example.dedan.digitalreceipts.Database.Week_Database.Friday.FriRepo;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class GoodsRepository {
     private GoodsDao goodsDao;
     private LiveData<List<GoodsEntity>> allGoods;
+    private LiveData<List<GoodsEntity>> goods;
 
     public GoodsRepository(Application application){
         AppDatabase database=AppDatabase.getInstance(application);
@@ -33,6 +38,31 @@ public class GoodsRepository {
         return allGoods;
     }
 
+    public LiveData<List<GoodsEntity>> getCategoryGoods(String category){
+        GoodsCatAsync task=new GoodsCatAsync(goodsDao);
+        task.Repo=this;
+        try {
+            goods=task.execute(category).get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return goods;
+    }
+    private static class GoodsCatAsync extends AsyncTask<String,Void, LiveData<List<GoodsEntity>>> {
+        private GoodsDao dao;
+        private GoodsRepository Repo=null;
+
+        public GoodsCatAsync(GoodsDao dao) {
+            this.dao = dao;
+        }
+
+        @Override
+        protected LiveData<List<GoodsEntity>> doInBackground(String... strings) {
+            return dao.getCategoryGoods(strings[0]);
+        }
+    }
     public void deleteAll(){
         new deleteAllAsync(goodsDao).execute();
     }
