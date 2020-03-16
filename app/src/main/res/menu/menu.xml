@@ -2,7 +2,6 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-
     <item
         android:id="@+id/save"
         android:title=""
@@ -11,21 +10,28 @@
         />
     <item
         android:id="@+id/send"
-        android:title=""
-        android:icon="@drawable/baseline_send_black_18dp"
-        app:showAsAction="ifRoom"
-        />
+        android:title="Send"
+        app:showAsAction="never">
+        <menu>
+            <item
+                android:id="@+id/email"
+                android:title="Email"
+                />
+            <item
+                android:id="@+id/whatsapp"
+                android:title="Whatsapp"
+                />
+        </menu>
+    </item>
     <item
         android:id="@+id/client"
         android:title="Client"
         app:showAsAction="never"
         />
     <item
-        android:id="@+id/newPdf"
+        android:id="@+id/refresh"
         android:title="New"
-        app:showAsAction="never"
+        android:icon="@drawable/baseline_send_black_18dp"
+        app:showAsAction="always"
         />
-
-
-
 </menu>

@@ -17,12 +17,16 @@ public class ReceiptEntity {
     private String KEY_servedby;
     @ColumnInfo(name = "customer")
     private String KEY_customer;
+    @ColumnInfo(name = "type")
+    private String KEY_type;
 
-    public ReceiptEntity(String KEY_date, String KEY_rcpt_ref, String KEY_servedby, String KEY_customer) {
+    public ReceiptEntity(String KEY_date, String KEY_rcpt_ref, String KEY_servedby,
+                         String KEY_customer, String KEY_type) {
         this.KEY_date = KEY_date;
         this.KEY_rcpt_ref = KEY_rcpt_ref;
         this.KEY_servedby = KEY_servedby;
         this.KEY_customer = KEY_customer;
+        this.KEY_type = KEY_type;
     }
 
     public String getKEY_servedby() {
@@ -63,5 +67,13 @@ public class ReceiptEntity {
 
     public void setKEY_rcpt_ref(String KEY_rcpt_ref) {
         this.KEY_rcpt_ref = KEY_rcpt_ref;
+    }
+
+    public String getKEY_type() {
+        return KEY_type;
+    }
+
+    public void setKEY_type(String KEY_type) {
+        this.KEY_type = KEY_type;
     }
 }

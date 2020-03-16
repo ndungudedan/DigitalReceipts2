@@ -144,23 +144,25 @@ public class CustomerActivity extends AppCompatActivity {
             customerViewModel.insert(customerEntity);
         }
         else if(requestCode==EDIT_CUSTOMER_REQUEST && resultCode==RESULT_OK){
-            int id=data.getIntExtra(CustomerAddEdit.EXTRA_ID,-1);
-            if(id==-1){
-                Toast.makeText(this, "cannot update", Toast.LENGTH_SHORT).show();
-                return;
+            int id= 0;
+            if (data != null) {
+                id = data.getIntExtra(CustomerAddEdit.EXTRA_ID, -1);
+                if (id == -1) {
+                    Toast.makeText(this, "cannot update", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                String fname = data.getStringExtra(CustomerAddEdit.EXTRA_FNAME);
+                String sname = data.getStringExtra(CustomerAddEdit.EXTRA_SNAME);
+                String pobox = data.getStringExtra(CustomerAddEdit.EXTRA_POBOX);
+                String address = data.getStringExtra(CustomerAddEdit.EXTRA_ADDRESS);
+                String location = data.getStringExtra(CustomerAddEdit.EXTRA_LOCATION);
+                String email = data.getStringExtra(CustomerAddEdit.EXTRA_EMAIL);
+                String phone = data.getStringExtra(CustomerAddEdit.EXTRA_PHONE);
+
+                CustomerEntity customerEntity = new CustomerEntity(fname, sname, phone, location, address, pobox, email);
+                customerEntity.setKEY_id(id);
+                customerViewModel.update(customerEntity);
             }
-            String fname=data.getStringExtra(CustomerAddEdit.EXTRA_FNAME);
-            String sname=data.getStringExtra(CustomerAddEdit.EXTRA_SNAME);
-            String pobox=data.getStringExtra(CustomerAddEdit.EXTRA_POBOX);
-            String address=data.getStringExtra(CustomerAddEdit.EXTRA_ADDRESS);
-            String location=data.getStringExtra(CustomerAddEdit.EXTRA_LOCATION);
-            String email=data.getStringExtra(CustomerAddEdit.EXTRA_EMAIL);
-            String phone=data.getStringExtra(CustomerAddEdit.EXTRA_PHONE);
-
-            CustomerEntity customerEntity=new CustomerEntity(fname,sname,phone,location,address,pobox,email);
-            customerEntity.setKEY_id(id);
-            customerViewModel.update(customerEntity);
-
         }
     }
     public void confirmdialog(){
@@ -189,5 +191,4 @@ public class CustomerActivity extends AppCompatActivity {
     private void deleteAll() {
         customerViewModel.deleteAll();
     }
-
 }

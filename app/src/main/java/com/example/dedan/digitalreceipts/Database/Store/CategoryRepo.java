@@ -29,12 +29,16 @@ public class CategoryRepo {
     public void update(CategoryEntity categoryEntity){
         new updateAsyncTask(dao).execute(categoryEntity);
     }
+    public  void delete(CategoryEntity categoryEntity){
+        new deleteAsyncTask(dao).execute(categoryEntity);
+    }
     public LiveData<List<CategoryEntity>> AllCategories(){
         return allCategory;
     }
     public void deleteAll(){
         new deleteAllAsync(dao).execute();
     }
+
     private static class deleteAllAsync extends AsyncTask<Void,Void,Void>{
         private CategoryDao dao;
         public deleteAllAsync(CategoryDao dao) {
@@ -47,7 +51,20 @@ public class CategoryRepo {
             return null;
         }
     }
-    private static class insertAsyncTask extends AsyncTask<CategoryEntity,Void,Void> {
+    private static class deleteAsyncTask extends AsyncTask<CategoryEntity,Void,Void> {
+        private CategoryDao dao;
+
+        private deleteAsyncTask(CategoryDao dao) {
+            this.dao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(CategoryEntity... categoryEntities) {
+            dao.delete(categoryEntities[0]);
+            return null;
+        }
+    }
+        private static class insertAsyncTask extends AsyncTask<CategoryEntity,Void,Void> {
         private CategoryDao dao;
 
         public insertAsyncTask(CategoryDao dao) {

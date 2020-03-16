@@ -1,5 +1,6 @@
 package com.example.dedan.digitalreceipts;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.Observer;
@@ -39,6 +40,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.example.dedan.digitalreceipts.Database.Store.CategoryDeleteAdapter;
 import com.example.dedan.digitalreceipts.Database.Store.CategoryEntity;
 import com.example.dedan.digitalreceipts.Database.Store.CategoryViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -54,7 +56,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
-
+import java.util.Queue;
 
 public class unit extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private GoodsViewModel goodsViewModel;
@@ -64,7 +66,6 @@ public class unit extends AppCompatActivity implements AdapterView.OnItemSelecte
     private String pack;
     TextView nulltxt;
     Spinner catSpinner;
-    Button catbtn;
     Toolbar unittool;
     private ArrayAdapter<String> spinAdapt;
     private List<String> spinList=new ArrayList<>();
@@ -75,6 +76,10 @@ public class unit extends AppCompatActivity implements AdapterView.OnItemSelecte
     private Bitmap bitmap;
     private ImageView imageView;
     private List<GoodsEntity> goodsList;
+    private List<CategoryEntity> catEntities;
+    private int catId;
+    private CategoryDeleteAdapter categoryDeleteAdapter;
+    private List<String> spinListInputDialogs=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,14 +88,16 @@ public class unit extends AppCompatActivity implements AdapterView.OnItemSelecte
         unittool = findViewById(R.id.unitbar);
         setSupportActionBar(unittool);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        categoryDeleteAdapter = new CategoryDeleteAdapter();
 
         goodsViewModel= ViewModelProviders.of(this).get(GoodsViewModel.class);
         categoryViewModel=ViewModelProviders.of(this).get(CategoryViewModel.class);
 
         catSpinner=findViewById(R.id.cat_spin);
-        catbtn=findViewById(R.id.cat_btn);
         nulltxt=findViewById(R.id.empty_unit);
         FloatingActionButton floatingActionButton=findViewById(R.id.floating_unit_btn);
+
+        bitmap=BitmapFactory.decodeResource(this.getResources(),R.drawable.icons8add96);
 
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,23 +105,21 @@ public class unit extends AppCompatActivity implements AdapterView.OnItemSelecte
                 inputDialog();
             }
         });
-        catbtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-             addCategory();
-            }
-        });
         categoryViewModel.AllCategorys().observe(this, new Observer<List<CategoryEntity>>() {
             @Override
             public void onChanged(List<CategoryEntity> categoryEntities) {
+                catEntities=categoryEntities;
+                categoryDeleteAdapter.submitList(categoryEntities);
                 for(CategoryEntity ent:categoryEntities){
                     spinList.add(ent.getKEY_Category());
+                    spinListInputDialogs.add(ent.getKEY_Category());
                 }
                 spinList.add(0,"ALL CATEGORY");
                 loadSpinner();
             }
 
         });
+
         RecyclerView recyclerView=findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
@@ -140,8 +145,8 @@ public class unit extends AppCompatActivity implements AdapterView.OnItemSelecte
                 editinputDialog(goodsEntity.getKEY_GOODS_ID(),goodsEntity.getKEY_PIC(),goodsEntity.getKEY_ITEM(),goodsEntity.getKEY_PACK(),goodsEntity.getKEY_COST());
             }
         });
-
     }
+
     public void loadSpinner(){
         if(!spinList.isEmpty()){
             spinAdapt=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,spinList);
@@ -155,7 +160,7 @@ public class unit extends AppCompatActivity implements AdapterView.OnItemSelecte
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater=getMenuInflater();
-        inflater.inflate(R.menu.del_menu, menu);
+        inflater.inflate(R.menu.unit_menu, menu);
         return true;
     }
 
@@ -165,7 +170,16 @@ public class unit extends AppCompatActivity implements AdapterView.OnItemSelecte
             case R.id.delete:
                 confirmdialog();
                 break;
-    }
+            case R.id.add:
+                categoryInputDialog();
+                break;
+            case R.id.del:
+                deleteCatdialog();
+                break;
+            case R.id.edit:
+                categoryEditInputDialog(spinList.get(catSpinner.getSelectedItemPosition()));
+                break;
+        }
         return super.onOptionsItemSelected(menuitem);
     }
     public void confirmdialog(){
@@ -190,11 +204,112 @@ public class unit extends AppCompatActivity implements AdapterView.OnItemSelecte
         AlertDialog dialog=builder.create();
         dialog.show();
     }
-
     private void deleteAll() {
         goodsViewModel.deleteAll();
+        categoryViewModel.deleteAll();
+        spinList.clear();
     }
 
+    public void deleteCatdialog(){
+        AlertDialog.Builder builder=new AlertDialog.Builder(unit.this);
+        View mview=getLayoutInflater().inflate(R.layout.category_delete,null);
+        RecyclerView recyclerView = mview.findViewById(R.id.del_cat_recycler);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(categoryDeleteAdapter);
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
+                ItemTouchHelper.LEFT| ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                categoryViewModel.delete(categoryDeleteAdapter.getCategoryAt(viewHolder.getAdapterPosition()));
+                goodsViewModel.deleteCategoryGoods(categoryDeleteAdapter.getCategoryAt(viewHolder.getAdapterPosition()).getKEY_Category());
+                spinList.clear();
+            }
+        }).attachToRecyclerView(recyclerView);
+        builder.setTitle("Swipe to delete category");
+        builder.setView(mview);
+        builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog=builder.create();
+        dialog.show();
+    }
+    public void categoryEditInputDialog(final String cat){
+        final EditText cat_edit;
+        AlertDialog.Builder builder = new AlertDialog.Builder(unit.this);
+        View mview=getLayoutInflater().inflate(R.layout.category_input,null);
+        cat_edit=mview.findViewById(R.id.cattxt);
+        cat_edit.setText(cat);
+        builder.setView(mview);
+        builder.setTitle("Update Category");
+        builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                categoryEdit(cat_edit.getText().toString(),cat);
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog=builder.create();
+        dialog.show();
+    }
+    public void categoryEdit(final String Newcat, String Oldcat){
+        CategoryEntity categoryEntity=new CategoryEntity(Newcat);
+        categoryEntity.setKEY_ID(catId);
+        categoryViewModel.update(categoryEntity);
+        goodsViewModel.getAllCategoryGoods(Oldcat).observe(this, new Observer<List<GoodsEntity>>() {
+            @Override
+            public void onChanged(List<GoodsEntity> goodsEntities) {
+                for(GoodsEntity ent:goodsEntities){
+                 GoodsEntity goodsEntity=new GoodsEntity(ent.getKEY_PIC(),ent.getKEY_ITEM(),
+                         ent.getKEY_PACK(),ent.getKEY_COST(),Newcat);
+                 goodsEntity.setKEY_GOODS_ID(ent.getKEY_GOODS_ID());
+                 goodsViewModel.update(goodsEntity);
+                }
+            }
+        });
+        spinList.clear();
+    }
+    public void categoryInputDialog(){
+        final EditText cat_edit;
+        AlertDialog.Builder builder = new AlertDialog.Builder(unit.this);
+        View mview=getLayoutInflater().inflate(R.layout.category_input,null);
+        cat_edit=mview.findViewById(R.id.cattxt);
+        builder.setView(mview);
+        builder.setTitle("Category");
+        builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                String category=cat_edit.getText().toString();
+                categoryViewModel.insert(new CategoryEntity(category));
+                spinList.clear();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog=builder.create();
+        dialog.show();
+    }
 
     public void inputDialog(){
         final EditText item_edit,cost_edit,pack_edit;
@@ -206,8 +321,7 @@ public class unit extends AppCompatActivity implements AdapterView.OnItemSelecte
         pack_edit=mview.findViewById(R.id.packtxt);
         imageView =mview.findViewById(R.id.item_image);
         spinner=mview.findViewById(R.id.cat_spin);
-        spinAdapt=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,spinList);
-        //spinList.remove(0);
+        spinAdapt=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,spinListInputDialogs);
         spinAdapt.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinAdapt);
         spinner.setOnItemSelectedListener(this);
@@ -228,9 +342,13 @@ public class unit extends AppCompatActivity implements AdapterView.OnItemSelecte
                 item=item_edit.getText().toString();
                 cost= Integer.parseInt(cost_edit.getText().toString());
                 pack=pack_edit.getText().toString();
-
-                GoodsEntity goodsEntity=new GoodsEntity(goodpic(bitmap),item,pack,cost,spinner.getSelectedItem().toString());
-                goodsViewModel.insert(goodsEntity);
+                if(spinListInputDialogs.isEmpty()){
+                    GoodsEntity goodsEntity=new GoodsEntity(goodpic(bitmap),item,pack,cost,"N/A");
+                    goodsViewModel.insert(goodsEntity);
+                }else{
+                    GoodsEntity goodsEntity=new GoodsEntity(goodpic(bitmap),item,pack,cost,spinner.getSelectedItem().toString());
+                    goodsViewModel.insert(goodsEntity);
+                }
 
             }
         });
@@ -240,6 +358,60 @@ public class unit extends AppCompatActivity implements AdapterView.OnItemSelecte
             }
         });
         AlertDialog dialog=builder.create();
+        dialog.show();
+    }
+    public void editinputDialog(final int i,String pic, String it, String pa, int co) {
+        final EditText item_edit, cost_edit, pack_edit;
+        final Spinner spinner;
+        AlertDialog.Builder builder = new AlertDialog.Builder(unit.this);
+        View mview = getLayoutInflater().inflate(R.layout.unit_goods_dialog, null);
+        item_edit = mview.findViewById(R.id.itemtxt);
+        cost_edit = mview.findViewById(R.id.unittxt);
+        pack_edit = mview.findViewById(R.id.packtxt);
+        imageView=mview.findViewById(R.id.item_image);
+        spinner=mview.findViewById(R.id.cat_spin);
+        spinAdapt=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,spinListInputDialogs);
+        spinAdapt.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(spinAdapt);
+        spinner.setOnItemSelectedListener(this);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent gallery=new Intent();
+                gallery.setType("image/*");
+                gallery.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(gallery,"pictures"),pick);
+            }
+        });
+        item_edit.setText(it);
+        pack_edit.setText(pa);
+        cost_edit.setText(String.valueOf(co));
+        retreivePic(pic,it);
+        builder.setView(mview);
+        builder.setTitle("Edit");
+        builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                item = item_edit.getText().toString();
+                cost = Integer.parseInt(cost_edit.getText().toString());
+                pack = pack_edit.getText().toString();
+                if(spinListInputDialogs.isEmpty()){
+                    GoodsEntity goodsEntity = new GoodsEntity(goodpic(bitmap),item, pack, cost,"N/A");
+                    goodsEntity.setKEY_GOODS_ID(i);
+                    goodsViewModel.update(goodsEntity);
+                }else{
+                    GoodsEntity goodsEntity = new GoodsEntity(goodpic(bitmap),item, pack, cost,spinner.getSelectedItem().toString());
+                    goodsEntity.setKEY_GOODS_ID(i);
+                    goodsViewModel.update(goodsEntity);
+                }
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
         dialog.show();
     }
     @Override
@@ -255,74 +427,7 @@ public class unit extends AppCompatActivity implements AdapterView.OnItemSelecte
             }
         }
     }
-    public void editinputDialog(final int i,String pic, String it, String pa, int co) {
-        final EditText item_edit, cost_edit, pack_edit;
-        final Spinner spinner;
-        AlertDialog.Builder builder = new AlertDialog.Builder(unit.this);
-        View mview = getLayoutInflater().inflate(R.layout.unit_goods_dialog, null);
-        item_edit = mview.findViewById(R.id.itemtxt);
-        cost_edit = mview.findViewById(R.id.unittxt);
-        pack_edit = mview.findViewById(R.id.packtxt);
-        imageView=mview.findViewById(R.id.item_image);
-        spinner=mview.findViewById(R.id.cat_spin);
-        spinAdapt=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,spinList);
-        //spinList.remove(0);
-        spinAdapt.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(spinAdapt);
-        spinner.setOnItemSelectedListener(this);
-        item_edit.setText(it);
-        pack_edit.setText(pa);
-        cost_edit.setText(String.valueOf(co));
-        retreivePic(pic,it);
-        builder.setView(mview);
-        builder.setTitle("Edit");
-        builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                item = item_edit.getText().toString();
-                cost = Integer.parseInt(cost_edit.getText().toString());
-                pack = pack_edit.getText().toString();
 
-                GoodsEntity goodsEntity = new GoodsEntity(goodpic(bitmap),item, pack, cost,spinner.getSelectedItem().toString());
-                goodsEntity.setKEY_GOODS_ID(i);
-                goodsViewModel.update(goodsEntity);
-
-            }
-        });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-    public void addCategory(){
-        final EditText cat_edit,cost_edit,pack_edit;
-        AlertDialog.Builder builder = new AlertDialog.Builder(unit.this);
-        View mview=getLayoutInflater().inflate(R.layout.unit_goods_dialog,null);
-        cat_edit=mview.findViewById(R.id.itemtxt);
-        cost_edit=mview.findViewById(R.id.unittxt);
-        pack_edit=mview.findViewById(R.id.packtxt);
-        builder.setView(mview);
-        builder.setTitle("Add Category");
-        cost_edit.setVisibility(View.INVISIBLE);pack_edit.setVisibility(View.INVISIBLE);
-        builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                cat=cat_edit.getText().toString();
-                categoryViewModel.insert(new CategoryEntity(cat));
-                spinList.clear();
-            }
-        });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
-        AlertDialog dialog=builder.create();
-        dialog.show();
-    }
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         if(spinList.get(position).equals("ALL CATEGORY")){
@@ -348,7 +453,15 @@ public class unit extends AppCompatActivity implements AdapterView.OnItemSelecte
                     nulltxt.setText("Nothing to display");
                 }
             }
-        }); }
+        });
+        }
+        for(CategoryEntity ent:catEntities){
+            String x=ent.getKEY_Category();
+            String y=view.toString();
+            if(ent.getKEY_Category().equals(spinList.get(position))){
+            catId =ent.getKEY_ID();
+            }
+        }
     }
 
     @Override
@@ -358,8 +471,8 @@ public class unit extends AppCompatActivity implements AdapterView.OnItemSelecte
     private void retreivePic(String path,String item) {
         try{
             File file=new File(path,item+"pic.jpg");
-            Bitmap bit= BitmapFactory.decodeStream(new FileInputStream(file));
-            imageView.setImageBitmap(bit);
+                Bitmap bit= BitmapFactory.decodeStream(new FileInputStream(file));
+                imageView.setImageBitmap(bit);
         }
         catch (FileNotFoundException e){
             e.printStackTrace();

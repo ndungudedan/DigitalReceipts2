@@ -1,160 +1,282 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/relativeLayout3"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/userdetailsCard"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/yearSummaryCard"
+    <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/textView16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Digital Receipts"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/comp_month_recycler" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <androidx.cardview.widget.CardView
+            android:id="@+id/userdetailsCard"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/yearSummaryCard"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
-                android:id="@+id/profilePic"
-                android:layout_width="323dp"
-                android:layout_height="312dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/icons8businessman80" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/na"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Name:"
-                app:layout_constraintStart_toEndOf="@id/profilePic"
-                app:layout_constraintTop_toTopOf="parent" />
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profilePic"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/icons8businessman80"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/na"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/Name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toEndOf="@id/na"
-                app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/na"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Name:"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="18sp"
+                    android:textStyle="normal"
+                    app:layout_constraintBottom_toTopOf="@+id/id"
+                    app:layout_constraintEnd_toStartOf="@id/Name"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintStart_toEndOf="@id/profilePic"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_chainStyle="spread_inside" />
 
-            <TextView
-                android:id="@+id/id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Id.No:"
-                app:layout_constraintStart_toEndOf="@id/profilePic"
-                app:layout_constraintTop_toBottomOf="@id/na" />
+                <TextView
+                    android:id="@+id/Name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Dedan Ndungu"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@+id/idno"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintStart_toEndOf="@id/na"
+                    app:layout_constraintTop_toTopOf="@id/na"
+                    app:layout_constraintVertical_chainStyle="spread_inside" />
 
-            <TextView
-                android:id="@+id/idno"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toEndOf="@id/id"
-                app:layout_constraintTop_toBottomOf="@id/Name" />
+                <TextView
+                    android:id="@+id/id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Id.No:"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toTopOf="@+id/dobirth"
+                    app:layout_constraintEnd_toStartOf="@id/idno"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintStart_toEndOf="@id/profilePic"
+                    app:layout_constraintTop_toBottomOf="@id/na"
+                    app:layout_constraintVertical_chainStyle="spread_inside" />
 
-            <TextView
-                android:id="@+id/dobirth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="DOB:"
-                app:layout_constraintStart_toEndOf="@id/profilePic"
-                app:layout_constraintTop_toBottomOf="@id/id" />
+                <TextView
+                    android:id="@+id/idno"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="36432716"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@id/DOB"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintStart_toEndOf="@id/id"
+                    app:layout_constraintTop_toBottomOf="@id/Name"
+                    app:layout_constraintVertical_chainStyle="spread_inside" />
 
-            <TextView
-                android:id="@+id/DOB"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toEndOf="@id/dobirth"
-                app:layout_constraintTop_toBottomOf="@id/idno" />
+                <TextView
+                    android:id="@+id/dobirth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="DOB:"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toTopOf="@+id/pho"
+                    app:layout_constraintEnd_toStartOf="@id/DOB"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintStart_toEndOf="@id/profilePic"
+                    app:layout_constraintTop_toBottomOf="@id/id"
+                    app:layout_constraintVertical_chainStyle="spread_inside" />
 
-            <TextView
-                android:id="@+id/pho"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Phone:"
-                app:layout_constraintStart_toEndOf="@id/profilePic"
-                app:layout_constraintTop_toBottomOf="@id/dobirth" />
+                <TextView
+                    android:id="@+id/DOB"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="01/04/1999"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@+id/mobile"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintStart_toEndOf="@id/dobirth"
+                    app:layout_constraintTop_toBottomOf="@id/idno"
+                    app:layout_constraintVertical_chainStyle="spread_inside" />
 
-            <TextView
-                android:id="@+id/mobile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toEndOf="@id/pho"
-                app:layout_constraintTop_toBottomOf="@id/DOB" />
+                <TextView
+                    android:id="@+id/pho"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Phone:"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toTopOf="@+id/res"
+                    app:layout_constraintEnd_toStartOf="@id/mobile"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintStart_toEndOf="@id/profilePic"
+                    app:layout_constraintTop_toBottomOf="@id/dobirth"
+                    app:layout_constraintVertical_chainStyle="spread_inside" />
 
-            <TextView
-                android:id="@+id/res"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Residence:"
-                app:layout_constraintStart_toEndOf="@id/profilePic"
-                app:layout_constraintTop_toBottomOf="@id/pho" />
+                <TextView
+                    android:id="@+id/mobile"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:text="0700314700"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@+id/mresidence"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintStart_toEndOf="@id/pho"
+                    app:layout_constraintTop_toBottomOf="@id/DOB"
+                    app:layout_constraintVertical_chainStyle="spread_inside" />
 
-            <TextView
-                android:id="@+id/mresidence"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toEndOf="@id/res"
-                app:layout_constraintTop_toBottomOf="@id/mobile" />
+                <TextView
+                    android:id="@+id/res"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Residence:"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toTopOf="@+id/ema"
+                    app:layout_constraintEnd_toStartOf="@id/mresidence"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintStart_toEndOf="@id/profilePic"
+                    app:layout_constraintTop_toBottomOf="@id/pho"
+                    app:layout_constraintVertical_chainStyle="spread_inside" />
 
-            <TextView
-                android:id="@+id/ema"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Email:"
-                app:layout_constraintStart_toEndOf="@id/profilePic"
-                app:layout_constraintTop_toBottomOf="@id/res" />
+                <TextView
+                    android:id="@+id/mresidence"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Thome"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@+id/memail"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintStart_toEndOf="@id/res"
+                    app:layout_constraintTop_toBottomOf="@id/mobile"
+                    app:layout_constraintVertical_chainStyle="spread_inside" />
 
-            <TextView
-                android:id="@+id/memail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toEndOf="@id/ema"
-                app:layout_constraintTop_toBottomOf="@id/mresidence" />
+                <TextView
+                    android:id="@+id/ema"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Email:"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toTopOf="@+id/mstat"
+                    app:layout_constraintEnd_toStartOf="@id/memail"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintStart_toEndOf="@id/profilePic"
+                    app:layout_constraintTop_toBottomOf="@id/res"
+                    app:layout_constraintVertical_chainStyle="spread_inside" />
 
-            <TextView
-                android:id="@+id/mstat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Status:"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/profilePic"
-                app:layout_constraintTop_toBottomOf="@id/ema" />
+                <TextView
+                    android:id="@+id/memail"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="dnkibere@gmail.com"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@+id/mstatus"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintStart_toEndOf="@id/ema"
+                    app:layout_constraintTop_toBottomOf="@id/mresidence"
+                    app:layout_constraintVertical_chainStyle="spread_inside" />
 
-            <TextView
-                android:id="@+id/mstatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/mstat"
-                app:layout_constraintTop_toBottomOf="@id/memail" />
+                <TextView
+                    android:id="@+id/mstat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Status:"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toTopOf="@id/access_btn"
+                    app:layout_constraintEnd_toStartOf="@id/mstatus"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintStart_toEndOf="@id/profilePic"
+                    app:layout_constraintTop_toBottomOf="@id/ema"
+                    app:layout_constraintVertical_chainStyle="spread_inside" />
 
-            <Button
-                android:id="@+id/access_btn"
-                style="@style/Widget.AppCompat.Button.Borderless.Colored"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:clickable="false"
-                android:text="INVALIDATE"
-                android:visibility="invisible"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/mstatus" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
+                <TextView
+                    android:id="@+id/mstatus"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="ACCESS_GRANTED"
+                    android:textColor="#17BD20"
+                    android:textSize="18sp"
+                    android:textStyle="bold|italic"
+                    app:layout_constraintBottom_toBottomOf="@+id/mstat"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintStart_toEndOf="@id/mstat"
+                    app:layout_constraintTop_toBottomOf="@id/memail"
+                    app:layout_constraintVertical_chainStyle="spread_inside" />
+
+                <Button
+                    android:id="@+id/access_btn"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="INVALIDATE"
+                    android:visibility="invisible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/mstatus"
+                    app:layout_constraintVertical_chainStyle="spread_inside" />
+
+                <Button
+                    android:id="@+id/edit"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Edit"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/mstatus"
+                    app:layout_constraintVertical_chainStyle="spread_inside" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/yearSummaryCard"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
         app:layout_constraintBottom_toTopOf="@id/comp_week_recycler"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/userdetailsCard"
+        app:layout_constraintStart_toStartOf="@id/userdetailsCard"
         app:layout_constraintTop_toBottomOf="@id/userdetailsCard">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -168,7 +290,7 @@
                 android:layout_height="wrap_content"
                 android:text="2020"
                 android:textColor="#F7FFFFFF"
-                android:textSize="50sp"
+                android:textSize="40sp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -191,8 +313,7 @@
                 android:textColor="#F7FFFFFF"
                 android:textSize="25sp"
                 app:layout_constraintEnd_toEndOf="@+id/sa"
-                app:layout_constraintHorizontal_bias="0.996"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toStartOf="@id/sa"
                 app:layout_constraintTop_toBottomOf="@id/sa" />
 
             <TextView
@@ -214,22 +335,9 @@
                 android:text="00"
                 android:textColor="#F7FFFFFF"
                 android:textSize="25sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintEnd_toEndOf="@id/cli"
                 app:layout_constraintStart_toStartOf="@id/cli"
                 app:layout_constraintTop_toBottomOf="@id/cli" />
-
-            <View
-                android:id="@+id/divider"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?android:attr/listDivider"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/year"
-                app:layout_constraintVertical_bias="1.0" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
@@ -239,8 +347,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="week 0-1"
+        android:textColor="#0622EF"
+        android:textSize="14sp"
+        android:textStyle="italic"
         app:layout_constraintBottom_toTopOf="@id/comp_week_recycler"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/yearSummaryCard" />
 
@@ -248,17 +360,18 @@
         android:id="@+id/empty_txt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="#E80C0C"
         android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/yearSummaryCard"
         app:layout_constraintBottom_toBottomOf="parent"
-        />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/yearSummaryCard"
+        app:layout_constraintVertical_bias="0.25" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/comp_week_recycler"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@id/comp_month_recycler"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -270,19 +383,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Financial Year"
-        app:layout_constraintTop_toBottomOf="@id/comp_week_recycler"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="#0622EF"
+        android:textSize="14sp"
+        android:textStyle="italic"
         app:layout_constraintBottom_toTopOf="@id/comp_month_recycler"
-        />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/comp_week_recycler" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/comp_month_recycler"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/comp_week_recycler"
         tools:listitem="@layout/user_stats_recycler" />
 </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

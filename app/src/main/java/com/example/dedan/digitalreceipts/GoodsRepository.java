@@ -34,6 +34,9 @@ public class GoodsRepository {
     public void delete(GoodsEntity goodsEntity){
         new deleteGoodsAsyncTask(goodsDao).execute(goodsEntity);
     }
+    public void deleteCategoryGoods(String cat){
+        new deleteCategoryAsync(goodsDao).execute(cat);
+    }
     public LiveData<List<GoodsEntity>> getAllGoods(){
         return allGoods;
     }
@@ -65,6 +68,17 @@ public class GoodsRepository {
     }
     public void deleteAll(){
         new deleteAllAsync(goodsDao).execute();
+    }
+    private static class deleteCategoryAsync extends AsyncTask<String,Void,Void>{
+        private GoodsDao dao;
+        public deleteCategoryAsync(GoodsDao dao){
+            this.dao = dao;
+        }
+        @Override
+        protected Void doInBackground(String... strings) {
+            dao.deleteCategoryGoods(strings[0]);
+            return null;
+        }
     }
     private static class deleteAllAsync extends AsyncTask<Void,Void,Void>{
         private GoodsDao dao;

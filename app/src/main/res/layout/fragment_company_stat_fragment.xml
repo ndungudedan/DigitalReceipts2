@@ -1,80 +1,250 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".company_stat_fragment">
-    <androidx.cardview.widget.CardView
-        android:id="@+id/yearSummaryCard"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        >
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/year"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2019"
-                android:layout_centerHorizontal="true"
-                />
-            <TextView
-                android:id="@+id/sa"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sales:"
-                android:layout_below="@id/year"
-                />
-            <TextView
-                android:id="@+id/comp_sales"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/year"
-                android:layout_toEndOf="@id/sa"/>
-            <TextView
-                android:id="@+id/cli"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Clients:"
-                android:layout_below="@id/sa"/>
-            <TextView
-                android:id="@+id/client_served"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/sa"
-                android:layout_toEndOf="@id/cli"/>
 
-        </RelativeLayout>
-    </androidx.cardview.widget.CardView>
-    <FrameLayout
-        android:id="@+id/week_frame"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/compstatsconstraint"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/yearSummaryCard"
-        >
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/comp_week_recycler"
+        app:layout_constraintBottom_toTopOf="@id/constraintLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/comp_logo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/logo1_launcher"
+            app:layout_constraintBottom_toTopOf="@id/emailtxt"
+            app:layout_constraintEnd_toStartOf="@id/subtitletxt"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.060000002" />
+
+        <TextView
+            android:id="@+id/titletxt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:listitem="@layout/month_total_recycler"
-            />
+            android:layout_marginTop="32dp"
+            android:text="TIDTECH"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.506"
+            app:layout_constraintStart_toEndOf="@+id/comp_logo"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    </FrameLayout>
-    <FrameLayout
-        android:id="@+id/month_frame"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/week_frame"
-        >
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/comp_month_recycler"
+        <TextView
+            android:id="@+id/emailtxt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:listitem="@layout/month_total_recycler"
-            />
+            android:layout_marginStart="9dp"
+            android:layout_marginTop="28dp"
+            android:text="dnkibere@gmail.com"
+            app:layout_constraintStart_toEndOf="@+id/imageView6"
+            app:layout_constraintTop_toBottomOf="@+id/comp_logo" />
 
-    </FrameLayout>
+        <TextView
+            android:id="@+id/phonetxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="9dp"
+            android:layout_marginTop="19dp"
+            android:text="0700314700"
+            app:layout_constraintStart_toEndOf="@+id/imageView4"
+            app:layout_constraintTop_toBottomOf="@+id/imageView6" />
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/locationtxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:text="Ruiru,Kenya"
+            app:layout_constraintStart_toEndOf="@+id/imageView7"
+            app:layout_constraintTop_toBottomOf="@+id/subtitletxt" />
+
+        <TextView
+            android:id="@+id/subtitletxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:inputType="textMultiLine"
+            android:text="Digitize your workplace"
+            app:layout_constraintEnd_toEndOf="@id/titletxt"
+            app:layout_constraintStart_toStartOf="@+id/titletxt"
+            app:layout_constraintTop_toBottomOf="@+id/titletxt" />
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="9dp"
+            android:src="@android:drawable/ic_menu_call"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/phonetxt"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView6" />
+
+        <ImageView
+            android:id="@+id/imageView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:layout_marginEnd="9dp"
+            android:src="@android:drawable/ic_dialog_email"
+            app:layout_constraintEnd_toStartOf="@+id/emailtxt"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/comp_logo" />
+
+        <ImageView
+            android:id="@+id/imageView7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="87dp"
+            android:layout_marginTop="26dp"
+            android:layout_marginEnd="12dp"
+            android:src="@android:drawable/ic_dialog_map"
+            app:layout_constraintEnd_toStartOf="@+id/locationtxt"
+            app:layout_constraintStart_toEndOf="@+id/emailtxt"
+            app:layout_constraintTop_toBottomOf="@+id/comp_logo" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/comp_week_recycler"
+        app:layout_constraintTop_toBottomOf="@id/compstatsconstraint"
+        >
+
+        <TextView
+            android:id="@+id/year"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2020"
+            android:textColor="#F7FFFFFF"
+            android:textSize="40sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/sa"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="KES:"
+            android:textColor="#F7FFFFFF"
+            android:textSize="25sp"
+            app:layout_constraintEnd_toStartOf="@id/year"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartf="parent"
+            app:layout_constraintTop_toBottomOf="@id/year" />
+
+        <TextView
+            android:id="@+id/comp_sales"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00"
+            android:textColor="#F7FFFFFF"
+            android:textSize="25sp"
+            app:layout_constraintEnd_toEndOf="@+id/sa"
+            app:layout_constraintStart_toStartOf="@id/sa"
+            app:layout_constraintTop_toBottomOf="@id/sa" />
+
+        <TextView
+            android:id="@+id/cli"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Clients:"
+            android:textColor="#F7FFFFFF"
+            android:textSize="25sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/year"
+            app:layout_constraintTop_toBottomOf="@id/year" />
+
+        <TextView
+            android:id="@+id/client_served"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00"
+            android:textColor="#F7FFFFFF"
+            android:textSize="25sp"
+            app:layout_constraintEnd_toEndOf="@id/cli"
+            app:layout_constraintStart_toStartOf="@id/cli"
+            app:layout_constraintTop_toBottomOf="@id/cli" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/wkno"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="week 0-1"
+        android:textColor="#0622EF"
+        android:textSize="14sp"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toTopOf="@id/comp_week_recycler"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/constraintLayout" />
+    <TextView
+        android:id="@+id/mnth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Financial Year"
+        android:textColor="#0622EF"
+        android:textSize="14sp"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toTopOf="@id/comp_month_recycler"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/comp_week_recycler" />
+
+    <TextView
+        android:id="@+id/empty_txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#E80C0C"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/comp_week_recycler"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintBottom_toTopOf="@id/comp_month_recycler"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
+        tools:listitem="@layout/month_total_recycler" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/comp_month_recycler"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/comp_week_recycler"
+        tools:listitem="@layout/month_total_recycler" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

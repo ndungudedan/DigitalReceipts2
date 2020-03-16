@@ -6,11 +6,15 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -20,16 +24,27 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.dedan.digitalreceipts.Database.CompDetails.detailsEntity;
+import com.example.dedan.digitalreceipts.Database.CompDetails.detailsViewModel;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class createReceipt extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-
-    EditText title,locat,box;
+    private detailsViewModel detailsViewModel;
+    private onlineDb onlineDb;
+    FirebaseFirestore firedb = FirebaseFirestore.getInstance();
+    FirebaseStorage firestorage = FirebaseStorage.getInstance();
+    StorageReference storageRef = firestorage.getReference();
+    EditText title,locat,box,cont;
     EditText mail;
-    EditText cont;
     Button save;
     ImageView image;
     int pick=1;
@@ -39,22 +54,24 @@ public class createReceipt extends AppCompatActivity implements AdapterView.OnIt
     Spinner spin;
     String[] spinList ;
     ArrayAdapter<String> spinAdapt;
-
     SharedPreferences sharedpreferences;
+    private detailsEntity detEnt=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_receipt);
+        detailsViewModel= ViewModelProviders.of(this).get(detailsViewModel.class);
+        onlineDb=new onlineDb(firedb,firestorage,storageRef);
 
         sharedpreferences=getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+
         spin= findViewById(R.id.month_spinner);
         spinList= new String[]{"January","February","March","April","May","June","July","August",
                 "September","October","November","December"};
         spinAdapt=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,spinList);
         spinAdapt.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spin.setAdapter(spinAdapt);
-        spin.setSelection(sharedpreferences.getInt("startMonthPos",0));
         spin.setOnItemSelectedListener(this);
 
         title= findViewById(R.id.title);
@@ -76,17 +93,6 @@ public class createReceipt extends AppCompatActivity implements AdapterView.OnIt
                 String l = locat.getText().toString();
                 String b = box.getText().toString();
 
-                sharedpreferences=getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedpreferences.edit();
-                    editor.putString("nameKey",""+ t);
-                    editor.putString("emailKey",""+ e);
-                    editor.putString("locationKey",""+ l);
-                    editor.putString("boxKey",""+ b);
-                    editor.putString("contactKey",""+ c);
-                    editor.apply();
-                    Toast.makeText(createReceipt.this, "thanks", Toast.LENGTH_LONG).show();
-
-
                 String state= Environment.getExternalStorageState();
                 if(bitmap!=null){
                 if(Environment.MEDIA_MOUNTED.equals(state)) {
@@ -106,7 +112,11 @@ public class createReceipt extends AppCompatActivity implements AdapterView.OnIt
                         e1.printStackTrace();
                     }
                 }}
-
+                if(detEnt!=null){
+                        companyUpdate(t,b,l,e,c);
+                }else{
+                    companyRegister(t,b,l,e,c);
+                }
 
                     cont.setEnabled(false);
                     mail.setEnabled(false);
@@ -125,6 +135,40 @@ public class createReceipt extends AppCompatActivity implements AdapterView.OnIt
                 startActivityForResult(Intent.createChooser(gallery,"pictures"),pick);
             }
         });
+    }
+    public void companyRegister(String title,String address,String location,String email,String contact){
+        if(internetIsConnected()){
+            onlineDb.registerCompanyOnline(title,spin.getSelectedItemPosition(),spin.getSelectedView().toString(),location,contact,email,file.getAbsolutePath());
+            detailsEntity detailsEntity=new detailsEntity(title,email,location,address,contact,file.getAbsolutePath(),spin.getSelectedItemPosition(),spin.getSelectedView().toString());
+            detailsViewModel.insert(detailsEntity);
+            onlineDb.companyUsers(title,sharedpreferences.getString("current_useremail",""),sharedpreferences.getString("current_username",""));
+        }else{
+            Toast.makeText(createReceipt.this, "failed!!!No network access",
+                    Toast.LENGTH_SHORT).show();
+        }
+
+    }
+    public void companyUpdate(String title,String address,String location,String email,String contact){
+        if(internetIsConnected()){
+            if(file==null){
+                onlineDb.updateCompanyOnline(title,spin.getSelectedItemPosition(),spin.getSelectedView().toString(),location,contact,email,detEnt.getKEY_Logo());
+                onlineDb.companyUpdateUsers(title,sharedpreferences.getString("current_useremail",""),sharedpreferences.getString("current_username",""));
+                detailsEntity detailsEntity=new detailsEntity(title,email,location,address,contact,detEnt.getKEY_Logo(),spin.getSelectedItemPosition(),spin.getSelectedView().toString());
+                detailsEntity.setKEY_ID(detEnt.getKEY_ID());
+                detailsViewModel.update(detailsEntity);
+            }else {
+                onlineDb.companyUpdateUsers(title,sharedpreferences.getString("current_useremail",""),sharedpreferences.getString("current_username",""));
+                onlineDb.updateCompanyOnline(title,spin.getSelectedItemPosition(),spin.getSelectedView().toString(),location,contact,email,file.getAbsolutePath());
+                detailsEntity detailsEntity = new detailsEntity(title, email, location, address, contact, file.getAbsolutePath(), spin.getSelectedItemPosition(), spin.getSelectedView().toString());
+                detailsEntity.setKEY_ID(detEnt.getKEY_ID());
+                detailsViewModel.update(detailsEntity);
+            }
+        }
+        else{
+            Toast.makeText(createReceipt.this, "failed!!!No network access",
+                    Toast.LENGTH_SHORT).show();
+        }
+
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -149,20 +193,34 @@ public class createReceipt extends AppCompatActivity implements AdapterView.OnIt
         image.setEnabled(true);
         locat.setEnabled(true);
         box.setEnabled(true);
-
-
     }
-
     public void retrieve (){
-        sharedpreferences=getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        detailsViewModel.AllDetails().observe(this, new Observer<detailsEntity>() {
+            @Override
+            public void onChanged(detailsEntity detailsEntity) {
+                detEnt=detailsEntity;
+                if(detailsEntity!=null) {
+                    mail.setText(detailsEntity.getKEY_Email());
+                    title.setText(detailsEntity.getKEY_Title());
+                    locat.setText(detailsEntity.getKEY_Location());
+                    box.setText(detailsEntity.getKEY_Box());
+                    cont.setText(detailsEntity.getKEY_Contact());
+                    spin.setSelection(detailsEntity.getKEY_StartMonthPos());
+                    try (FileInputStream stream = new FileInputStream(detailsEntity.getKEY_Logo())) {
+                        Bitmap bit = BitmapFactory.decodeStream(stream);
+                        image.setImageBitmap(bit);
 
-        mail.setText(sharedpreferences.getString("emailKey",""));
-        title.setText(sharedpreferences.getString("nameKey",""));
-        locat.setText(sharedpreferences.getString("locationKey",""));
-        box.setText(sharedpreferences.getString("boxKey",""));
-        cont.setText(sharedpreferences.getString("contactKey",""));
+                        if (bit == null) {
+                            image.setImageResource(R.mipmap.launch_foreground);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
 
-        File route = Environment.getExternalStorageDirectory();
+        /*File route = Environment.getExternalStorageDirectory();
         File dir = new File(route.getAbsolutePath() + "/DIGITALRECEIPTS","Logo");
         File g=new File(dir,"/Logo.jpg");
         try (FileInputStream stream = new FileInputStream(g)) {
@@ -174,7 +232,7 @@ public class createReceipt extends AppCompatActivity implements AdapterView.OnIt
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     public void dropLIST(View view) {
@@ -184,16 +242,27 @@ public class createReceipt extends AppCompatActivity implements AdapterView.OnIt
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        sharedpreferences=getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedpreferences.edit();
-        editor.putString("startMonth",view.toString());
-        editor.putInt("startMonthPos",position);
-        editor.apply();
+        if(detEnt!=null){
+            detailsEntity detailsEntity=new detailsEntity(detEnt.getKEY_Title(),detEnt.getKEY_Email(),detEnt.getKEY_Location(),
+                    detEnt.getKEY_Box(),detEnt.getKEY_Contact(),detEnt.getKEY_Logo(),position,view.toString());
+            detailsEntity.setKEY_ID(detEnt.getKEY_ID());
+            detailsViewModel.update(detailsEntity);
+        }
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
     }
+    public boolean internetIsConnected() {
+        try {
+            String command = "ping -c 1 google.com";
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                return (Runtime.getRuntime().exec(command).waitFor(5, TimeUnit.SECONDS));
+            }
+            return (Runtime.getRuntime().exec(command).waitFor()==0);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
-

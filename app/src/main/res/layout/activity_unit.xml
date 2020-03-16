@@ -20,22 +20,14 @@
 
     <Spinner
         android:id="@+id/cat_spin"
+        style="@android:style/Widget.Material.Spinner.Underlined"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
-        app:layout_constraintEnd_toStartOf="@+id/cat_btn"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/unitbar" />
-
-    <Button
-        android:id="@+id/cat_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="32dp"
+        android:spinnerMode="dropdown"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/cat_spin"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/unitbar" />
 
     <TextView
@@ -57,7 +49,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cat_btn"
+        app:layout_constraintTop_toBottomOf="@id/cat_spin"
         tools:listitem="@layout/unit_recycler" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

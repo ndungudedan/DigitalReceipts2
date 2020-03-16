@@ -25,6 +25,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.dedan.digitalreceipts.Database.CompDetails.detailsEntity;
+import com.example.dedan.digitalreceipts.Database.CompDetails.detailsViewModel;
 import com.example.dedan.digitalreceipts.Database.Month_Database.April.AprEntity;
 import com.example.dedan.digitalreceipts.Database.Month_Database.April.AprViewModel;
 import com.example.dedan.digitalreceipts.Database.Month_Database.August.AugEntity;
@@ -49,7 +51,6 @@ import com.example.dedan.digitalreceipts.Database.Month_Database.October.OctEnti
 import com.example.dedan.digitalreceipts.Database.Month_Database.October.OctViewModel;
 import com.example.dedan.digitalreceipts.Database.Month_Database.September.SepEntity;
 import com.example.dedan.digitalreceipts.Database.Month_Database.September.SepViewModel;
-import com.example.dedan.digitalreceipts.Database.Today_Database.UserStatsMonthEntity;
 import com.example.dedan.digitalreceipts.Database.Today_Database.UserStatsMonthViewModel;
 import com.example.dedan.digitalreceipts.Database.Week_Database.Friday.FriViewModel;
 import com.example.dedan.digitalreceipts.Database.Week_Database.Monday.MonViewModel;
@@ -71,7 +72,6 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.draw.DottedLineSeparator;
-import com.itextpdf.text.pdf.draw.LineSeparator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -79,7 +79,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -98,12 +99,15 @@ public class MainActivity extends AppCompatActivity {
     MonthSalesViewModel monthSalesViewModel;
     WeekSalesViewModel weekSalesViewModel;
     UserStatsMonthViewModel userStatsMonthViewModel;
+    detailsViewModel detailsViewModel;
     private Document doc;
     private FileOutputStream fileOutputStream;
     private PdfPTable table;
     private String username="";
     private File file;
-    private Date date;
+    private String date;
+    Paragraph compDetails;
+    private detailsEntity detEnt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,17 +117,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(maintool);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
 
-
         sharedPreferences=getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        date = new Date();
-        SimpleDateFormat currentDate = new SimpleDateFormat("ddMMyyyy_HHmmss");
-        String timeStamp= currentDate.format(date);
-        if (timeStamp.contains(sharedPreferences.getString("startMonth","January"))){
-            endYeardialog();
-        }
-
-        sharedPreferences=getSharedPreferences("Data",MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
 
         userViewModel=ViewModelProviders.of(this).get(UserViewModel.class);
         janViewModel=ViewModelProviders.of(this).get(JanViewModel.class);febViewModel=ViewModelProviders.of(this).get(FebViewModel.class);
@@ -136,15 +130,30 @@ public class MainActivity extends AppCompatActivity {
         wedViewModel=ViewModelProviders.of(this).get(WedViewModel.class);thurViewModel=ViewModelProviders.of(this).get(ThurViewModel.class);
         friViewModel=ViewModelProviders.of(this).get(FriViewModel.class);satViewModel=ViewModelProviders.of(this).get(SatViewModel.class);
         sunViewModel=ViewModelProviders.of(this).get(SunViewModel.class);
-
         receiptViewModel = ViewModelProviders.of(this).get(ReceiptViewModel.class);
         weekSalesViewModel=ViewModelProviders.of(this).get(WeekSalesViewModel.class);
         monthSalesViewModel=ViewModelProviders.of(this).get(MonthSalesViewModel.class);
+        detailsViewModel=ViewModelProviders.of(this).get(detailsViewModel.class);
         userStatsMonthViewModel =ViewModelProviders.of(this).get(UserStatsMonthViewModel.class);
 
+        sharedPreferences=getSharedPreferences("Data",MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
         if(!sharedPreferences.getBoolean("firstTime", false)) {
             editor.putBoolean("firstTime", true);
             editor.apply();
+        }
+
+        Calendar calendar=Calendar.getInstance();
+        date= DateFormat.getDateInstance(DateFormat.MONTH_FIELD).format(calendar.getTime());
+        detailsViewModel.AllDetails().observe(this, new Observer<detailsEntity>() {
+            @Override
+            public void onChanged(detailsEntity detailsEntity) {
+                detEnt=detailsEntity;
+            }
+        });
+        if (detEnt!=null && date.contains(detEnt.getKEY_StartMonth())){
+            reportPdf();
+            endYeardialog();
         }
 
         permissions();
@@ -217,6 +226,7 @@ public class MainActivity extends AppCompatActivity {
         TextView mess = mview.findViewById(R.id.conf_text);
         mess.setText("YOU ARE LOGGING OUT");
         builder.setTitle("CONFIRM");
+        builder.setMessage("DO YOU WANT TO LOG OUT?");
         builder.setView(mview);
         builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
             @Override
@@ -237,13 +247,14 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder builder=new AlertDialog.Builder(MainActivity.this);
         View mview=getLayoutInflater().inflate(R.layout.confirm_dialogbox,null);
         TextView mess = mview.findViewById(R.id.conf_text);
-        mess.setText("END OF FINANCIAL YEAR:");
-        builder.setTitle("GENERATE ANNUAL REPORT");
+        builder.setTitle("END OF FINANCIAL YEAR:");
+        builder.setMessage("OPEN ANNUAL REPORT");
         builder.setView(mview);
         builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                reportPdf();
+                Intent intent=new Intent(MainActivity.this,Company.class);
+                startActivity(intent);
             }
         });
         AlertDialog dialog=builder.create();
@@ -306,15 +317,32 @@ public class MainActivity extends AppCompatActivity {
         });
         return username;
     }
+    public void table(String month){
+        try {
+            doc.add(new Paragraph(month+"Summary"));
+            doc.add(new DottedLineSeparator());
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+        table = new PdfPTable(4);
+        table.addCell("User");
+        table.addCell("Sales");
+        table.addCell("Clients");
+        try {
+            doc.add(table);
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+    }
     public void report(){
         janViewModel.getAllJanEvents().observe(this, new Observer<List<JanEntity>>() {
             @Override
             public void onChanged(List<JanEntity> janEntities) {
                 for(JanEntity jan:janEntities){
+                    table("January");
                     table.addCell(getUser(jan.getKEY_FOREIGN_KEY()));
                     table.addCell(String.valueOf(jan.getKEY_SALES()));
                     table.addCell(String.valueOf(jan.getKEY_NO_OF_CLIENTS()));
-                    table.addCell("January");
                 }
             }
         });
@@ -322,10 +350,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<FebEntity> febEntities) {
                 for (FebEntity feb:febEntities){
+                    table("February");
                     table.addCell(getUser(feb.getKEY_FOREIGN_KEY()));
                     table.addCell(String.valueOf(feb.getKEY_SALES()));
                     table.addCell(String.valueOf(feb.getKEY_NO_OF_CLIENTS()));
-                    table.addCell("February");
                 }
             }
         });
@@ -333,10 +361,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<MarEntity> marEntities) {
                 for(MarEntity val:marEntities){
+                    table("March");
                     table.addCell(getUser(val.getKEY_FOREIGN_KEY()));
                     table.addCell(String.valueOf(val.getKEY_SALES()));
                     table.addCell(String.valueOf(val.getKEY_NO_OF_CLIENTS()));
-                    table.addCell("January");
                 }
             }
         });
@@ -344,10 +372,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<AprEntity> aprEntities) {
                 for(AprEntity val:aprEntities){
+                    table("April");
                     table.addCell(getUser(val.getKEY_FOREIGN_KEY()));
                     table.addCell(String.valueOf(val.getKEY_SALES()));
                     table.addCell(String.valueOf(val.getKEY_NO_OF_CLIENTS()));
-                    table.addCell("January");
                 }
             }
         });
@@ -355,10 +383,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<MayEntity> mayEntities) {
                 for(MayEntity val:mayEntities){
+                    table("May");
                     table.addCell(getUser(val.getKEY_FOREIGN_KEY()));
                     table.addCell(String.valueOf(val.getKEY_SALES()));
                     table.addCell(String.valueOf(val.getKEY_NO_OF_CLIENTS()));
-                    table.addCell("January");
                 }
             }
         });
@@ -366,10 +394,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<JunEntity> junEntities) {
                 for(JunEntity val:junEntities){
+                    table("June");
                     table.addCell(getUser(val.getKEY_FOREIGN_KEY()));
                     table.addCell(String.valueOf(val.getKEY_SALES()));
                     table.addCell(String.valueOf(val.getKEY_NO_OF_CLIENTS()));
-                    table.addCell("January");
                 }
             }
         });
@@ -377,10 +405,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<JulEntity> julEntities) {
                 for(JulEntity val:julEntities){
+                    table("July");
                     table.addCell(getUser(val.getKEY_FOREIGN_KEY()));
                     table.addCell(String.valueOf(val.getKEY_SALES()));
                     table.addCell(String.valueOf(val.getKEY_NO_OF_CLIENTS()));
-                    table.addCell("January");
                 }
             }
         });
@@ -388,10 +416,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<AugEntity> augEntities) {
                 for(AugEntity val:augEntities){
+                    table("August");
                     table.addCell(getUser(val.getKEY_FOREIGN_KEY()));
                     table.addCell(String.valueOf(val.getKEY_SALES()));
                     table.addCell(String.valueOf(val.getKEY_NO_OF_CLIENTS()));
-                    table.addCell("January");
                 }
             }
         });
@@ -399,10 +427,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<SepEntity> sepEntities) {
                 for(SepEntity val:sepEntities){
+                    table("September");
                     table.addCell(getUser(val.getKEY_FOREIGN_KEY()));
                     table.addCell(String.valueOf(val.getKEY_SALES()));
                     table.addCell(String.valueOf(val.getKEY_NO_OF_CLIENTS()));
-                    table.addCell("January");
                 }
             }
         });
@@ -410,10 +438,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<OctEntity> octEntities) {
                 for(OctEntity val:octEntities){
+                    table("October");
                     table.addCell(getUser(val.getKEY_FOREIGN_KEY()));
                     table.addCell(String.valueOf(val.getKEY_SALES()));
                     table.addCell(String.valueOf(val.getKEY_NO_OF_CLIENTS()));
-                    table.addCell("January");
                 }
             }
         });
@@ -421,10 +449,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<NovEntity> novEntities) {
                 for(NovEntity val:novEntities){
+                    table("November");
                     table.addCell(getUser(val.getKEY_FOREIGN_KEY()));
                     table.addCell(String.valueOf(val.getKEY_SALES()));
                     table.addCell(String.valueOf(val.getKEY_NO_OF_CLIENTS()));
-                    table.addCell("January");
                 }
             }
         });
@@ -432,18 +460,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<DecEntity> decEntities) {
                 for(DecEntity val:decEntities){
+                    table("December");
                     table.addCell(getUser(val.getKEY_FOREIGN_KEY()));
                     table.addCell(String.valueOf(val.getKEY_SALES()));
                     table.addCell(String.valueOf(val.getKEY_NO_OF_CLIENTS()));
-                    table.addCell("January");
                 }
             }
         });
-        try {
-            doc.add(table);
-        } catch (DocumentException e) {
-            e.printStackTrace();
-        }
         doc.close();
         try {
             fileOutputStream.close();
@@ -460,10 +483,6 @@ public class MainActivity extends AppCompatActivity {
             if(!dir.exists()){
                 dir.mkdirs();
             }
-            date = new Date();
-            SimpleDateFormat currentDate = new SimpleDateFormat("ddMMyyyy_HHmmss");
-            String timeStamp= currentDate.format(date);
-
             file = new File(dir,"Annual Report"+".pdf");
             try {
 //creates pdf,saves and writes to it.
@@ -496,20 +515,21 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-                Paragraph Na=new Paragraph(sharedPreferences.getString("nameKey","")+"\n"+sharedPreferences.getString("emailKey","")+"\n"+"P.O. BOX"+
-                        sharedPreferences.getString("boxKey","")+ "\n"+sharedPreferences.getString("locationKey","")+"\n"+
-                        sharedPreferences.getString("contactKey",""), FontFactory.getFont(FontFactory.TIMES_ROMAN,18, Font.NORMAL));
+                detailsEntity ent=detEnt;
+                    compDetails=new Paragraph(ent.getKEY_Title()+"\n"+ent.getKEY_Email()+"\n"+"P.O. BOX"+ ent.getKEY_Box()+ "\n"
+                            +ent.getKEY_Location()+"\n"+ent.getKEY_Contact(), FontFactory.getFont(FontFactory.TIMES_ROMAN,18, Font.NORMAL));
+
                 Paragraph Em=new Paragraph(sharedPreferences.getString("emailKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL, BaseColor.MAGENTA));
-                Paragraph Bo=new Paragraph("P.O. BOX"+sharedPreferences.getString("boxKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL,BaseColor.MAGENTA));
+                Paragraph Bo=new Paragraph("P.O. BOX"+sharedPreferences.getString("boxKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL, BaseColor.MAGENTA));
                 Paragraph Lo=new Paragraph(sharedPreferences.getString("locationKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL,BaseColor.MAGENTA));
                 Paragraph Co=new Paragraph(sharedPreferences.getString("contactKey",""),FontFactory.getFont(FontFactory.TIMES_ROMAN,14,Font.NORMAL,BaseColor.MAGENTA));
 
-                Na.setAlignment(Element.ALIGN_RIGHT);
+                compDetails.setAlignment(Element.ALIGN_RIGHT);
                 Em.setAlignment(Element.ALIGN_RIGHT);
                 Bo.setAlignment(Element.ALIGN_RIGHT);
                 Lo.setAlignment(Element.ALIGN_RIGHT);
                 Co.setAlignment(Element.ALIGN_RIGHT);
-                doc.add(Na);
+                doc.add(compDetails);
                 doc.add(Em);
                 doc.add(Bo);
                 doc.add(Lo);
@@ -517,18 +537,9 @@ public class MainActivity extends AppCompatActivity {
                 doc.add(new Paragraph(new Date().toString()));
 
 
-                PdfPCell Cell=new PdfPCell(new Paragraph(Na));
+                PdfPCell Cell=new PdfPCell(new Paragraph(compDetails));
                 company.addCell(Cell);
                 doc.add(company);
-
-                doc.add(new Paragraph("January Summary"));
-                doc.add(new DottedLineSeparator());
-
-                table = new PdfPTable(4);
-                table.addCell("User");
-                table.addCell("Sales");
-                table.addCell("Clients");
-                table.addCell("Month");
 
                 report();
 
@@ -542,7 +553,7 @@ public class MainActivity extends AppCompatActivity {
         else{
             Toast.makeText(getApplicationContext(),"sdCard not mounted",Toast.LENGTH_SHORT).show();
         }
-        ReceiptEntity receiptEntity=new ReceiptEntity("N/A",file.getAbsolutePath(),"Report",file.getName());
+        ReceiptEntity receiptEntity=new ReceiptEntity(date.toString(),file.getAbsolutePath(),"N/A",file.getName(),"Report");
         receiptViewModel.insert(receiptEntity);
     }
 }

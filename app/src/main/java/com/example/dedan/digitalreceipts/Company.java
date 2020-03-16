@@ -29,6 +29,7 @@ public class Company extends AppCompatActivity {
 
         adapter.AddFragment(new company_user_fragment(),"Users");
         adapter.AddFragment(company_stat_fragment.newInstance(),"Statistics");
+        adapter.AddFragment(new company_reports_fragment(),"Reports");
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);

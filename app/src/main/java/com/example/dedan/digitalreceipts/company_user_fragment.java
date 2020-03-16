@@ -18,7 +18,7 @@ import android.view.ViewGroup;
 import java.util.List;
 
 public class company_user_fragment extends Fragment {
-    UserViewModel userViewModel;
+    private UserViewModel userViewModel;
     private companyUserAdapter adapter;
 
     public company_user_fragment() {

@@ -28,9 +28,7 @@ public class UserStatsAdapter extends ListAdapter<UserStatsEntity,UserStatsAdapt
     @Override
     public void onBindViewHolder(@NonNull userStatsHolder holder, int position) {
         UserStatsEntity userStatsEntity=getUserStatAt(position);
-        int x=userStatsEntity.getKEY_WEEK_SALES();
-        int y=userStatsEntity.getKEY_W_CLIENTS_SERVED();
-        holder.txtdate.setText(userStatsEntity.getKEY_WEEK()+""+userStatsEntity.getKEY_DAY());
+        holder.txtdate.setText(userStatsEntity.getKEY_DAY());
         holder.txtsale.setText(String.valueOf(userStatsEntity.getKEY_WEEK_SALES()));
         holder.txtclient.setText(String.valueOf(userStatsEntity.getKEY_W_CLIENTS_SERVED()));
     }

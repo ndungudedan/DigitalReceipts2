@@ -30,4 +30,6 @@ public interface GoodsDao {
     @Query("delete from Goods")
     void deleteAll();
 
+    @Query("delete from Goods where Category =:cat")
+    void deleteCategoryGoods(String cat);
 }

@@ -56,10 +56,10 @@ public class company_stat_fragment extends Fragment {
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_company_stat_fragment, container, false);
 
-        recyclerMT = view.findViewById(R.id.comp_month_recycler);
+        recyclerMT = view.findViewById(R.id.comp_week_recycler);
         recyclerMT.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
 
-        mnthrecycler = view.findViewById(R.id.comp_week_recycler);
+        mnthrecycler = view.findViewById(R.id.comp_month_recycler);
         mnthrecycler.setLayoutManager(new GridLayoutManager(getActivity(),4));
 
         txtClients=view.findViewById(R.id.client_served);

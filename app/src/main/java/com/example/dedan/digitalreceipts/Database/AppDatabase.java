@@ -5,6 +5,8 @@ import android.os.AsyncTask;
 
 import com.example.dedan.digitalreceipts.CustomerDao;
 import com.example.dedan.digitalreceipts.CustomerEntity;
+import com.example.dedan.digitalreceipts.Database.CompDetails.detailsDao;
+import com.example.dedan.digitalreceipts.Database.CompDetails.detailsEntity;
 import com.example.dedan.digitalreceipts.Database.Store.CategoryDao;
 import com.example.dedan.digitalreceipts.Database.Store.CategoryEntity;
 import com.example.dedan.digitalreceipts.Database.Today_Database.UserStatsMonthDao;
@@ -71,8 +73,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 @Database(entities = {UserEntity.class, GoodsEntity.class, PickedGoodEntity.class, MonthSalesEntity.class, WeekSalesEntity.class, ReceiptEntity.class,
         CustomerEntity.class, UserStatsEntity.class, JanEntity.class, FebEntity.class, MarEntity.class, AprEntity.class, MayEntity.class, JunEntity.class,
         JulEntity.class, AugEntity.class, SepEntity.class, OctEntity.class, NovEntity.class, DecEntity.class, MonEntity.class,
-        TueEntity.class, WedEntity.class, ThurEntity.class, FriEntity.class, SatEntity.class, SunEntity.class, UserStatsMonthEntity.class, CategoryEntity.class},
-        version = 13)
+        TueEntity.class, WedEntity.class, ThurEntity.class, FriEntity.class, SatEntity.class, SunEntity.class, UserStatsMonthEntity.class, CategoryEntity.class,
+        detailsEntity.class}, version = 16)
 public abstract class AppDatabase extends RoomDatabase {
     private static AppDatabase dbInstance;
     public abstract UserDao userDao();
@@ -91,6 +93,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract ThurDao thurDao();public abstract FriDao friDao();public abstract SatDao satDao();public abstract SunDao sunDao();
     public abstract UserStatsMonthDao todayDao();
     public abstract CategoryDao categoryDao();
+    public abstract detailsDao detailsDao();
     public static synchronized AppDatabase getInstance(Context context) {
         if (dbInstance == null) {
             dbInstance = Room.databaseBuilder(context.getApplicationContext(),

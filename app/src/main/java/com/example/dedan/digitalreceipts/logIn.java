@@ -1,14 +1,19 @@
 package com.example.dedan.digitalreceipts;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import androidx.annotation.NonNull;
+
+import com.example.dedan.digitalreceipts.Database.CompDetails.detailsEntity;
+import com.example.dedan.digitalreceipts.Database.CompDetails.detailsViewModel;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -21,6 +26,9 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,28 +38,32 @@ import java.util.concurrent.TimeUnit;
 
 public class logIn extends AppCompatActivity {
     UserViewModel userViewModel;
+    detailsViewModel detailsViewModel;
     SharedPreferences sharedPreferences;
     private ProgressBar progressBar;
     TextView stat_view;
     private FirebaseAuth mAuth;
+    FirebaseFirestore firedb = FirebaseFirestore.getInstance();
     EditText usernametxt;
     TextInputEditText pass;
 
     private TextInputLayout inputLayoutEmail, inputLayoutPassword;
     private UserEntity user;
+    private String compTitle="";
+    private Boolean checkComp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         userViewModel= ViewModelProviders.of(this).get(UserViewModel.class);
+        detailsViewModel=ViewModelProviders.of(this).get(detailsViewModel.class);
         sharedPreferences=getSharedPreferences("Data",MODE_PRIVATE);
 
         setContentView(R.layout.activity_log_in);
         pass=findViewById(R.id.password_edit);
         usernametxt =findViewById(R.id.user_edit);
         inputLayoutPassword = findViewById(R.id.input_layout_password);
-        //inputLayoutEmail=findViewById(R.id.input_layout_useremail);
         progressBar = findViewById(R.id.progressBar);
         stat_view=findViewById(R.id.status_check);
 
@@ -73,31 +85,33 @@ public class logIn extends AppCompatActivity {
                 Toast.makeText(logIn.this, "  No such user exists",
                         Toast.LENGTH_SHORT).show();
             }
-        if(x==1 & !internetIsConnected()){
+            if(x==1 & !internetIsConnected()){
             housekeeping();
             Intent main=new Intent(logIn.this,MainActivity.class);
             loggedUser();
             startActivity(main);
         }
-            if(x == 1 & internetIsConnected()){
+        if(x == 1 & internetIsConnected()){
                 mAuth.signInWithEmailAndPassword(user.getKEY_EMAIL(), pass.getText().toString().trim())
                         .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
                                     // Sign in success, update UI with the signed-in user's information
-                                    if(mAuth.getCurrentUser().isEmailVerified()){
-                                        housekeeping();
-                                        loggedUser();
-                                        Intent main=new Intent(logIn.this,MainActivity.class);
-                                        startActivity(main);
-                                    }
-                                    else{
-                                        Toast.makeText(logIn.this, "Please verify email",
-                                                Toast.LENGTH_SHORT).show();
+                                    if(onlineLog()){
+                                        if(mAuth.getCurrentUser().isEmailVerified()){
+                                            housekeeping();
+                                            loggedUser();
+                                            Intent main=new Intent(logIn.this,MainActivity.class);
+                                            startActivity(main);
+                                        }
+                                        else{
+                                            Toast.makeText(logIn.this, "Please verify email",
+                                                    Toast.LENGTH_SHORT).show();
 
+                                        }
+                                        stat_view.setText("success");
                                     }
-                                    stat_view.setText("success");
                                 }
                             }
                         }).addOnFailureListener(new OnFailureListener() {
@@ -116,9 +130,8 @@ public class logIn extends AppCompatActivity {
                         .show();
             }
     }
-    public int checkLogin( String name, String password) {              //0=default value
+    public int checkLogin( String name, String password) {              //0=default value       //2=access denied
         int x = 0;                                                      //99=credentials empty unlikely scenario
-        //2=accessbtn denied
         user = userViewModel.getSingleUser(name,password);
         if(user !=null){                                                   //1=login good
             String n = user.getKEY_NAME();                                 //3=no such user exists
@@ -131,20 +144,23 @@ public class logIn extends AppCompatActivity {
                 x = 99;
                 return x;
             }
-            if (n.equals(name) && p.equals(password)) {
                 if(a.equals("ACCESS_DENIED")){
                     x = 2;
                     return x;
                 }
                 x = 1;
+            detailsViewModel.AllDetails().observe(this, new Observer<detailsEntity>() {
+                @Override
+                public void onChanged(detailsEntity detailsEntity) {
+                    compTitle = detailsEntity.getKEY_Title();
+                }
+            });
                 return x;
-            }
         }
         else{
             x=3;
             return x;
         }
-        return x;
     }
     public void Reg_link(View view) {
         Intent intent=new Intent(this,Register.class);
@@ -192,11 +208,6 @@ public class logIn extends AppCompatActivity {
 
          int x=checkLogin(username,password);
             if(user!=null && user.getKEY_NAME().startsWith("ADMIN_")){
-                if(x==3){
-                    Toast.makeText(logIn.this, "  No such user exists",
-                            Toast.LENGTH_SHORT).show();
-                }
-
                 if(x==1 & !internetIsConnected()){
                     housekeeping();
                     Intent main=new Intent(logIn.this,MainActivity.class);
@@ -210,18 +221,20 @@ public class logIn extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
                                         // Sign in success, update UI with the signed-in user's information
-                                        if(mAuth.getCurrentUser().isEmailVerified()){
-                                            housekeeping();
-                                            loggedUser();
-                                            Intent main=new Intent(logIn.this,MainActivity.class);
-                                            startActivity(main);
-                                        }
-                                        else{
-                                            Toast.makeText(logIn.this, "Please verify email",
-                                                    Toast.LENGTH_SHORT).show();
+                                        if(onlineLog()){
+                                            if(mAuth.getCurrentUser().isEmailVerified()){
+                                                housekeeping();
+                                                loggedUser();
+                                                Intent main=new Intent(logIn.this,MainActivity.class);
+                                                startActivity(main);
+                                            }
+                                            else{
+                                                Toast.makeText(logIn.this, "Please verify email",
+                                                        Toast.LENGTH_SHORT).show();
 
+                                            }
+                                            stat_view.setText("success");
                                         }
-                                        stat_view.setText("success");
                                     }
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
@@ -233,11 +246,15 @@ public class logIn extends AppCompatActivity {
                     });
                     stat_view.setText("success");
                 }
-            /*else{
-                stat_view.setText("Wrong Credentials!");
-                stat_view.setTextColor(Color.RED);
-            }*/
             }
+        if(user!=null && !user.getKEY_NAME().startsWith("ADMIN_")) {
+            Toast.makeText(logIn.this, "  Not an ADMIN",
+                    Toast.LENGTH_SHORT).show();
+        }
+        if(x==3){
+            Toast.makeText(logIn.this, "  No such user exists",
+                    Toast.LENGTH_SHORT).show();
+        }
 
         }
     public void housekeeping(){
@@ -275,14 +292,36 @@ public class logIn extends AppCompatActivity {
             Date date=new Date();
             SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yy");
             String timeStamp= sdf.format(date);
-
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("login_time",timeStamp);
             editor.putInt("current_user",0);
             editor.putString("current_user",user.getKEY_FIRSTNAME());
             editor.putString("current_username",user.getKEY_NAME());
+            editor.putString("current_useremail",user.getKEY_EMAIL());
             editor.putString("current_userId", String.valueOf(user.getKEY_USER_ID()));
+            editor.putString("company_title",compTitle);
             editor.apply();
         }
+    }
+    public boolean onlineLog(){
+        checkComp = true;
+        return checkComp;
+        /*DocumentReference docRef = firedb.collection("companies").document(compTitle).collection("companyUsers").document(user.getKEY_EMAIL());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (!document.exists()) {
+                        checkComp =false;
+                        Toast.makeText(logIn.this, "Unauthorised access to this company",
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
+                else {
+                }
+            }
+        });
+        return checkComp;*/
     }
 }

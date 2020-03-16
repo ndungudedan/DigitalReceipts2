@@ -37,6 +37,8 @@
                                               <map>
                                                 <entry key="color" value="000000" />
                                                 <entry key="opacityPercent" value="80" />
+                                                <entry key="paddingPercent" value="5" />
+                                                <entry key="trimmed" value="true" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -47,8 +49,8 @@
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
-                                      <entry key="imageAsset" value="C:\Users\DEDAN\Desktop\Android\download\Material Design\icons8-sales-performance-40.png" />
-                                      <entry key="outputName" value="sales_icon" />
+                                      <entry key="imageAsset" value="C:\Users\DEDAN\Desktop\docs\IMG_20200313_161631_622.jpg" />
+                                      <entry key="outputName" value="logo1_icon" />
                                       <entry key="theme" value="HOLO_DARK" />
                                       <entry key="themeColor" value="ffffff" />
                                     </map>
@@ -67,11 +69,19 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
+                                                <entry key="scalingPercent" value="121" />
+                                                <entry key="trimmed" value="true" />
                                               </map>
                                             </option>
                                           </PersistentState>
                                         </value>
                                       </entry>
+                                    </map>
+                                  </option>
+                                  <option name="values">
+                                    <map>
+                                      <entry key="foregroundImage" value="C:\Users\DEDAN\Desktop\docs\IMG_20200313_161631_622.jpg" />
+                                      <entry key="outputName" value="logo1_launcher" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -121,17 +131,17 @@
                             </entry>
                           </map>
                         </option>
-                        <option name="values">
-                          <map>
-                            <entry key="outputIconType" value="ACTIONBAR" />
-                          </map>
-                        </option>
                       </PersistentState>
                     </value>
                   </entry>
                 </map>
               </option>
             </PersistentState>
+          </value>
+        </entry>
+        <entry key="vectorWizard">
+          <value>
+            <PersistentState />
           </value>
         </entry>
       </map>

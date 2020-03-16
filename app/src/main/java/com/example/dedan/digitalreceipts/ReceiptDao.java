@@ -20,8 +20,10 @@ public interface ReceiptDao {
     @Delete
     void delete(ReceiptEntity receiptEntity);
 
-    @Query("select * from Receipts order by ID asc ")
+    @Query("select * from Receipts where type='sale' order by ID asc ")
     LiveData<List<ReceiptEntity>> getAllReceipts();
+    @Query("select * from Receipts where type='report' order by ID asc ")
+    LiveData<List<ReceiptEntity>> getAllReports();
 
     @Query("select * from Receipts where time !=:h order by ID asc ")
     LiveData<List<ReceiptEntity>> getTodayReceipts(String h);

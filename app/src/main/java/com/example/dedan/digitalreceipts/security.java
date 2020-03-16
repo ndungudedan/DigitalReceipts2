@@ -58,6 +58,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -92,12 +93,11 @@ public class security extends AppCompatActivity {
 
     SharedPreferences sharedPreferences;
     ImageView imageView;
-    Button accessbtn;
+    Button accessbtn,edit_details;
 
     public String Loggeduser;
     public String LoggeduserId;
     private int pick=1;
-    private Uri uri;
     private Bitmap bitmap;
     private String currentMonth;
     String time;
@@ -118,11 +118,14 @@ public class security extends AppCompatActivity {
         txtmobile=findViewById(R.id.mobile);
         txtstatus=findViewById(R.id.mstatus);
         accessbtn =findViewById(R.id.access_btn);
+        edit_details=findViewById(R.id.edit);
         txtYrClients=findViewById(R.id.client_served);
         txtYrSales=findViewById(R.id.user_sales);
         nulltxt=findViewById(R.id.empty_txt);
 
-
+        if(LoggeduserId!=null && LoggeduserId.equals(String.valueOf(1))){
+            accessbtn.setVisibility(View.VISIBLE);
+        }
         userStatsViewModel=ViewModelProviders.of(this).get(UserStatsViewModel.class);
         userStatsMonthViewModel=ViewModelProviders.of(this).get(UserStatsMonthViewModel.class);
         userViewModel= ViewModelProviders.of(this).get(UserViewModel.class);
@@ -153,9 +156,15 @@ public class security extends AppCompatActivity {
             LoggeduserId= String.valueOf(intent.getIntExtra("userid",0));
             accessbtn.setVisibility(View.VISIBLE);
             accessbtn.setClickable(true);
+            edit_details.setVisibility(View.INVISIBLE);
+            edit_details.setClickable(false);
         }
         else {
             LoggeduserId = String.valueOf(sharedPreferences.getInt("current_userId", 0));
+            accessbtn.setVisibility(View.INVISIBLE);
+            accessbtn.setClickable(false);
+            edit_details.setVisibility(View.VISIBLE);
+            edit_details.setClickable(true);
         }
 
         RecyclerView recyclerView=findViewById(R.id.comp_week_recycler);
@@ -179,6 +188,7 @@ public class security extends AppCompatActivity {
                             user.getKEY_LOG(),"ACCESS_DENIED",user.getKEY_PIC());
                     userEntity.setKEY_USER_ID(user.getKEY_USER_ID());
                     userViewModel.update(userEntity);
+                    accessbtn.setText("Authorise");
                 }
                 else{
                     UserEntity userEntity=new UserEntity(user.getKEY_FIRSTNAME(),user.getKEY_SECNAME(),user.getKEY_empNO(),user.getKEY_DOB(),
@@ -186,6 +196,7 @@ public class security extends AppCompatActivity {
                             user.getKEY_LOG(),"ACCESS_GRANTED",user.getKEY_PIC());
                     userEntity.setKEY_USER_ID(user.getKEY_USER_ID());
                     userViewModel.update(userEntity);
+                    accessbtn.setText("Invalidate");
                 }
             }
         });
@@ -223,12 +234,14 @@ public class security extends AppCompatActivity {
         userStatsViewModel.getAllstats().observe(this, new Observer<List<UserStatsEntity>>() {
             @Override
             public void onChanged(List<UserStatsEntity> userStatsEntities) {
-                userStatsAdapter.submitList(userStatsEntities);
-                TextView txt=findViewById(R.id.wkno);
-                txt.setText(userStatsEntities.get(0).getKEY_WEEK());
                 if(userStatsEntities.isEmpty()){
                     nulltxt.setVisibility(View.VISIBLE);
                     nulltxt.setText("Nothing to display");
+                }
+                else{
+                    userStatsAdapter.submitList(userStatsEntities);
+                    TextView txt=findViewById(R.id.wkno);
+                    txt.setText(userStatsEntities.get(0).getKEY_WEEK());
                 }
             }
         });
@@ -243,15 +256,14 @@ public class security extends AppCompatActivity {
         txtYrSales.setText(String.valueOf(total_sales));
         txtYrClients.setText(String.valueOf(total_clients));
 
-        imageView.setOnClickListener(new View.OnClickListener() {
+        edit_details.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent gallery=new Intent();
-                gallery.setType("image/*");
-                gallery.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(gallery,"pictures"),pick);
+                Intent intent=new Intent(security.this,Register.class);
+                intent.putExtra("userId",user.getKEY_USER_ID());
             }
         });
+
     }
     private void retreivePic(String path) {
         try{
@@ -261,21 +273,6 @@ public class security extends AppCompatActivity {
         }
         catch (FileNotFoundException e){
             e.printStackTrace();
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==pick&&resultCode==RESULT_OK){
-            uri=data.getData();
-            try {
-                bitmap= MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
-                imageView.setImageBitmap(bitmap);
-                profilepic(bitmap);
-            } catch(IOException e){
-                e.printStackTrace();
-            }
         }
     }
 
@@ -383,7 +380,6 @@ public class security extends AppCompatActivity {
         }
     }
     public void weekStatsPopul(){
-        int x=monViewModel.getUserDaySales(LoggeduserId).getKEY_SALES();
         if(monViewModel.getUserDaySales(LoggeduserId)!=null){
             UserStatsEntity monStat=new UserStatsEntity("Monday","Week 27",monViewModel.getUserDaySales(LoggeduserId).getKEY_SALES(),
                     monViewModel.getUserDaySales(LoggeduserId).getKEY_NO_OF_CLIENTS(),Integer.parseInt(LoggeduserId));
@@ -419,34 +415,6 @@ public class security extends AppCompatActivity {
                     sunViewModel.getUserDaySales(LoggeduserId).getKEY_NO_OF_CLIENTS(),Integer.parseInt(LoggeduserId));
             userStatsViewModel.insert(sunStat);
         }
-    }
-    public void profilepic(Bitmap bit){
-        ContextWrapper cw=new ContextWrapper(this);
-        File dir=cw.getDir("profilepic", MODE_PRIVATE);
-        File file=new File(dir,"pic.jpg");
-        if(!file.exists()){
-        }
-        FileOutputStream fos=null;
-        try {
-            fos=new FileOutputStream(file);
-            bit.compress(Bitmap.CompressFormat.PNG,100,fos);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        finally {
-            try {
-                fos.close();
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-        }
-        UserEntity userEntity=new UserEntity(user.getKEY_FIRSTNAME(),user.getKEY_SECNAME(),user.getKEY_empNO(),user.getKEY_DOB(),
-                user.getKEY_residence(),user.getKEY_MOBILENO(),user.getKEY_NAME(),user.getKEY_EMAIL(),user.getKEY_PASS(),user.getKEY_NATNLID(),
-                user.getKEY_LOG(),user.getKEY_ACCESS(),dir.getAbsolutePath());
-        userEntity.setKEY_USER_ID(user.getKEY_USER_ID());
-        userViewModel.update(userEntity);
-
     }
 
     @Override

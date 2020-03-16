@@ -2,18 +2,21 @@ package com.example.dedan.digitalreceipts;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import androidx.appcompat.app.AppCompatActivity;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import androidx.annotation.DrawableRes;
 
 import androidx.annotation.NonNull;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -95,7 +98,8 @@ class UnitAdapter extends ListAdapter<GoodsEntity,UnitAdapter.UnitHolder> {
         Bitmap bit=null;
         try{
             File file=new File(path,item+"pic.jpg");
-            bit= BitmapFactory.decodeStream(new FileInputStream(file));
+                bit= BitmapFactory.decodeStream(new FileInputStream(file));
+
         }
         catch (FileNotFoundException e){
             e.printStackTrace();

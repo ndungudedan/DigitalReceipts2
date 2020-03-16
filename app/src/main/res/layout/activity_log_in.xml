@@ -12,23 +12,28 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="32dp"
         android:text="status"
+        app:layout_constraintBottom_toTopOf="@+id/input_layout_username"
         app:layout_constraintStart_toStartOf="@+id/input_layout_username"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
 
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/input_layout_username"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="150dp"
-        app:layout_constraintStart_toStartOf="@+id/input_layout_password"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintBottom_toTopOf="@+id/input_layout_password"
+        app:layout_constraintEnd_toEndOf="@id/guideline12"
+        app:layout_constraintStart_toStartOf="@id/guideline11"
+        app:layout_constraintTop_toBottomOf="@+id/status_check"
+        app:layout_constraintVertical_chainStyle="packed">
 
         <EditText
             android:id="@+id/user_edit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:ems="10"
             android:hint="username"
             android:inputType="text" />
@@ -37,18 +42,20 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/input_layout_password"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@+id/admin_login"
-        app:layout_constraintStart_toStartOf="@+id/admin_login"
+        app:layout_constraintBottom_toTopOf="@+id/login_btn"
+        app:layout_constraintEnd_toEndOf="@+id/input_layout_username"
+        app:layout_constraintStart_toStartOf="@+id/input_layout_username"
         app:layout_constraintTop_toBottomOf="@+id/input_layout_username"
+        app:layout_constraintVertical_chainStyle="packed"
         app:passwordToggleEnabled="true"
         app:passwordToggleTint="@android:color/holo_blue_dark">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/password_edit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:ems="10"
             android:hint="Password"
             android:inputType="textPassword" />
@@ -60,15 +67,16 @@
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="1dp"
-        android:layout_marginLeft="1dp"
-        android:layout_marginTop="35dp"
+        android:layout_marginTop="32dp"
         android:onClick="login"
         android:text="LogIn"
-        app:layout_constraintEnd_toStartOf="@+id/admin_login"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input_layout_password" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintEnd_toStartOf="@id/admin_login"
+        app:layout_constraintStart_toStartOf="@+id/input_layout_password"
+        app:layout_constraintTop_toBottomOf="@+id/input_layout_password"
+        app:layout_constraintVertical_chainStyle="spread_inside" />
+
 
     <Button
         android:id="@+id/admin_login"
@@ -78,9 +86,9 @@
         android:onClick="admin_login"
         android:text="ADMIN"
         app:layout_constraintBaseline_toBaselineOf="@+id/login_btn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/login_btn" />
-
+        app:layout_constraintEnd_toEndOf="@+id/input_layout_password"
+        app:layout_constraintStart_toEndOf="@+id/login_btn"
+        app:layout_constraintHorizontal_chainStyle="spread" />
 
     <Button
         android:id="@+id/reg_link_btn"
@@ -123,5 +131,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.13" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.15" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.85" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

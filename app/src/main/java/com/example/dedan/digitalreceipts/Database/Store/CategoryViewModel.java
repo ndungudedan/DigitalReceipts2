@@ -1,9 +1,6 @@
 package com.example.dedan.digitalreceipts.Database.Store;
 
 import android.app.Application;
-
-import com.example.dedan.digitalreceipts.Database.Week_Database.Friday.FriEntity;
-
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -25,6 +22,10 @@ public class CategoryViewModel extends AndroidViewModel {
     public LiveData<List<CategoryEntity>> AllCategorys(){
         return categoryRepo.AllCategories();
     }
+    public void delete(CategoryEntity categoryEntity){
+        categoryRepo.delete(categoryEntity);
+    }
+
     public void deleteAll(){
         categoryRepo.deleteAll();
     }

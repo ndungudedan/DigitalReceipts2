@@ -34,5 +34,8 @@ public class GoodsViewModel extends AndroidViewModel {
     public LiveData<List<GoodsEntity>> getAllCategoryGoods(String category){
         return goodsRepository.getCategoryGoods(category);
     }
+    public void deleteCategoryGoods(String cat){
+        goodsRepository.deleteCategoryGoods(cat);
+    }
 
 }

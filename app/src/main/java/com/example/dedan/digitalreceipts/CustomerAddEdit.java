@@ -10,13 +10,7 @@ import android.widget.EditText;
 import android.widget.NumberPicker;
 
 public class CustomerAddEdit extends AppCompatActivity {
-    private EditText editfname;
-    private EditText editsname;
-    private EditText editphone;
-    private EditText editemail;
-    private EditText editpobox;
-    private EditText editaddress;
-    private EditText editlocation;
+    private EditText editfname,editsname,editphone,editemail,editpobox,editaddress,editlocation;
     public static final String EXTRA_FNAME=
             "com.tidtech.EXTRA_FNAME";
     public static final String EXTRA_SNAME=
@@ -69,7 +63,7 @@ public class CustomerAddEdit extends AppCompatActivity {
 
         }
         else{
-            setTitle("ADD_CUSTOMER");
+            setTitle("ADD CUSTOMER");
         }
     }
     public void saveCustomer(){

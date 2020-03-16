@@ -20,7 +20,7 @@
 
     <TextView
         android:id="@+id/totaltxt"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:layout_marginStart="12dp"
@@ -29,7 +29,10 @@
         android:gravity="center"
         android:text="KSH"
         android:textColor="#171718"
+        android:textSize="18sp"
+        android:textStyle="normal|bold"
         app:layout_constraintBottom_toTopOf="@+id/guideline9"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/guideline8"
         app:layout_constraintTop_toBottomOf="@+id/bar" />
 
@@ -38,12 +41,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:text="empty"
+        android:text="Please pick Items"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/guideline8"
-        app:layout_constraintTop_toBottomOf="@+id/guideline9"
-        app:layout_constraintVertical_bias="0.52" />
+        app:layout_constraintBottom_toBottomOf="@id/pickedGoodsRecycler"
+        app:layout_constraintStart_toStartOf="@+id/pickedGoodsRecycler"
+        app:layout_constraintTop_toTopOf="@+id/pickedGoodsRecycler"
+        app:layout_constraintEnd_toEndOf="@id/pickedGoodsRecycler"
+        />
 
     <TextView
         android:id="@+id/textView15"
@@ -132,7 +136,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/homeGoodsrecycler"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -166,5 +170,17 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_begin="100dp" />
+
+    <Button
+        android:id="@+id/unitLink"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Go to Items"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@id/homeGoodsrecycler"
+        app:layout_constraintEnd_toEndOf="@id/homeGoodsrecycler"
+        app:layout_constraintStart_toStartOf="@id/homeGoodsrecycler"
+        app:layout_constraintTop_toTopOf="@id/homeGoodsrecycler" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

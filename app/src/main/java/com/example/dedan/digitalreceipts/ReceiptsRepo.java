@@ -12,11 +12,13 @@ import androidx.lifecycle.LiveData;
 public class ReceiptsRepo {
     private ReceiptDao receiptDao;
     private LiveData<List<ReceiptEntity>> allReceipts;
+    private LiveData<List<ReceiptEntity>> allReports;
 
     public ReceiptsRepo(Application application) {
         AppDatabase database=AppDatabase.getInstance(application);
         receiptDao =database.dailySalesDao();
-        allReceipts= receiptDao.getAllReceipts();
+        allReceipts=receiptDao.getAllReceipts();
+        allReports=receiptDao.getAllReports();
     }
     public void insert(ReceiptEntity receiptEntity){
         new insertReceipt(receiptDao).execute(receiptEntity);
@@ -30,8 +32,11 @@ public class ReceiptsRepo {
     public LiveData<List<ReceiptEntity>> getAllReceipts(){
         return allReceipts;
     }
+    public LiveData<List<ReceiptEntity>> getAllReports(){
+        return allReports;
+    }
 
-    class insertReceipt extends AsyncTask<ReceiptEntity,Void,Void>{
+    static class insertReceipt extends AsyncTask<ReceiptEntity,Void,Void>{
         private ReceiptDao receiptDao;
 
         public insertReceipt(ReceiptDao receiptDao) {
@@ -44,7 +49,7 @@ public class ReceiptsRepo {
             return null;
         }
     }
-    class updateDaily extends AsyncTask<ReceiptEntity,Void,Void>{
+    static class updateDaily extends AsyncTask<ReceiptEntity,Void,Void>{
         private ReceiptDao receiptDao;
 
         public updateDaily(ReceiptDao receiptDao) {
